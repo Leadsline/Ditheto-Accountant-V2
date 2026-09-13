@@ -91,11 +91,14 @@ const accentClasses = {
 };
 
 function ProfileAvatar({ member, large = false }: { member: TeamMember; large?: boolean }) {
-  if (member.image) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (member.image && !imageFailed) {
     return (
       <img
         src={member.image}
         alt={`${member.name} profile`}
+        onError={() => setImageFailed(true)}
         className={`${large ? "h-24 w-24" : "h-20 w-20"} rounded-full border-4 border-white object-cover shadow-md ring-2 ring-primary/20 shrink-0`}
       />
     );

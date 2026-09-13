@@ -36,6 +36,28 @@ function initialsFor(name: string) {
   return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "??";
 }
 
+function TeamPhoto({ image, initials, large = false }: { image?: string; initials: string; large?: boolean }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const size = large ? "h-16 w-16 text-lg" : "h-12 w-12";
+
+  if (image && !imageFailed) {
+    return (
+      <img
+        src={image}
+        alt=""
+        onError={() => setImageFailed(true)}
+        className={`${large ? "h-16 w-16" : "h-12 w-12"} rounded-full object-cover ring-4 ring-primary/10`}
+      />
+    );
+  }
+
+  return (
+    <div className={`flex ${size} shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary ring-4 ring-primary/5`}>
+      {initials}
+    </div>
+  );
+}
+
 export default function AdminTeam() {
   const [people, setPeople] = useState(startingTeam);
   const [editing, setEditing] = useState<Person | null>(null);
@@ -111,7 +133,7 @@ export default function AdminTeam() {
               {people.map((person) => (
                 <div key={person.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex min-w-0 items-center gap-4">
-                    {person.image ? <img src={person.image} alt="" className="h-12 w-12 rounded-full object-cover ring-4 ring-primary/10" /> : <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary ring-4 ring-primary/5">{person.initials}</div>}
+                    <TeamPhoto image={person.image} initials={person.initials} />
                     <div className="min-w-0">
                       <p className="truncate font-bold text-secondary">{person.name}</p>
                       <p className="text-sm text-primary">{person.title}</p>
@@ -136,7 +158,7 @@ export default function AdminTeam() {
             </CardHeader>
             <CardContent className="space-y-4 p-5">
               <div className="flex items-center gap-4">
-                {draft.image ? <img src={draft.image} alt="" className="h-16 w-16 rounded-full object-cover ring-4 ring-primary/10" /> : <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary ring-4 ring-primary/5">{initialsFor(draft.name)}</div>}
+                <TeamPhoto image={draft.image} initials={initialsFor(draft.name)} large />
                 <div>
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(event) => uploadImage(event.target.files?.[0])} />
                   <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} className="gap-2"><Upload className="h-3.5 w-3.5" /> Upload photo</Button>

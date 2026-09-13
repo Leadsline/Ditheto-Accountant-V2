@@ -12,6 +12,7 @@ type TeamMember = {
   email: string;
   phone?: string;
   initials: string;
+  image?: string;
   accent: "teal" | "gold" | "navy";
   level: "director" | "lead" | "team";
 };
@@ -88,8 +89,17 @@ const accentClasses = {
 };
 
 function ProfileAvatar({ member, large = false }: { member: TeamMember; large?: boolean }) {
+  if (member.image) {
+    return (
+      <img
+        src={member.image}
+        alt={`${member.name} profile`}
+        className={`${large ? "h-24 w-24" : "h-20 w-20"} rounded-full border-4 border-white object-cover shadow-md ring-2 ring-primary/20 shrink-0`}
+      />
+    );
+  }
   return (
-    <div className={`${large ? "h-24 w-24 text-2xl" : "h-16 w-16 text-lg"} rounded-full border-4 ${accentClasses[member.accent]} flex items-center justify-center font-heading font-bold shadow-sm shrink-0`}>
+    <div className={`${large ? "h-24 w-24 text-2xl" : "h-20 w-20 text-xl"} rounded-full border-4 ${accentClasses[member.accent]} flex items-center justify-center font-heading font-bold shadow-sm shrink-0`}>
       {member.initials}
     </div>
   );
@@ -100,7 +110,7 @@ function MemberCard({ member, onSelect }: { member: TeamMember; onSelect: (membe
     <button
       type="button"
       onClick={() => onSelect(member)}
-      className="group flex w-full items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
+      className="group flex w-full items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
     >
       <ProfileAvatar member={member} />
       <span className="min-w-0">
@@ -164,11 +174,11 @@ export default function Team() {
 
             <div className="relative">
               <div className="hidden absolute left-1/2 top-24 h-16 w-px -translate-x-1/2 bg-primary/25 lg:block" />
-              <div className="mx-auto max-w-sm">
+            <div className="mx-auto w-full max-w-xl">
                 {directors.map((member) => <MemberCard key={member.id} member={member} onSelect={setSelected} />)}
               </div>
               <div className="mx-auto hidden h-10 w-[66%] border-l border-r border-t border-primary/25 lg:block" />
-              <div className="grid gap-5 md:grid-cols-2">
+              <div className="grid gap-6 md:grid-cols-2">
                 {leads.map((member) => (
                   <div key={member.id} className="relative">
                     <div className="hidden absolute -top-5 left-1/2 h-5 w-px bg-primary/25 md:block" />
@@ -177,7 +187,7 @@ export default function Team() {
                 ))}
               </div>
               <div className="mx-auto hidden h-10 w-[82%] border-l border-r border-t border-primary/25 lg:block" />
-              <div className="grid gap-5 md:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-2 2xl:grid-cols-3">
                 {specialists.map((member) => (
                   <div key={member.id} className="relative">
                     <div className="hidden absolute -top-5 left-1/2 h-5 w-px bg-primary/25 md:block" />

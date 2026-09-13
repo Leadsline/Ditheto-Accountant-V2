@@ -4,25 +4,25 @@ import logo from "@assets/logo_1789318782052.png";
 
 export function Footer() {
   return (
-    <footer className="bg-secondary text-white pt-16 pb-8 border-t-4 border-accent">
+    <footer className="relative overflow-hidden border-t-4 border-accent bg-secondary pb-8 pt-16 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           
           <div className="space-y-6">
-            <div className="bg-white p-2 rounded-lg inline-block">
+            <div className="inline-block rounded-lg bg-background p-2">
               <img src={logo} alt="Ditheto Accountants" className="h-10 w-auto" />
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed pr-4">
+            <p className="max-w-sm pr-4 text-sm leading-relaxed text-gray-300">
               A 100% black-owned South African accounting, tax, payroll, bookkeeping, and business registration firm serving Pretoria and Secunda. Integrity you can count on.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors text-white">
+             <div className="flex gap-3">
+               <a href="#" aria-label="Facebook" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-primary">
                 <Facebook className="h-4 w-4" />
               </a>
-              <a href="#" className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors text-white">
+               <a href="#" aria-label="Instagram" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-primary">
                 <Instagram className="h-4 w-4" />
               </a>
-              <a href="#" className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors text-white">
+               <a href="#" aria-label="LinkedIn" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-primary">
                 <Linkedin className="h-4 w-4" />
               </a>
             </div>

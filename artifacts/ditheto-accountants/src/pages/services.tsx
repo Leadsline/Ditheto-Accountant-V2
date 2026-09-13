@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Calculator, FileSpreadsheet, Briefcase, FileText, CheckCircle } from "lucide-react";
+import { Reveal } from "@/components/motion/reveal";
 
 const services = [
   {
@@ -70,10 +71,10 @@ const services = [
 
 export default function Services() {
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-muted/60 pb-24">
       {/* Header */}
-      <div className="bg-secondary py-16 text-center border-b-4 border-accent">
-        <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">Our Services</h1>
+      <div className="noise bg-secondary py-20 text-center">
+        <h1 className="display-title mb-4 text-4xl font-bold text-white md:text-6xl">Our Services</h1>
         <p className="text-gray-300 max-w-2xl mx-auto text-lg px-4">
           Comprehensive accounting, tax, and compliance solutions tailored to your unique needs.
         </p>
@@ -81,8 +82,8 @@ export default function Services() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="space-y-12">
-          {services.map((category) => (
-            <div key={category.id} id={category.id} className="scroll-mt-24">
+          {services.map((category, categoryIndex) => (
+            <Reveal key={category.id} delay={categoryIndex * .08} className="scroll-mt-24" >
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
                   <category.icon className="h-6 w-6 text-primary" />
@@ -93,7 +94,7 @@ export default function Services() {
                 </div>
               </div>
 
-              <Card className="shadow-md border-gray-200">
+              <Card className="lift-card border-secondary/10 bg-card shadow-md">
                 <CardContent className="p-0">
                   <Accordion type="multiple" className="w-full">
                     {category.items.map((item, idx) => (
@@ -129,7 +130,7 @@ export default function Services() {
                   </Accordion>
                 </CardContent>
               </Card>
-            </div>
+            </Reveal>
           ))}
         </div>
         

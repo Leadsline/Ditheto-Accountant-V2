@@ -62,12 +62,12 @@ function Router() {
       <Switch>
         {/* Clerk Auth Routes */}
         <Route path="/sign-in/*?" component={() => (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="min-h-screen flex items-center justify-center bg-background">
             <SignIn routing="path" path={`${basePath}/sign-in`} forceRedirectUrl={`${basePath}/admin/clients`} />
           </div>
         )} />
         <Route path="/sign-up/*?" component={() => (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="min-h-screen flex items-center justify-center bg-background">
             <SignUp routing="path" path={`${basePath}/sign-up`} forceRedirectUrl={`${basePath}/admin/clients`} />
           </div>
         )} />
@@ -128,7 +128,7 @@ function App() {
           colorInput: "#F7FAFC",
           colorInputForeground: "#17324D",
           colorMutedForeground: "#64748B",
-          fontFamily: "Inter, sans-serif",
+           fontFamily: "DM Sans, sans-serif",
           borderRadius: "0.75rem",
         },
       }}

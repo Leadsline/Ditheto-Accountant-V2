@@ -3,6 +3,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Phone, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
+import { Reveal } from "@/components/motion/reveal";
 
 type TeamMember = {
   id: string;
@@ -107,10 +109,12 @@ function ProfileAvatar({ member, large = false }: { member: TeamMember; large?: 
 
 function MemberCard({ member, onSelect }: { member: TeamMember; onSelect: (member: TeamMember) => void }) {
   return (
-    <button
+    <motion.button
       type="button"
       onClick={() => onSelect(member)}
-      className="group flex w-full items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
+      whileHover={{ y: -5 }}
+      transition={{ duration: .25 }}
+      className="group flex w-full items-center gap-5 rounded-2xl border border-secondary/10 bg-card p-6 text-left shadow-sm transition-all hover:border-primary/40 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
     >
       <ProfileAvatar member={member} />
       <span className="min-w-0">
@@ -120,7 +124,7 @@ function MemberCard({ member, onSelect }: { member: TeamMember; onSelect: (membe
           View profile <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
         </span>
       </span>
-    </button>
+    </motion.button>
   );
 }
 
@@ -172,7 +176,7 @@ export default function Team() {
               </Link>
             </div>
 
-            <div className="relative">
+              <Reveal className="relative" delay={.12}>
               <div className="hidden absolute left-1/2 top-24 h-16 w-px -translate-x-1/2 bg-primary/25 lg:block" />
             <div className="mx-auto w-full max-w-xl">
                 {directors.map((member) => <MemberCard key={member.id} member={member} onSelect={setSelected} />)}
@@ -195,7 +199,7 @@ export default function Team() {
                   </div>
                 ))}
               </div>
-            </div>
+              </Reveal>
           </div>
         </div>
       </section>

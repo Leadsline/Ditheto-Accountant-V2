@@ -2,6 +2,8 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calculator, FileText, Briefcase, FileSpreadsheet, CheckCircle2, ChevronRight, TrendingUp, ShieldCheck, MessageCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { Reveal } from "@/components/motion/reveal";
 
 import heroImg from "@assets/1_1789318706811.jpeg";
 import trustImg from "@assets/3_1789318706812.jpeg";
@@ -10,15 +12,15 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full">
       {/* Hero Section */}
-      <section className="relative w-full bg-secondary overflow-hidden">
+      <section className="noise relative w-full overflow-hidden bg-secondary">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary via-secondary to-secondary"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary rounded-full blur-3xl"></div>
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="py-20 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="grid grid-cols-1 items-center gap-12 py-20 md:py-28 lg:grid-cols-[1.02fr_.98fr]">
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }} className="space-y-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-accent text-sm font-semibold tracking-wide">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
@@ -26,7 +28,7 @@ export default function Home() {
                 </span>
                 TAX SEASON IS HERE
               </div>
-              <h1 className="text-4xl md:text-6xl font-heading font-extrabold text-white leading-tight">
+              <h1 className="display-title text-4xl font-extrabold leading-[1.06] text-white md:text-6xl lg:text-[4.25rem]">
                 Accounting & Tax Services You Can <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-yellow-300">Trust</span>.
               </h1>
               <p className="text-lg md:text-xl text-gray-300 max-w-lg leading-relaxed">
@@ -49,11 +51,11 @@ export default function Home() {
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-accent" /> Fast Turnaround</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-accent" /> 100% Compliant</div>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="relative animate-in fade-in slide-in-from-right-12 duration-1000 delay-300">
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .12 }} className="relative">
               <div className="absolute -inset-4 bg-gradient-to-tr from-primary to-accent opacity-20 blur-2xl rounded-full"></div>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 transform -rotate-2 hover:rotate-0 transition-transform duration-500">
+              <div className="relative rotate-[-1.5deg] overflow-hidden rounded-[1.5rem] border border-white/10 shadow-2xl transition-transform duration-500 hover:rotate-0">
                 <img 
                   src={heroImg} 
                   alt="Ditheto Accountants Tax Services" 
@@ -71,15 +73,15 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Trust Bar */}
-      <section className="bg-white border-b border-gray-100 py-8">
+      <section className="border-b border-secondary/10 bg-background py-7">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center lg:justify-between items-center gap-8 text-secondary/70 font-heading font-bold text-lg md:text-xl uppercase tracking-widest text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-center font-heading text-sm font-bold uppercase tracking-[0.18em] text-secondary/65 md:justify-between md:text-base">
             <span className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-primary"></span> FAST</span>
             <span className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-primary"></span> ACCURATE</span>
             <span className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-primary"></span> RELIABLE</span>
@@ -89,13 +91,13 @@ export default function Home() {
       </section>
 
       {/* Services Preview */}
-      <section className="py-24 bg-gray-50">
+      <section className="bg-muted/60 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-primary font-bold tracking-wider uppercase text-sm mb-3">What We Do</h2>
-            <h3 className="text-3xl md:text-4xl font-heading font-bold text-secondary mb-6">Comprehensive Financial Solutions</h3>
+           <Reveal className="mx-auto mb-16 max-w-3xl text-center">
+             <h2 className="eyebrow mb-3">What We Do</h2>
+             <h3 className="display-title mb-6 text-3xl font-bold text-secondary md:text-4xl">Comprehensive Financial Solutions</h3>
             <p className="text-gray-600 text-lg">From personal tax returns to corporate payroll, we remove the stress of compliance so you can focus on growth.</p>
-          </div>
+           </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -104,7 +106,8 @@ export default function Home() {
               { title: "Business Registration", desc: "Company (Pty) Ltd, NPO, CIDB registrations and business profiles.", icon: Briefcase, color: "bg-amber-50 text-accent" },
               { title: "Accounting", desc: "Monthly bookkeeping, management accounts and bank reconciliations.", icon: FileText, color: "bg-indigo-50 text-indigo-600" },
             ].map((s, i) => (
-              <Card key={i} className="border-none shadow-md hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
+              <Reveal key={i} delay={i * .07}>
+              <Card className="lift-card group h-full border border-secondary/8 bg-card shadow-md">
                 <CardContent className="p-8">
                   <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${s.color} transition-transform group-hover:scale-110`}>
                     <s.icon className="h-7 w-7" />
@@ -116,6 +119,7 @@ export default function Home() {
                   </Link>
                 </CardContent>
               </Card>
+              </Reveal>
             ))}
           </div>
 
@@ -130,18 +134,18 @@ export default function Home() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-24 bg-white overflow-hidden">
+      <section className="overflow-hidden bg-card py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative">
+             <div className="relative">
               <div className="absolute top-0 -left-4 w-72 h-72 bg-accent/20 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
               <div className="absolute top-0 -right-4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
               
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-                <img src={trustImg} alt="Ditheto IRP6 Service" className="w-full object-cover" />
-              </div>
+                 <img src={trustImg} alt="Ditheto IRP6 Service" className="w-full object-cover" />
+               </div>
               
-              <div className="absolute -bottom-8 -right-8 bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hidden md:block">
+               <div className="absolute -bottom-8 -right-8 bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hidden md:block">
                 <div className="flex items-center gap-4 mb-2">
                   <div className="h-12 w-12 rounded-full bg-accent flex items-center justify-center text-secondary font-bold text-xl">D</div>
                   <div>
@@ -152,14 +156,14 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="space-y-8">
+             <div className="space-y-8">
               <div>
                 <h2 className="text-primary font-bold tracking-wider uppercase text-sm mb-3">Why Choose Ditheto</h2>
                 <h3 className="text-3xl md:text-4xl font-heading font-bold text-secondary mb-6">Integrity You Can Count On</h3>
                 <p className="text-gray-600 text-lg leading-relaxed">
                   We are a 100% black-owned professional accounting firm dedicated to delivering precise, reliable, and tailored financial solutions for businesses and individuals across Gauteng and Mpumalanga.
                 </p>
-              </div>
+               </div>
 
               <div className="space-y-6">
                 {[
@@ -194,7 +198,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary py-20 relative overflow-hidden">
+      <section className="noise relative overflow-hidden bg-primary py-20">
         <div className="absolute right-0 top-0 w-1/3 h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent/20 to-transparent"></div>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">Ready to take the hassle out of tax and accounting?</h2>

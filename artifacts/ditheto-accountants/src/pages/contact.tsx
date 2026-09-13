@@ -1,14 +1,15 @@
 import { Building, MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/motion/reveal";
 
 export default function Contact() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-secondary py-16 text-center border-b-4 border-accent relative overflow-hidden">
+      <div className="noise relative overflow-hidden bg-secondary py-20 text-center">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-primary to-transparent"></div>
-        <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4 relative z-10">Get In Touch</h1>
+        <h1 className="display-title relative z-10 mb-4 text-4xl font-bold text-white md:text-6xl">Get In Touch</h1>
         <p className="text-gray-300 max-w-2xl mx-auto text-lg px-4 relative z-10">
           We're here to assist you with all your accounting, tax, and compliance needs. Reach out to your nearest branch.
         </p>
@@ -19,7 +20,8 @@ export default function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           
           {/* Pretoria Branch */}
-          <Card className="border-t-4 border-t-primary shadow-lg hover:shadow-xl transition-shadow">
+          <Reveal>
+          <Card className="lift-card border-t-4 border-t-primary shadow-lg">
             <CardContent className="p-8">
               <div className="flex items-center gap-4 mb-6">
                 <div className="bg-primary/10 p-3 rounded-xl text-primary">
@@ -64,9 +66,11 @@ export default function Contact() {
               </div>
             </CardContent>
           </Card>
+          </Reveal>
 
           {/* Secunda Branch */}
-          <Card className="border-t-4 border-t-accent shadow-lg hover:shadow-xl transition-shadow">
+          <Reveal delay={.1}>
+          <Card className="lift-card border-t-4 border-t-accent shadow-lg">
             <CardContent className="p-8">
               <div className="flex items-center gap-4 mb-6">
                 <div className="bg-accent/10 p-3 rounded-xl text-accent">
@@ -111,6 +115,7 @@ export default function Contact() {
               </div>
             </CardContent>
           </Card>
+          </Reveal>
           
         </div>
       </div>

@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { FileText, Send, Building2, User, Phone, Mail } from "lucide-react";
+import { Reveal } from "@/components/motion/reveal";
 
 // Organize full catalogue
 const serviceCatalogue = {
@@ -87,9 +88,9 @@ export default function Quote() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
+    <div className="min-h-screen bg-muted/60 py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 text-center">
+        <Reveal className="mb-10 text-center">
           <div className="inline-flex h-12 w-12 rounded-full bg-accent/20 items-center justify-center text-accent mb-4">
             <FileText className="h-6 w-6" />
           </div>
@@ -97,9 +98,10 @@ export default function Quote() {
           <p className="text-gray-600 max-w-2xl mx-auto">
             Select the services you need, provide your details, and our team will get back to you with a customized, transparent quote.
           </p>
-        </div>
+        </Reveal>
 
-        <Card className="shadow-lg border-t-4 border-t-primary rounded-xl overflow-hidden">
+        <Reveal delay={.1}>
+        <Card className="border-t-4 border-t-primary bg-card shadow-lg">
           <CardContent className="p-6 md:p-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -117,7 +119,7 @@ export default function Quote() {
                         <FormItem>
                           <FormLabel className="text-secondary font-semibold">Full Name *</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" {...field} className="bg-white" />
+                             <Input placeholder="Your full name" {...field} className="bg-white" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -132,7 +134,7 @@ export default function Quote() {
                           <FormControl>
                             <div className="relative">
                               <Building2 className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                              <Input placeholder="Acme Corp" {...field} className="pl-9 bg-white" />
+                               <Input placeholder="Your company name" {...field} className="pl-9 bg-white" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -318,6 +320,7 @@ export default function Quote() {
             </Form>
           </CardContent>
         </Card>
+        </Reveal>
       </div>
     </div>
   );

@@ -5,7 +5,9 @@
  * Ditheto Accountants administration API
  * OpenAPI spec version: 0.2.0
  */
+import type { ErrorEnvelope } from './errorEnvelope';
 
-export interface HealthStatus {
-  status: string;
-}
+/**
+ * Record not found
+ */
+export type NotFoundResponse = ErrorEnvelope;

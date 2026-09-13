@@ -1,9 +1,39 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, CalendarClock, Megaphone, LogOut, Bell, UserRoundCog } from "lucide-react";
+import { LayoutDashboard, Users, CalendarClock, Megaphone, LogOut, Bell, UserRoundCog, Settings } from "lucide-react";
+import { useUser, useClerk } from "@clerk/react";
+import { useRole } from "@/hooks/use-role";
 import logo from "@assets/logo_1789318782052.png";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
+  return <AdminLayoutClerk>{children}</AdminLayoutClerk>;
+}
+
+function AdminLayoutClerk({ children }: { children: ReactNode }) {
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const { isSuperAdmin } = useRole();
+  
+  return <AdminLayoutContent 
+    user={user} 
+    isSuperAdmin={isSuperAdmin} 
+    signOut={() => signOut({ redirectUrl: import.meta.env.BASE_URL })} 
+  >
+    {children}
+  </AdminLayoutContent>;
+}
+
+function AdminLayoutContent({ 
+  children, 
+  user, 
+  isSuperAdmin, 
+  signOut 
+}: { 
+  children: ReactNode, 
+  user: any, 
+  isSuperAdmin: boolean, 
+  signOut: () => void 
+}) {
   const [location] = useLocation();
 
   const navItems = [
@@ -12,6 +42,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { path: "/admin/reminders", label: "Reminders", icon: CalendarClock },
     { path: "/admin/campaigns", label: "Marketing / Posters", icon: Megaphone },
     { path: "/admin/team", label: "Team & Organogram", icon: UserRoundCog },
+    { path: "/admin/settings/integrations", label: "Integrations", icon: Settings },
   ];
 
   return (
@@ -23,21 +54,22 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </div>
         
         <div className="px-4 py-6 font-semibold text-xs uppercase tracking-wider text-gray-400">
-          Staff Portal Preview
+          Admin Portal
         </div>
 
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
-            const isActive = location === item.path;
+            const isCurrent = location === item.path || (item.path === "/admin/clients" && location.startsWith("/admin/clients")) || (item.path === "/admin/settings/integrations" && location.startsWith("/admin/settings"));
+            
             return (
               <Link 
                 key={item.path} 
                 href={item.path}
                 className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
-                  isActive ? "bg-primary text-white" : "text-gray-300 hover:bg-white/5 hover:text-white"
+                  isCurrent ? "bg-primary text-white" : "text-gray-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? "text-white" : "text-gray-400"}`} />
+                <item.icon className={`h-5 w-5 ${isCurrent ? "text-white" : "text-gray-400"}`} />
                 <span className="font-medium text-sm">{item.label}</span>
               </Link>
             );
@@ -45,12 +77,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="p-4 border-t border-white/10">
-          <Link href="/">
-            <button className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors w-full">
-              <LogOut className="h-5 w-5 text-gray-400" />
-              <span className="font-medium text-sm">Exit to Website</span>
-            </button>
-          </Link>
+          <button onClick={signOut} className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors w-full cursor-pointer">
+            <LogOut className="h-5 w-5 text-gray-400" />
+            <span className="font-medium text-sm">Sign Out</span>
+          </button>
         </div>
       </aside>
 
@@ -59,24 +89,26 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         {/* Top Header */}
         <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
           <h2 className="text-xl font-heading font-bold text-secondary">
-            {navItems.find(i => i.path === location)?.label || "Admin"}
+            {navItems.find(i => location.startsWith(i.path))?.label || "Admin"}
           </h2>
           
           <div className="flex items-center gap-6">
-            <div className="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full border border-yellow-200">
-              UI PREVIEW ONLY - NO BACKEND
-            </div>
-            <button className="relative p-2 text-gray-400 hover:text-secondary transition-colors">
+            <button className="relative p-2 text-gray-400 hover:text-secondary transition-colors cursor-pointer">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full"></span>
             </button>
             <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                SA
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold uppercase">
+                {user?.firstName?.[0] || 'U'}
+                {user?.lastName?.[0] || ''}
               </div>
               <div className="text-sm">
-                <p className="font-bold text-secondary">System Admin</p>
-                <p className="text-gray-500 text-xs">Pretoria Branch</p>
+                <p className="font-bold text-secondary">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className="text-gray-500 text-xs">
+                  {isSuperAdmin ? "Super Admin" : "Staff"}
+                </p>
               </div>
             </div>
           </div>

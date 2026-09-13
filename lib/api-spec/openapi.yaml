@@ -1,22 +1,23 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 0.2.0
+  description: Ditheto Accountants administration API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: Admin Clients
+  - name: Client Documents
+  - name: Document Requests
+  - name: Integrations
+  - name: Storage
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +25,357 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /admin/clients:
+    get:
+      operationId: listAdminClients
+      tags: [Admin Clients]
+      responses:
+        "200":
+          description: Client records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminClient"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /admin/clients/{clientId}:
+    get:
+      operationId: getAdminClient
+      tags: [Admin Clients]
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+      responses:
+        "200":
+          description: Client record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminClient"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /admin/clients/{clientId}/documents:
+    get:
+      operationId: listClientDocuments
+      tags: [Client Documents]
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+      responses:
+        "200":
+          description: Documents belonging to a client
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClientDocument"
+    post:
+      operationId: createClientDocument
+      tags: [Client Documents]
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientDocumentInput"
+      responses:
+        "201":
+          description: Document metadata created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientDocument"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /admin/documents/{documentId}:
+    patch:
+      operationId: updateClientDocument
+      tags: [Client Documents]
+      parameters:
+        - $ref: "#/components/parameters/DocumentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientDocumentUpdate"
+      responses:
+        "200":
+          description: Updated document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientDocument"
+    delete:
+      operationId: deleteClientDocument
+      tags: [Client Documents]
+      parameters:
+        - $ref: "#/components/parameters/DocumentId"
+      responses:
+        "204":
+          description: Document deleted
+  /admin/clients/{clientId}/document-requests:
+    get:
+      operationId: listDocumentRequests
+      tags: [Document Requests]
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+      responses:
+        "200":
+          description: Request history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentRequest"
+    post:
+      operationId: createDocumentRequest
+      tags: [Document Requests]
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentRequestInput"
+      responses:
+        "201":
+          description: Request logged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentRequest"
+  /admin/integrations/odoo/status:
+    get:
+      operationId: getOdooStatus
+      tags: [Integrations]
+      responses:
+        "200":
+          description: Odoo connection status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OdooStatus"
+  /admin/integrations/odoo/sync:
+    post:
+      operationId: syncOdooClient
+      tags: [Integrations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OdooSyncInput"
+      responses:
+        "200":
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OdooSyncResult"
+        "409":
+          description: Odoo is disabled or disconnected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      tags: [Storage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Presigned upload URL generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+  /storage/objects/{objectPath}:
+    get:
+      operationId: getStorageObject
+      tags: [Storage]
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Object content
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
 components:
+  parameters:
+    ClientId:
+      name: clientId
+      in: path
+      required: true
+      schema:
+        type: integer
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    Forbidden:
+      description: Super Admin role required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    NotFound:
+      description: Record not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
-
+    AdminClient:
+      type: object
+      required: [id, name, email, phone, company, branch, odooSyncStatus, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        company: { type: string }
+        branch: { type: string, enum: [Pretoria, Secunda] }
+        odooSyncStatus: { type: string, enum: [not_synced, synced, error] }
+        createdAt: { type: string, format: date-time }
+    DocumentStatus:
+      type: string
+      enum: [received, outstanding, expired, under_review]
+    DocumentCategory:
+      type: string
+      enum: [ID, Tax Clearance, IRP5, Bank Statements, Contracts, SARS Correspondence, Other]
+    ClientDocument:
+      type: object
+      required: [id, clientId, name, category, status, objectPath, mimeType, size, uploadedBy, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        clientId: { type: integer }
+        name: { type: string }
+        category: { $ref: "#/components/schemas/DocumentCategory" }
+        status: { $ref: "#/components/schemas/DocumentStatus" }
+        objectPath: { type: string }
+        mimeType: { type: string }
+        size: { type: integer }
+        expiresAt: { type: [string, "null"], format: date }
+        uploadedBy: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ClientDocumentInput:
+      type: object
+      required: [name, category, status, objectPath, mimeType, size]
+      properties:
+        name: { type: string, minLength: 1 }
+        category: { $ref: "#/components/schemas/DocumentCategory" }
+        status: { $ref: "#/components/schemas/DocumentStatus" }
+        objectPath: { type: string, minLength: 1 }
+        mimeType: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1 }
+        expiresAt: { type: [string, "null"], format: date }
+    ClientDocumentUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        category: { $ref: "#/components/schemas/DocumentCategory" }
+        status: { $ref: "#/components/schemas/DocumentStatus" }
+        objectPath: { type: string }
+        mimeType: { type: string }
+        size: { type: integer, minimum: 1 }
+        expiresAt: { type: [string, "null"], format: date }
+    DocumentRequest:
+      type: object
+      required: [id, clientId, channel, documentIds, subject, message, sentBy, sentAt, deliveryStatus]
+      properties:
+        id: { type: integer }
+        clientId: { type: integer }
+        channel: { type: string, enum: [email, whatsapp] }
+        documentIds:
+          type: array
+          items: { type: integer }
+        subject: { type: string }
+        message: { type: string }
+        sentBy: { type: string }
+        sentAt: { type: string, format: date-time }
+        deliveryStatus: { type: string, enum: [logged, sent, failed] }
+    DocumentRequestInput:
+      type: object
+      required: [channel, documentIds, subject, message]
+      properties:
+        channel: { type: string, enum: [email, whatsapp] }
+        documentIds:
+          type: array
+          minItems: 1
+          items: { type: integer }
+        subject: { type: string, minLength: 1 }
+        message: { type: string, minLength: 1 }
+    OdooStatus:
+      type: object
+      required: [enabled, connected, message, lastSyncAt]
+      properties:
+        enabled: { type: boolean }
+        connected: { type: boolean }
+        message: { type: string }
+        lastSyncAt: { type: [string, "null"], format: date-time }
+    OdooSyncInput:
+      type: object
+      required: [clientId]
+      properties:
+        clientId: { type: integer }
+    OdooSyncResult:
+      type: object
+      required: [success, message]
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        externalId: { type: [string, "null"] }
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1 }
+        contentType: { type: string, minLength: 1 }
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+        metadata: { $ref: "#/components/schemas/UploadUrlRequest" }
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }

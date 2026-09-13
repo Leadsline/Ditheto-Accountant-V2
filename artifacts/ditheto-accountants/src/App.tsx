@@ -1,9 +1,13 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
+import { Route, Switch, useLocation, Router as WouterRouter, Redirect } from 'wouter';
+import { ClerkProvider, SignIn, SignUp, useAuth, useClerk } from '@clerk/react';
+import { publishableKeyFromHost } from '@clerk/react/internal';
+import { shadcn } from '@clerk/themes';
+
 import { Layout } from '@/components/layout/layout';
 import Home from '@/pages/home';
 import Services from '@/pages/services';
@@ -13,23 +17,69 @@ import Team from '@/pages/team';
 import Contact from '@/pages/contact';
 import AdminDashboard from '@/pages/admin/dashboard';
 import AdminClients from '@/pages/admin/clients';
+import AdminClientProfile from '@/pages/admin/client-profile';
+import AdminIntegrations from '@/pages/admin/integrations';
 import AdminReminders from '@/pages/admin/reminders';
 import AdminCampaigns from '@/pages/admin/campaigns';
 import AdminTeam from '@/pages/admin/team';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient();
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const clerkPubKey = publishableKeyFromHost(
+  window.location.hostname,
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+);
+const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+
+function stripBase(path: string): string {
+  return basePath && path.startsWith(basePath)
+    ? path.slice(basePath.length) || "/"
+    : path;
+}
+
+function AdminGuard({ children }: { children: ReactNode }) {
+  const { isLoaded, isSignedIn } = useAuth();
+  if (!isLoaded) return <div className="min-h-screen bg-gray-50" />;
+  if (!isSignedIn) return <Redirect to="/sign-in" />;
+  return <>{children}</>;
+}
+
+function ClerkQueryInvalidator() {
+  const { addListener } = useClerk();
+  const previous = useRef<string | null | undefined>(undefined);
+  useEffect(() => addListener(({ user }) => {
+    const userId = user?.id ?? null;
+    if (previous.current !== undefined && previous.current !== userId) queryClient.clear();
+    previous.current = userId;
+  }), [addListener]);
+  return null;
+}
 
 function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
+        {/* Clerk Auth Routes */}
+        <Route path="/sign-in/*?" component={() => (
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <SignIn routing="path" path={`${basePath}/sign-in`} forceRedirectUrl={`${basePath}/admin/clients`} />
+          </div>
+        )} />
+        <Route path="/sign-up/*?" component={() => (
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <SignUp routing="path" path={`${basePath}/sign-up`} forceRedirectUrl={`${basePath}/admin/clients`} />
+          </div>
+        )} />
+
         {/* Admin Routes */}
-        <Route path="/admin" component={AdminDashboard} />
-        <Route path="/admin/clients" component={AdminClients} />
-        <Route path="/admin/reminders" component={AdminReminders} />
-        <Route path="/admin/campaigns" component={AdminCampaigns} />
-        <Route path="/admin/team" component={AdminTeam} />
+        <Route path="/admin"><AdminGuard><AdminDashboard /></AdminGuard></Route>
+        <Route path="/admin/clients"><AdminGuard><AdminClients /></AdminGuard></Route>
+        <Route path="/admin/clients/:clientId"><AdminGuard><AdminClientProfile /></AdminGuard></Route>
+        <Route path="/admin/settings/integrations"><AdminGuard><AdminIntegrations /></AdminGuard></Route>
+        <Route path="/admin/reminders"><AdminGuard><AdminReminders /></AdminGuard></Route>
+        <Route path="/admin/campaigns"><AdminGuard><AdminCampaigns /></AdminGuard></Route>
+        <Route path="/admin/team"><AdminGuard><AdminTeam /></AdminGuard></Route>
         
         {/* Public Routes with Layout */}
         <Route path="/">
@@ -61,16 +111,45 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 }
 
 function App() {
+  const [, setLocation] = useLocation();
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      proxyUrl={clerkProxyUrl}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
+      appearance={{
+        theme: shadcn,
+        cssLayerName: "clerk",
+        variables: {
+          colorPrimary: "#008E8A",
+          colorForeground: "#17324D",
+          colorBackground: "#FFFFFF",
+          colorInput: "#F7FAFC",
+          colorInputForeground: "#17324D",
+          colorMutedForeground: "#64748B",
+          fontFamily: "Inter, sans-serif",
+          borderRadius: "0.75rem",
+        },
+      }}
+      localization={{
+        signIn: { start: { title: "Ditheto Admin Portal", subtitle: "Sign in to manage client records securely" } },
+        signUp: { start: { title: "Create staff account", subtitle: "Access is limited by your assigned staff role" } },
+      }}
+      routerPush={(to) => setLocation(stripBase(to))}
+      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+    >
+      <QueryClientProvider client={queryClient}>
+        <ClerkQueryInvalidator />
+        <TooltipProvider>
           <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
   );
 }
 
-export default App;
+export default function AppRoot() {
+  return <WouterRouter base={basePath}><App /></WouterRouter>;
+}

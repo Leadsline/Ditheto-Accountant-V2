@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface OdooSyncResult {
+  success: boolean;
+  message: string;
+  /** @nullable */
+  externalId?: string | null;
 }

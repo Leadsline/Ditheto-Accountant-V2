@@ -1,45 +1,54 @@
-# [Project name]
+# Ditheto Accountants
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Professional public website and secure staff portal for managing accounting clients, documents, communications, and future Odoo synchronization.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/ditheto-accountants run dev` — run the website
+- `pnpm --filter @workspace/api-server run dev` — run the API server
+- `pnpm --filter @workspace/ditheto-accountants run typecheck` — check the website
+- `pnpm --filter @workspace/api-server run typecheck` — check the API
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas after changing OpenAPI
+- `pnpm --filter @workspace/db run push` — push development schema changes
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- React 19, Vite, TypeScript, Tailwind CSS and Wouter
+- Clerk authentication with a production Frontend API proxy
+- Express 5 API with generated Zod request/response validation
+- PostgreSQL with Drizzle ORM
+- Replit App Storage for private client documents
+- OpenAPI and Orval for generated React Query clients
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- Public and admin UI: `artifacts/ditheto-accountants/src`
+- API routes: `artifacts/api-server/src/routes`
+- Authentication and role enforcement: `artifacts/api-server/src/middlewares`
+- Source-of-truth API contract: `lib/api-spec/openapi.yaml`
+- Database schema: `lib/db/src/schema`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Browser authentication is cookie-based through Clerk; browser code must not add bearer tokens.
+- The first authenticated staff account is bootstrapped as `super_admin`; later accounts default to read-only `staff`.
+- Super Admin permissions are enforced on the server for uploads, edits, deletes, requests, and sync actions. Hiding buttons is not treated as authorization.
+- Client files upload directly to private App Storage with short-lived signed URLs; PostgreSQL stores metadata and object paths, not file blobs.
+- Odoo is modular and disabled by default. Its UI and API report `Disconnected` until an authorized connector is attached.
+- Without messaging connectors, email and WhatsApp requests are logged in PostgreSQL and opened in the staff member's email app or WhatsApp for final sending.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Public Home, Services, Quote, About, Team, and Contact pages
+- Secure staff sign-in and sign-up
+- Searchable client database and detailed client profiles
+- Client document library with status/category management and private uploads
+- Outstanding-document request composer and communication history
+- Role-based Super Admin and Staff access
+- Odoo connection status and client sync foundation
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Run OpenAPI code generation immediately after editing `lib/api-spec/openapi.yaml`.
+- Private object routes must remain behind Clerk staff authentication.
+- Do not present Odoo, email, or WhatsApp delivery as connected until the relevant integration has been authorized.

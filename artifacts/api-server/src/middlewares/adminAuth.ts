@@ -1,0 +1,70 @@
+import { getAuth } from "@clerk/express";
+import { asc, eq } from "drizzle-orm";
+import type { NextFunction, Request, Response } from "express";
+import { db, staffUsersTable, type StaffUser } from "@workspace/db";
+
+export type AdminRequest = Request & {
+  staffUser?: StaffUser;
+  authUserId?: string;
+};
+
+async function resolveStaffUser(req: Request): Promise<StaffUser | null> {
+  const auth = getAuth(req);
+  const userId = auth.userId;
+  if (!userId) return null;
+
+  const [existing] = await db
+    .select()
+    .from(staffUsersTable)
+    .where(eq(staffUsersTable.clerkUserId, userId))
+    .limit(1);
+  if (existing) return existing;
+
+  const [firstUser] = await db
+    .select()
+    .from(staffUsersTable)
+    .orderBy(asc(staffUsersTable.id))
+    .limit(1);
+  const role = firstUser ? "staff" : "super_admin";
+  const [created] = await db
+    .insert(staffUsersTable)
+    .values({ clerkUserId: userId, role })
+    .onConflictDoNothing({ target: staffUsersTable.clerkUserId })
+    .returning();
+
+  if (created) return created;
+  const [concurrent] = await db
+    .select()
+    .from(staffUsersTable)
+    .where(eq(staffUsersTable.clerkUserId, userId))
+    .limit(1);
+  return concurrent ?? null;
+}
+
+export async function requireStaff(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const staffUser = await resolveStaffUser(req);
+  if (!staffUser) {
+    res.status(401).json({ error: "Authentication required" });
+    return;
+  }
+  const adminReq = req as AdminRequest;
+  adminReq.staffUser = staffUser;
+  adminReq.authUserId = staffUser.clerkUserId;
+  next();
+}
+
+export async function requireSuperAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const staffUser = await resolveStaffUser(req);
+  if (!staffUser) {
+    res.status(401).json({ error: "Authentication required" });
+    return;
+  }
+  if (staffUser.role !== "super_admin") {
+    res.status(403).json({ error: "Super Admin role required" });
+    return;
+  }
+  const adminReq = req as AdminRequest;
+  adminReq.staffUser = staffUser;
+  adminReq.authUserId = staffUser.clerkUserId;
+  next();
+}

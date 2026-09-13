@@ -28,6 +28,7 @@ export function Navbar() {
             <Link href="/" className="text-foreground hover:text-primary font-medium text-sm transition-colors">Home</Link>
             <Link href="/services" className="text-foreground hover:text-primary font-medium text-sm transition-colors">Services</Link>
             <Link href="/about" className="text-foreground hover:text-primary font-medium text-sm transition-colors">About Us</Link>
+            <Link href="/team" className="text-foreground hover:text-primary font-medium text-sm transition-colors">Team</Link>
             <Link href="/contact" className="text-foreground hover:text-primary font-medium text-sm transition-colors">Contact</Link>
             <Link href="/quote" className="bg-primary text-white hover:bg-primary/90 px-5 py-2.5 rounded-md font-semibold text-sm transition-all shadow-sm">Request a Quote</Link>
           </nav>

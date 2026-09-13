@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, CalendarClock, Megaphone, LogOut, Bell } from "lucide-react";
+import { LayoutDashboard, Users, CalendarClock, Megaphone, LogOut, Bell, UserRoundCog } from "lucide-react";
 import logo from "@assets/logo_1789318782052.png";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -11,6 +11,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { path: "/admin/clients", label: "Client Database", icon: Users },
     { path: "/admin/reminders", label: "Reminders", icon: CalendarClock },
     { path: "/admin/campaigns", label: "Marketing / Posters", icon: Megaphone },
+    { path: "/admin/team", label: "Team & Organogram", icon: UserRoundCog },
   ];
 
   return (

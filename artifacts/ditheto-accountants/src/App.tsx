@@ -9,11 +9,13 @@ import Home from '@/pages/home';
 import Services from '@/pages/services';
 import Quote from '@/pages/quote';
 import About from '@/pages/about';
+import Team from '@/pages/team';
 import Contact from '@/pages/contact';
 import AdminDashboard from '@/pages/admin/dashboard';
 import AdminClients from '@/pages/admin/clients';
 import AdminReminders from '@/pages/admin/reminders';
 import AdminCampaigns from '@/pages/admin/campaigns';
+import AdminTeam from '@/pages/admin/team';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient();
@@ -27,6 +29,7 @@ function Router() {
         <Route path="/admin/clients" component={AdminClients} />
         <Route path="/admin/reminders" component={AdminReminders} />
         <Route path="/admin/campaigns" component={AdminCampaigns} />
+        <Route path="/admin/team" component={AdminTeam} />
         
         {/* Public Routes with Layout */}
         <Route path="/">
@@ -41,6 +44,7 @@ function Router() {
               <Route path="/services" component={Services} />
               <Route path="/quote" component={Quote} />
               <Route path="/about" component={About} />
+              <Route path="/team" component={Team} />
               <Route path="/contact" component={Contact} />
               <Route component={NotFound} />
             </Switch>

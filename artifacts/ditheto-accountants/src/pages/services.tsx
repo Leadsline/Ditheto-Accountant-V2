@@ -110,32 +110,42 @@ export default function Services() {
                       Quote for {category.title.split(" ")[0]} <ArrowUpRight className="h-4 w-4" />
                     </Link>
                   </div>
-                  <div className="overflow-hidden rounded-sm border border-primary/25 bg-card shadow-[0_18px_45px_-35px_hsl(var(--secondary)/.7)]">
-                    <Accordion type="multiple" className="w-full">
+                  <div className="overflow-hidden rounded-2xl border border-primary/25 border-t-4 border-t-primary bg-card shadow-[0_18px_45px_-35px_hsl(var(--secondary)/.7)]">
+                    <Accordion type="multiple" defaultValue={[`${category.id}-0`]} className="w-full">
                       {category.items.map((item, idx) => (
                         <AccordionItem value={`${category.id}-${idx}`} key={item.name} className="border-b border-foreground/10 px-5 last:border-0 sm:px-7">
                           <AccordionTrigger className="gap-4 py-6 text-left font-heading text-base font-bold text-secondary hover:no-underline hover:text-primary sm:text-lg" data-testid={`button-expand-${category.id}-${idx}`}>
-                            <span>{item.name}</span>
-                            {idx === 0 && <span className="ml-auto mr-2 rounded-full bg-accent/35 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">Most requested</span>}
+                            <span className="min-w-0 flex-1">
+                              <span className="flex flex-wrap items-center gap-3">
+                                <span>{item.name}</span>
+                                {idx === 0 && <span className="rounded-full bg-accent/35 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">Most requested</span>}
+                              </span>
+                              <span className="mt-2 block max-w-3xl text-xs font-normal leading-5 text-muted-foreground sm:text-sm">{item.desc}</span>
+                            </span>
                           </AccordionTrigger>
                           <AccordionContent className="pb-7 text-muted-foreground">
-                            <div className="grid gap-7 md:grid-cols-[1.1fr_.9fr]">
+                            <div className="grid gap-8 md:grid-cols-2">
                               <div>
-                                <p className="max-w-2xl text-sm leading-7">{item.desc}</p>
-                                <div className="mt-6 rounded-sm bg-muted/60 p-5">
-                                  <p className="mb-3 text-xs font-bold uppercase tracking-[.16em] text-secondary">What is included</p>
-                                  <ul className="grid gap-2 sm:grid-cols-2">
-                                    {item.benefits.map((benefit) => <li key={benefit} className="flex items-start gap-2 text-sm"><CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{benefit}</li>)}
-                                  </ul>
-                                </div>
+                                <p className="mb-4 text-sm font-bold text-secondary">What’s included</p>
+                                <ul className="grid gap-3">
+                                  {item.benefits.map((benefit) => <li key={benefit} className="flex items-start gap-2 text-sm leading-6"><CheckCircle className="mt-1 h-4 w-4 shrink-0 text-primary" />{benefit}</li>)}
+                                </ul>
                               </div>
-                              <div className="border-l-0 border-primary/20 md:border-l md:pl-7">
-                                <p className="mb-3 text-xs font-bold uppercase tracking-[.16em] text-secondary">Why it matters</p>
-                                <p className="text-sm leading-7">You get a clear process, an accurate submission and a team that follows up when the answer matters.</p>
+                              <div className="border-t border-primary/15 pt-6 md:border-l md:border-t-0 md:pl-8 md:pt-0">
+                                <p className="mb-4 text-sm font-bold text-secondary">Why it matters</p>
+                                <ul className="grid gap-3">
+                                  {item.benefits.map((benefit) => <li key={`${item.name}-${benefit}`} className="flex items-start gap-2 text-sm leading-6"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />{benefit}</li>)}
+                                </ul>
                                 <Link href={`/quote?service=${encodeURIComponent(item.name)}`} className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-primary transition-colors hover:text-secondary" data-testid={`link-quote-item-${category.id}-${idx}`}>
                                   Request a quote <ArrowUpRight className="h-4 w-4" />
                                 </Link>
                               </div>
+                            </div>
+                            <div className="mt-7 flex flex-col gap-4 rounded-xl bg-muted/60 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                              <p className="text-sm leading-6"><strong className="text-secondary">Who it is for:</strong> Salaried employees, business owners, contractors, and growing teams who want the detail handled properly.</p>
+                              <Link href={`/quote?service=${encodeURIComponent(item.name)}`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-secondary" data-testid={`link-quote-footer-${category.id}-${idx}`}>
+                                Request a quote <ArrowUpRight className="h-4 w-4" />
+                              </Link>
                             </div>
                           </AccordionContent>
                         </AccordionItem>

@@ -117,12 +117,12 @@ function MemberCard({ member, onSelect }: { member: TeamMember; onSelect: (membe
       onClick={() => onSelect(member)}
       whileHover={{ y: -5 }}
       transition={{ duration: .25 }}
-      className="group flex w-full items-center gap-5 rounded-2xl border border-secondary/10 bg-card p-6 text-left shadow-sm transition-all hover:border-primary/40 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
+      className="group flex w-full flex-col items-center rounded-xl border border-secondary/15 bg-card px-5 py-6 text-center shadow-[0_18px_35px_-28px_hsl(var(--secondary))] transition-all hover:border-primary/45 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
     >
       <ProfileAvatar member={member} />
-      <span className="min-w-0">
+      <span className="mt-4 min-w-0">
         <span className="block font-heading font-bold text-secondary group-hover:text-primary transition-colors">{member.name}</span>
-        <span className="mt-1 block text-sm text-gray-500">{member.title}</span>
+        <span className="mx-auto mt-2 inline-flex rounded-full border border-secondary/15 bg-background px-3 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-secondary/70">{member.title}</span>
         <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-primary">
           View profile <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
         </span>
@@ -155,54 +155,85 @@ export default function Team() {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.6fr] lg:items-start">
-            <div className="lg:sticky lg:top-32">
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-primary">Our team structure</p>
-              <h2 className="font-heading text-3xl font-bold text-secondary md:text-4xl">The right people in the right place.</h2>
-              <p className="mt-5 text-lg leading-relaxed text-gray-600">
-                Our Pretoria and Secunda teams bring together specialist knowledge and personal attention. Select any team member to learn more about the person supporting your business.
-              </p>
-              <div className="mt-8 space-y-3 rounded-2xl border border-primary/15 bg-primary/5 p-5">
-                <div className="flex gap-3">
-                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <p className="text-sm leading-relaxed text-secondary"><strong>Integrity first.</strong> Every client relationship is built on discretion, accuracy, and honest advice.</p>
-                </div>
-                <div className="flex gap-3">
-                  <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-                  <p className="text-sm leading-relaxed text-secondary"><strong>Practical support.</strong> We explain the detail without making it feel complicated.</p>
-                </div>
-              </div>
-              <Link href="/quote" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-secondary">
-                Work with our team <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+      <section className="bg-background py-20 sm:py-24">
+        <div className="site-container">
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <p className="eyebrow mb-4">Our team structure</p>
+            <h2 className="serif-display text-4xl leading-none text-secondary sm:text-5xl">The right people in the right place.</h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
+              Our Pretoria and Secunda teams bring together specialist knowledge and personal attention. Select any team member to learn more about the person supporting your business.
+            </p>
+          </Reveal>
 
-              <Reveal className="relative" delay={.12}>
-              <div className="hidden absolute left-1/2 top-24 h-16 w-px -translate-x-1/2 bg-primary/25 lg:block" />
-            <div className="mx-auto w-full max-w-xl">
-                {directors.map((member) => <MemberCard key={member.id} member={member} onSelect={setSelected} />)}
-              </div>
-              <div className="mx-auto hidden h-10 w-[66%] border-l border-r border-t border-primary/25 lg:block" />
-              <div className="grid gap-6 md:grid-cols-2">
-                {leads.map((member) => (
-                  <div key={member.id} className="relative">
-                    <div className="hidden absolute -top-5 left-1/2 h-5 w-px bg-primary/25 md:block" />
-                    <MemberCard member={member} onSelect={setSelected} />
+          <Reveal className="mt-16" delay={.12}>
+            <div className="rounded-3xl border border-secondary/10 bg-card p-5 shadow-[0_24px_70px_-50px_hsl(var(--secondary))] sm:p-8 lg:p-12">
+              <div className="space-y-8 lg:space-y-0">
+                <div className="grid gap-4 lg:grid-cols-[150px_1fr] lg:items-center">
+                  <div className="text-center lg:text-left">
+                    <p className="eyebrow text-secondary/55">Supervisory level</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Direction & accountability</p>
                   </div>
-                ))}
-              </div>
-              <div className="mx-auto hidden h-10 w-[82%] border-l border-r border-t border-primary/25 lg:block" />
-              <div className="grid gap-6 md:grid-cols-2 2xl:grid-cols-3">
-                {specialists.map((member) => (
-                  <div key={member.id} className="relative">
-                    <div className="hidden absolute -top-5 left-1/2 h-5 w-px bg-primary/25 md:block" />
-                    <MemberCard member={member} onSelect={setSelected} />
+                  <div className="mx-auto w-full max-w-xs">
+                    {directors.map((member) => <MemberCard key={member.id} member={member} onSelect={setSelected} />)}
                   </div>
-                ))}
+                </div>
+
+                <div className="mx-auto hidden h-10 w-px bg-primary/30 lg:block" />
+
+                <div className="grid gap-4 lg:grid-cols-[150px_1fr] lg:items-center">
+                  <div className="text-center lg:text-left">
+                    <p className="eyebrow text-secondary/55">Management level</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Specialist leads</p>
+                  </div>
+                  <div className="relative mx-auto grid w-full max-w-2xl gap-6 md:grid-cols-2">
+                    <div className="absolute left-1/4 right-1/4 top-0 hidden h-px bg-primary/30 md:block" />
+                    {leads.map((member) => (
+                      <div key={member.id} className="relative pt-4">
+                        <div className="absolute left-1/2 top-0 hidden h-4 w-px -translate-x-1/2 bg-primary/30 md:block" />
+                        <MemberCard member={member} onSelect={setSelected} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mx-auto hidden h-10 w-px bg-primary/30 lg:block" />
+
+                <div className="grid gap-4 lg:grid-cols-[150px_1fr] lg:items-center">
+                  <div className="text-center lg:text-left">
+                    <p className="eyebrow text-secondary/55">Team level</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Client-facing specialists</p>
+                  </div>
+                  <div className="relative mx-auto grid w-full max-w-4xl gap-6 md:grid-cols-3">
+                    <div className="absolute left-[16.66%] right-[16.66%] top-0 hidden h-px bg-primary/30 md:block" />
+                    {specialists.map((member) => (
+                      <div key={member.id} className="relative pt-4">
+                        <div className="absolute left-1/2 top-0 hidden h-4 w-px -translate-x-1/2 bg-primary/30 md:block" />
+                        <MemberCard member={member} onSelect={setSelected} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              </Reveal>
+            </div>
+          </Reveal>
+
+          <Reveal className="mx-auto mt-10 max-w-3xl rounded-2xl border border-primary/15 bg-primary/5 p-5 sm:p-6" delay={.18}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <p className="text-sm leading-relaxed text-secondary"><strong>Integrity first.</strong> Every client relationship is built on discretion, accuracy, and honest advice.</p>
+              </div>
+              <div className="flex gap-3">
+                <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                <p className="text-sm leading-relaxed text-secondary"><strong>Practical support.</strong> We explain the detail without making it feel complicated.</p>
+              </div>
+            </div>
+          </Reveal>
+
+          <div className="mt-8 text-center">
+            <Link href="/quote" className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-secondary">
+              Work with our team <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>

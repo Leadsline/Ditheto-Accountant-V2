@@ -9,6 +9,119 @@ export interface HealthStatus {
   status: string;
 }
 
+export type TeamMemberLevel = typeof TeamMemberLevel[keyof typeof TeamMemberLevel];
+
+
+export const TeamMemberLevel = {
+  director: 'director',
+  lead: 'lead',
+  team: 'team',
+} as const;
+
+export type TeamMemberAccent = typeof TeamMemberAccent[keyof typeof TeamMemberAccent];
+
+
+export const TeamMemberAccent = {
+  teal: 'teal',
+  gold: 'gold',
+  navy: 'navy',
+} as const;
+
+export interface TeamMember {
+  id: number;
+  name: string;
+  title: string;
+  bio: string;
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  level: TeamMemberLevel;
+  accent: TeamMemberAccent;
+  /** @nullable */
+  parentId?: number | null;
+  sortOrder: number;
+  /** @nullable */
+  imageUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type TeamMemberInputLevel = typeof TeamMemberInputLevel[keyof typeof TeamMemberInputLevel];
+
+
+export const TeamMemberInputLevel = {
+  director: 'director',
+  lead: 'lead',
+  team: 'team',
+} as const;
+
+export type TeamMemberInputAccent = typeof TeamMemberInputAccent[keyof typeof TeamMemberInputAccent];
+
+
+export const TeamMemberInputAccent = {
+  teal: 'teal',
+  gold: 'gold',
+  navy: 'navy',
+} as const;
+
+export interface TeamMemberInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  bio: string;
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  level: TeamMemberInputLevel;
+  accent: TeamMemberInputAccent;
+  /** @nullable */
+  parentId?: number | null;
+  /** @minimum 0 */
+  sortOrder: number;
+  /** @nullable */
+  imageObjectPath?: string | null;
+}
+
+export type TeamMemberUpdateLevel = typeof TeamMemberUpdateLevel[keyof typeof TeamMemberUpdateLevel];
+
+
+export const TeamMemberUpdateLevel = {
+  director: 'director',
+  lead: 'lead',
+  team: 'team',
+} as const;
+
+export type TeamMemberUpdateAccent = typeof TeamMemberUpdateAccent[keyof typeof TeamMemberUpdateAccent];
+
+
+export const TeamMemberUpdateAccent = {
+  teal: 'teal',
+  gold: 'gold',
+  navy: 'navy',
+} as const;
+
+export interface TeamMemberUpdate {
+  /** @minLength 1 */
+  name?: string;
+  /** @minLength 1 */
+  title?: string;
+  /** @minLength 1 */
+  bio?: string;
+  email?: string;
+  /** @nullable */
+  phone?: string | null;
+  level?: TeamMemberUpdateLevel;
+  accent?: TeamMemberUpdateAccent;
+  /** @nullable */
+  parentId?: number | null;
+  /** @minimum 0 */
+  sortOrder?: number;
+  /** @nullable */
+  imageObjectPath?: string | null;
+}
+
 export type AdminClientBranch = typeof AdminClientBranch[keyof typeof AdminClientBranch];
 
 

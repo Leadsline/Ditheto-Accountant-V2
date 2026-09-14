@@ -8,6 +8,7 @@ servers:
     description: Base API path
 tags:
   - name: health
+  - name: Team
   - name: Admin Clients
   - name: Client Documents
   - name: Document Requests
@@ -25,6 +26,89 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /team-members:
+    get:
+      operationId: listTeamMembers
+      tags: [Team]
+      responses:
+        "200":
+          description: Public employee profiles in organogram order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamMember"
+  /team-members/{teamMemberId}/photo:
+    get:
+      operationId: getTeamMemberPhoto
+      tags: [Team]
+      parameters:
+        - $ref: "#/components/parameters/TeamMemberId"
+      responses:
+        "200":
+          description: Employee profile photo
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /admin/team-members:
+    post:
+      operationId: createTeamMember
+      tags: [Team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamMemberInput"
+      responses:
+        "201":
+          description: Employee profile created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /admin/team-members/{teamMemberId}:
+    patch:
+      operationId: updateTeamMember
+      tags: [Team]
+      parameters:
+        - $ref: "#/components/parameters/TeamMemberId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamMemberUpdate"
+      responses:
+        "200":
+          description: Employee profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deleteTeamMember
+      tags: [Team]
+      parameters:
+        - $ref: "#/components/parameters/TeamMemberId"
+      responses:
+        "204":
+          description: Employee profile deleted
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /admin/clients:
     get:
       operationId: listAdminClients
@@ -233,6 +317,12 @@ components:
       required: true
       schema:
         type: integer
+    TeamMemberId:
+      name: teamMemberId
+      in: path
+      required: true
+      schema:
+        type: integer
   responses:
     Unauthorized:
       description: Authentication required
@@ -259,6 +349,50 @@ components:
       properties:
         status:
           type: string
+    TeamMember:
+      type: object
+      required: [id, name, title, bio, email, level, accent, sortOrder, imageUrl, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        title: { type: string }
+        bio: { type: string }
+        email: { type: string, format: email }
+        phone: { type: [string, "null"] }
+        level: { type: string, enum: [director, lead, team] }
+        accent: { type: string, enum: [teal, gold, navy] }
+        parentId: { type: [integer, "null"] }
+        sortOrder: { type: integer }
+        imageUrl: { type: [string, "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    TeamMemberInput:
+      type: object
+      required: [name, title, bio, email, level, accent, sortOrder]
+      properties:
+        name: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        bio: { type: string, minLength: 1 }
+        email: { type: string, format: email }
+        phone: { type: [string, "null"] }
+        level: { type: string, enum: [director, lead, team] }
+        accent: { type: string, enum: [teal, gold, navy] }
+        parentId: { type: [integer, "null"] }
+        sortOrder: { type: integer, minimum: 0 }
+        imageObjectPath: { type: [string, "null"] }
+    TeamMemberUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        bio: { type: string, minLength: 1 }
+        email: { type: string, format: email }
+        phone: { type: [string, "null"] }
+        level: { type: string, enum: [director, lead, team] }
+        accent: { type: string, enum: [teal, gold, navy] }
+        parentId: { type: [integer, "null"] }
+        sortOrder: { type: integer, minimum: 0 }
+        imageObjectPath: { type: [string, "null"] }
     AdminClient:
       type: object
       required: [id, name, email, phone, company, branch, odooSyncStatus, createdAt]

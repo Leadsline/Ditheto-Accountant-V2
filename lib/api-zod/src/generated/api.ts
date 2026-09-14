@@ -13,6 +13,116 @@ export const HealthCheckResponse = zod.object({
 })
 
 
+export const ListTeamMembersResponseItem = zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "title": zod.string(),
+  "bio": zod.string(),
+  "email": zod.string().email(),
+  "phone": zod.string().nullish(),
+  "level": zod.enum(['director', 'lead', 'team']),
+  "accent": zod.enum(['teal', 'gold', 'navy']),
+  "parentId": zod.number().int().nullish(),
+  "sortOrder": zod.number().int(),
+  "imageUrl": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListTeamMembersResponse = zod.array(ListTeamMembersResponseItem)
+
+
+export const GetTeamMemberPhotoParams = zod.object({
+  "teamMemberId": zod.coerce.number().int()
+})
+
+export const GetTeamMemberPhotoResponse = zod.unknown()
+
+
+
+
+
+export const createTeamMemberBodySortOrderMin = 0;
+
+
+
+export const CreateTeamMemberBody = zod.object({
+  "name": zod.string().min(1),
+  "title": zod.string().min(1),
+  "bio": zod.string().min(1),
+  "email": zod.string().email(),
+  "phone": zod.string().nullish(),
+  "level": zod.enum(['director', 'lead', 'team']),
+  "accent": zod.enum(['teal', 'gold', 'navy']),
+  "parentId": zod.number().int().nullish(),
+  "sortOrder": zod.number().int().min(createTeamMemberBodySortOrderMin),
+  "imageObjectPath": zod.string().nullish()
+})
+
+export const CreateTeamMemberResponse = zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "title": zod.string(),
+  "bio": zod.string(),
+  "email": zod.string().email(),
+  "phone": zod.string().nullish(),
+  "level": zod.enum(['director', 'lead', 'team']),
+  "accent": zod.enum(['teal', 'gold', 'navy']),
+  "parentId": zod.number().int().nullish(),
+  "sortOrder": zod.number().int(),
+  "imageUrl": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const UpdateTeamMemberParams = zod.object({
+  "teamMemberId": zod.coerce.number().int()
+})
+
+
+
+
+export const updateTeamMemberBodySortOrderMin = 0;
+
+
+
+export const UpdateTeamMemberBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "title": zod.string().min(1).optional(),
+  "bio": zod.string().min(1).optional(),
+  "email": zod.string().email().optional(),
+  "phone": zod.string().nullish(),
+  "level": zod.enum(['director', 'lead', 'team']).optional(),
+  "accent": zod.enum(['teal', 'gold', 'navy']).optional(),
+  "parentId": zod.number().int().nullish(),
+  "sortOrder": zod.number().int().min(updateTeamMemberBodySortOrderMin).optional(),
+  "imageObjectPath": zod.string().nullish()
+})
+
+export const UpdateTeamMemberResponse = zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "title": zod.string(),
+  "bio": zod.string(),
+  "email": zod.string().email(),
+  "phone": zod.string().nullish(),
+  "level": zod.enum(['director', 'lead', 'team']),
+  "accent": zod.enum(['teal', 'gold', 'navy']),
+  "parentId": zod.number().int().nullish(),
+  "sortOrder": zod.number().int(),
+  "imageUrl": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const DeleteTeamMemberParams = zod.object({
+  "teamMemberId": zod.coerce.number().int()
+})
+
+export const DeleteTeamMemberResponse = zod.void()
+
+
 export const ListAdminClientsResponseItem = zod.object({
   "id": zod.number().int(),
   "name": zod.string(),

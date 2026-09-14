@@ -5,84 +5,20 @@ import { ArrowRight, Mail, Phone, ShieldCheck, Sparkles, UsersRound } from "luci
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/motion/reveal";
+import { useListTeamMembers } from "@workspace/api-client-react";
 
 type TeamMember = {
-  id: string;
+  id: number;
   name: string;
   title: string;
   bio: string;
   email: string;
-  phone?: string;
+  phone?: string | null;
   initials: string;
-  image?: string;
+  image?: string | null;
   accent: "teal" | "gold" | "navy";
   level: "director" | "lead" | "team";
 };
-
-const team: TeamMember[] = [
-  {
-    id: "nomsa",
-    name: "Nomsa Mokoena",
-    title: "Managing Director",
-    bio: "Nomsa leads Ditheto with a practical belief that every business owner deserves clear numbers, calm guidance, and a partner who follows through.",
-    email: "nomsa@dithetoaccountants.co.za",
-    phone: "067 765 7387",
-    initials: "NM",
-    accent: "gold",
-    level: "director",
-  },
-  {
-    id: "thabo",
-    name: "Thabo Maseko",
-    title: "Tax & Compliance Manager",
-    bio: "Thabo helps clients stay ahead of SARS deadlines and turns complex compliance questions into clear next steps.",
-    email: "thabo@dithetoaccountants.co.za",
-    phone: "012 751 3200",
-    initials: "TM",
-    accent: "teal",
-    level: "lead",
-  },
-  {
-    id: "lerato",
-    name: "Lerato Dlamini",
-    title: "Payroll Supervisor",
-    bio: "Lerato oversees accurate payroll processing, EMP submissions, UIF declarations, and dependable employee support.",
-    email: "lerato@dithetoaccountants.co.za",
-    initials: "LD",
-    accent: "teal",
-    level: "lead",
-  },
-  {
-    id: "siyabonga",
-    name: "Siyabonga Ncube",
-    title: "Senior Accountant",
-    bio: "Siyabonga works alongside growing businesses on monthly accounting, management accounts, and decision-ready reporting.",
-    email: "siyabonga@dithetoaccountants.co.za",
-    initials: "SN",
-    accent: "navy",
-    level: "team",
-  },
-  {
-    id: "zanele",
-    name: "Zanele Khumalo",
-    title: "Bookkeeping Specialist",
-    bio: "Zanele keeps the day-to-day detail in order so clients can focus on serving customers and building their businesses.",
-    email: "zanele@dithetoaccountants.co.za",
-    initials: "ZK",
-    accent: "gold",
-    level: "team",
-  },
-  {
-    id: "mpho",
-    name: "Mpho Radebe",
-    title: "Client Services Coordinator",
-    bio: "Mpho makes sure every client receives a responsive, thoughtful experience from the first enquiry to ongoing support.",
-    email: "mpho@dithetoaccountants.co.za",
-    initials: "MR",
-    accent: "teal",
-    level: "team",
-  },
-];
 
 const accentClasses = {
   teal: "border-primary bg-primary/10 text-primary",
@@ -117,13 +53,13 @@ function MemberCard({ member, onSelect }: { member: TeamMember; onSelect: (membe
       onClick={() => onSelect(member)}
       whileHover={{ y: -5 }}
       transition={{ duration: .25 }}
-      className="group flex w-full flex-col items-center rounded-xl border border-secondary/15 bg-card px-5 py-6 text-center shadow-[0_18px_35px_-28px_hsl(var(--secondary))] transition-all hover:border-primary/45 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
+      className="group flex h-[250px] w-full flex-col items-center justify-start rounded-xl border border-secondary/15 bg-card px-5 py-6 text-center shadow-[0_18px_35px_-28px_hsl(var(--secondary))] transition-all hover:border-primary/45 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
     >
       <ProfileAvatar member={member} />
-      <span className="mt-4 min-w-0">
+      <span className="mt-4 flex w-full min-w-0 flex-1 flex-col items-center">
         <span className="block font-heading font-bold text-secondary group-hover:text-primary transition-colors">{member.name}</span>
-        <span className="mx-auto mt-2 inline-flex rounded-full border border-secondary/15 bg-background px-3 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-secondary/70">{member.title}</span>
-        <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-primary">
+        <span className="mx-auto mt-2 flex min-h-7 max-w-full items-center justify-center rounded-full border border-secondary/15 bg-background px-3 py-1 text-[9px] font-bold uppercase leading-4 tracking-[.1em] text-secondary/70">{member.title}</span>
+        <span className="mt-auto inline-flex items-center gap-1 pt-3 text-xs font-semibold uppercase tracking-wider text-primary">
           View profile <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
         </span>
       </span>
@@ -133,9 +69,22 @@ function MemberCard({ member, onSelect }: { member: TeamMember; onSelect: (membe
 
 export default function Team() {
   const [selected, setSelected] = useState<TeamMember | null>(null);
-  const directors = useMemo(() => team.filter((member) => member.level === "director"), []);
-  const leads = useMemo(() => team.filter((member) => member.level === "lead"), []);
-  const specialists = useMemo(() => team.filter((member) => member.level === "team"), []);
+  const { data, isLoading, isError } = useListTeamMembers();
+  const team = useMemo<TeamMember[]>(() => (data ?? []).map((member) => ({
+    id: member.id,
+    name: member.name,
+    title: member.title,
+    bio: member.bio,
+    email: member.email,
+    phone: member.phone,
+    initials: member.name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "??",
+    image: member.imageUrl,
+    accent: member.accent,
+    level: member.level,
+  })), [data]);
+  const directors = useMemo(() => team.filter((member) => member.level === "director"), [team]);
+  const leads = useMemo(() => team.filter((member) => member.level === "lead"), [team]);
+  const specialists = useMemo(() => team.filter((member) => member.level === "team"), [team]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -166,6 +115,9 @@ export default function Team() {
           </Reveal>
 
           <Reveal className="mt-16" delay={.12}>
+            {isLoading && <div className="rounded-3xl border border-secondary/10 bg-card p-12 text-center text-muted-foreground">Loading team structure…</div>}
+            {isError && <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center text-red-700">The team structure could not be loaded. Please try again shortly.</div>}
+            {!isLoading && !isError && (
             <div className="rounded-3xl border border-secondary/10 bg-card p-5 shadow-[0_24px_70px_-50px_hsl(var(--secondary))] sm:p-8 lg:p-12">
               <div className="space-y-8 lg:space-y-0">
                 <div className="grid gap-4 lg:grid-cols-[150px_1fr] lg:items-center">
@@ -215,6 +167,7 @@ export default function Team() {
                 </div>
               </div>
             </div>
+            )}
           </Reveal>
 
           <Reveal className="mx-auto mt-10 max-w-3xl rounded-2xl border border-primary/15 bg-primary/5 p-5 sm:p-6" delay={.18}>

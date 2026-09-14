@@ -1,8 +1,6 @@
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Calculator, FileSpreadsheet, Briefcase, FileText, CheckCircle } from "lucide-react";
+import { Calculator, FileSpreadsheet, Briefcase, FileText, CheckCircle, ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 
 const services = [
@@ -71,81 +69,92 @@ const services = [
 
 export default function Services() {
   return (
-    <div className="min-h-screen bg-muted/60 pb-24">
-      {/* Header */}
-      <div className="noise bg-secondary py-20 text-center">
-        <h1 className="display-title mb-4 text-4xl font-bold text-white md:text-6xl">Our Services</h1>
-        <p className="text-gray-300 max-w-2xl mx-auto text-lg px-4">
-          Comprehensive accounting, tax, and compliance solutions tailored to your unique needs.
-        </p>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="space-y-12">
-          {services.map((category, categoryIndex) => (
-            <Reveal key={category.id} delay={categoryIndex * .08} className="scroll-mt-24" >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <category.icon className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-heading font-bold text-secondary">{category.title}</h2>
-                  <p className="text-gray-600 text-sm">{category.description}</p>
-                </div>
-              </div>
-
-              <Card className="lift-card border-secondary/10 bg-card shadow-md">
-                <CardContent className="p-0">
-                  <Accordion type="multiple" className="w-full">
-                    {category.items.map((item, idx) => (
-                      <AccordionItem value={`item-${idx}`} key={idx} className="border-b last:border-0 px-6">
-                        <AccordionTrigger className="hover:no-underline hover:text-primary transition-colors text-left font-semibold text-secondary py-5">
-                          {item.name}
-                        </AccordionTrigger>
-                        <AccordionContent className="text-gray-600 pb-6">
-                          <p className="mb-4 text-base">{item.desc}</p>
-                          
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="text-sm font-bold text-secondary mb-2 uppercase tracking-wide">Key Benefits</h4>
-                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {item.benefits.map((benefit, bIdx) => (
-                                <li key={bIdx} className="flex items-start gap-2 text-sm text-gray-700">
-                                  <CheckCircle className="h-4 w-4 text-[#10B981] shrink-0 mt-0.5" />
-                                  <span>{benefit}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          
-                          <div className="mt-4 pt-4 border-t border-gray-200">
-                            <Link href={`/quote?service=${encodeURIComponent(item.name)}`}>
-                              <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white">
-                                Request a Quote for this service
-                              </Button>
-                            </Link>
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </CardContent>
-              </Card>
-            </Reveal>
-          ))}
+    <div className="min-h-screen bg-background pb-24">
+      <section className="noise relative overflow-hidden bg-secondary py-20 text-white sm:py-28">
+        <div className="absolute -right-16 -top-24 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
+        <div className="site-container relative z-10">
+          <Reveal>
+            <p className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent"><span className="h-px w-9 bg-accent" /> What we do</p>
+            <h1 className="serif-display max-w-3xl text-5xl leading-[.98] sm:text-7xl">Everything a South African business needs to stay compliant.</h1>
+            <p className="mt-7 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Four practice areas, one accountable team. Open any of them to see exactly what is included before you ask for a quote.</p>
+          </Reveal>
+          <div className="mt-12 grid gap-3 sm:grid-cols-4">
+            {services.map((category, index) => (
+              <a href={`#${category.id}`} key={category.id} className="border-t border-white/20 pt-4 text-sm text-white/75 transition-colors hover:text-accent" data-testid={`link-service-index-${category.id}`}>
+                <span className="serif-display mr-2 text-xl text-accent/80">0{index + 1}</span>{category.title}
+              </a>
+            ))}
+          </div>
         </div>
-        
-        <div className="mt-16 bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-bl-full"></div>
-          <h3 className="text-2xl font-heading font-bold text-secondary mb-4 relative z-10">Need a custom combination?</h3>
-          <p className="text-gray-600 mb-6 max-w-lg mx-auto relative z-10">
-            Every business is different. Select multiple services in our quotation form to get a comprehensive, tailored package.
-          </p>
-          <Link href="/quote">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold px-8 shadow-md relative z-10">
-              Build Your Package
-            </Button>
+      </section>
+
+      <div className="site-container mt-16 sm:mt-24">
+        <div className="space-y-20">
+          {services.map((category, categoryIndex) => {
+            const Icon = category.icon;
+            return (
+              <Reveal key={category.id} delay={categoryIndex * .06} className="scroll-mt-24" >
+                <section id={category.id}>
+                  <div className="mb-7 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
+                    <div>
+                      <p className="eyebrow mb-3">0{categoryIndex + 1} — {category.items.length} services</p>
+                      <div className="flex items-start gap-4">
+                        <Icon className="mt-2 h-5 w-5 shrink-0 text-primary" />
+                        <div>
+                          <h2 className="serif-display text-4xl leading-none text-secondary sm:text-5xl">{category.title}</h2>
+                          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{category.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <Link href={`/quote?service=${encodeURIComponent(category.title)}`} className="inline-flex h-11 items-center justify-center gap-2 rounded-sm border border-primary px-5 text-xs font-bold text-primary transition-colors hover:bg-primary hover:text-white" data-testid={`link-quote-category-${category.id}`}>
+                      Quote for {category.title.split(" ")[0]} <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                  <div className="overflow-hidden rounded-sm border border-primary/25 bg-card shadow-[0_18px_45px_-35px_hsl(var(--secondary)/.7)]">
+                    <Accordion type="multiple" className="w-full">
+                      {category.items.map((item, idx) => (
+                        <AccordionItem value={`${category.id}-${idx}`} key={item.name} className="border-b border-foreground/10 px-5 last:border-0 sm:px-7">
+                          <AccordionTrigger className="gap-4 py-6 text-left font-heading text-base font-bold text-secondary hover:no-underline hover:text-primary sm:text-lg" data-testid={`button-expand-${category.id}-${idx}`}>
+                            <span>{item.name}</span>
+                            {idx === 0 && <span className="ml-auto mr-2 rounded-full bg-accent/35 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">Most requested</span>}
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-7 text-muted-foreground">
+                            <div className="grid gap-7 md:grid-cols-[1.1fr_.9fr]">
+                              <div>
+                                <p className="max-w-2xl text-sm leading-7">{item.desc}</p>
+                                <div className="mt-6 rounded-sm bg-muted/60 p-5">
+                                  <p className="mb-3 text-xs font-bold uppercase tracking-[.16em] text-secondary">What is included</p>
+                                  <ul className="grid gap-2 sm:grid-cols-2">
+                                    {item.benefits.map((benefit) => <li key={benefit} className="flex items-start gap-2 text-sm"><CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{benefit}</li>)}
+                                  </ul>
+                                </div>
+                              </div>
+                              <div className="border-l-0 border-primary/20 md:border-l md:pl-7">
+                                <p className="mb-3 text-xs font-bold uppercase tracking-[.16em] text-secondary">Why it matters</p>
+                                <p className="text-sm leading-7">You get a clear process, an accurate submission and a team that follows up when the answer matters.</p>
+                                <Link href={`/quote?service=${encodeURIComponent(item.name)}`} className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-primary transition-colors hover:text-secondary" data-testid={`link-quote-item-${category.id}-${idx}`}>
+                                  Request a quote <ArrowUpRight className="h-4 w-4" />
+                                </Link>
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </div>
+                </section>
+              </Reveal>
+            );
+          })}
+        </div>
+        <Reveal className="mt-20 bg-secondary px-6 py-12 text-center text-white sm:px-10">
+          <p className="eyebrow text-accent">Not sure where to begin?</p>
+          <h2 className="serif-display mt-4 text-4xl">Tell us what is on your desk.</h2>
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-white/70">Select multiple services in our quotation form and we will shape the right package around your business.</p>
+          <Link href="/quote" className="mt-7 inline-flex h-12 items-center gap-2 rounded-sm bg-accent px-6 text-sm font-bold text-secondary transition-transform hover:-translate-y-1" data-testid="link-services-package">
+            Build your package <ArrowUpRight className="h-4 w-4" />
           </Link>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

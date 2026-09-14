@@ -133,8 +133,8 @@ function App() {
         },
       }}
       localization={{
-        signIn: { start: { title: "Ditheto Admin Portal", subtitle: "Sign in to manage client records securely" } },
-        signUp: { start: { title: "Create staff account", subtitle: "Access is limited by your assigned staff role" } },
+        signIn: { start: { title: "Ditheto Admin Portal", subtitle: "Use your email address and password to manage client records securely" } },
+        signUp: { start: { title: "Create staff account", subtitle: "The first staff account becomes Super Admin; later accounts are Staff" } },
       }}
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}

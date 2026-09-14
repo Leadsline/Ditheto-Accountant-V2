@@ -4,33 +4,33 @@ import logo from "@assets/logo_1789318782052.png";
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t-4 border-accent bg-secondary pb-8 pt-16 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+    <footer className="relative overflow-hidden border-t border-accent/60 bg-secondary pb-8 pt-16 text-white">
+      <div className="site-container">
+        <div className="mb-14 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_.7fr_1fr_1fr]">
           
           <div className="space-y-6">
-            <div className="inline-block rounded-lg bg-background p-2">
-              <img src={logo} alt="Ditheto Accountants" className="h-10 w-auto" />
+            <div className="inline-block rounded-sm bg-background px-3 py-2">
+              <img src={logo} alt="Ditheto Accountants" className="h-9 w-auto" />
             </div>
             <p className="max-w-sm pr-4 text-sm leading-relaxed text-gray-300">
               A 100% black-owned South African accounting, tax, payroll, bookkeeping, and business registration firm serving Pretoria and Secunda. Integrity you can count on.
             </p>
-             <div className="flex gap-3">
-               <a href="#" aria-label="Facebook" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-primary">
+             <div className="flex gap-2">
+               <a href="#" aria-label="Facebook" className="flex h-9 w-9 items-center justify-center rounded-sm bg-white/10 text-white transition-colors hover:bg-primary">
                 <Facebook className="h-4 w-4" />
               </a>
-               <a href="#" aria-label="Instagram" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-primary">
+                <a href="#" aria-label="Instagram" className="flex h-9 w-9 items-center justify-center rounded-sm bg-white/10 text-white transition-colors hover:bg-primary">
                 <Instagram className="h-4 w-4" />
               </a>
-               <a href="#" aria-label="LinkedIn" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-primary">
+                <a href="#" aria-label="LinkedIn" className="flex h-9 w-9 items-center justify-center rounded-sm bg-white/10 text-white transition-colors hover:bg-primary">
                 <Linkedin className="h-4 w-4" />
               </a>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-heading font-bold mb-6 flex items-center gap-2">
-              <span className="w-4 h-1 bg-accent rounded-full"></span> Quick Links
+             <h3 className="mb-6 flex items-center gap-2 text-lg font-heading font-bold">
+               <span className="h-1 w-4 bg-accent"></span> Quick Links
             </h3>
             <ul className="space-y-3 text-sm">
               <li><Link href="/" className="text-gray-300 hover:text-accent transition-colors block">Home</Link></li>
@@ -44,8 +44,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-heading font-bold mb-6 flex items-center gap-2">
-              <span className="w-4 h-1 bg-accent rounded-full"></span> Pretoria Branch
+             <h3 className="mb-6 flex items-center gap-2 text-lg font-heading font-bold">
+               <span className="h-1 w-4 bg-accent"></span> Pretoria Branch
             </h3>
             <ul className="space-y-4 text-sm text-gray-300">
               <li className="flex items-start gap-3">
@@ -64,8 +64,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-heading font-bold mb-6 flex items-center gap-2">
-              <span className="w-4 h-1 bg-accent rounded-full"></span> Secunda Branch
+             <h3 className="mb-6 flex items-center gap-2 text-lg font-heading font-bold">
+               <span className="h-1 w-4 bg-accent"></span> Secunda Branch
             </h3>
             <ul className="space-y-4 text-sm text-gray-300">
               <li className="flex items-start gap-3">

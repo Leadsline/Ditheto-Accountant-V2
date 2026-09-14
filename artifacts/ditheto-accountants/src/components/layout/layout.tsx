@@ -18,12 +18,12 @@ export function Layout({ children }: { children: ReactNode }) {
         href="https://wa.me/27677657387?text=Hi%20Ditheto%20Accountants,%20I%20need%20assistance%20with..."
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-5 right-5 z-50 bg-[#168a63] text-white p-4 rounded-full shadow-[0_14px_30px_-10px_rgba(20,94,74,.65)] hover:bg-[#11704f] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group ring-4 ring-white/80"
+         className="group fixed bottom-5 right-5 z-50 flex items-center justify-center rounded-full bg-primary p-4 text-white shadow-[0_14px_30px_-10px_hsl(var(--primary)/.65)] ring-4 ring-background/80 transition-transform duration-300 hover:-translate-y-1 hover:bg-secondary"
         aria-label="Chat on WhatsApp"
         data-testid="link-floating-whatsapp"
       >
         <MessageCircle className="h-7 w-7" />
-        <span className="absolute right-full mr-4 bg-secondary text-white text-sm px-3 py-1.5 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-medium">
+         <span className="pointer-events-none absolute right-full mr-4 whitespace-nowrap rounded-sm bg-secondary px-3 py-1.5 text-sm font-medium text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100">
           Chat with us
         </span>
       </a>

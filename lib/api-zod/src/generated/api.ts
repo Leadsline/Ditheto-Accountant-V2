@@ -31,6 +31,51 @@ export const ListTeamMembersResponseItem = zod.object({
 export const ListTeamMembersResponse = zod.array(ListTeamMembersResponseItem)
 
 
+export const createContactSubmissionBodyFullNameMin = 2;
+export const createContactSubmissionBodyFullNameMax = 120;
+
+export const createContactSubmissionBodyEmailMax = 254;
+
+export const createContactSubmissionBodyPhoneMin = 10;
+export const createContactSubmissionBodyPhoneMax = 30;
+
+export const createContactSubmissionBodyCompanyNameMax = 160;
+
+export const createContactSubmissionBodyCompanyRegistrationNumberMax = 80;
+
+export const createContactSubmissionBodyVatNumberMax = 80;
+
+export const createContactSubmissionBodyMessageMax = 3000;
+
+
+
+export const CreateContactSubmissionBody = zod.object({
+  "fullName": zod.string().min(createContactSubmissionBodyFullNameMin).max(createContactSubmissionBodyFullNameMax),
+  "email": zod.string().email().max(createContactSubmissionBodyEmailMax),
+  "phone": zod.string().min(createContactSubmissionBodyPhoneMin).max(createContactSubmissionBodyPhoneMax),
+  "clientType": zod.enum(['individual', 'business']),
+  "companyName": zod.string().max(createContactSubmissionBodyCompanyNameMax).nullish(),
+  "companyRegistrationNumber": zod.string().max(createContactSubmissionBodyCompanyRegistrationNumberMax).nullish(),
+  "vatNumber": zod.string().max(createContactSubmissionBodyVatNumberMax).nullish(),
+  "serviceRequest": zod.enum(['Tax Services', 'Payroll Services', 'Registration & Consulting', 'Accounting & Bookkeeping', 'Other / Multiple services']),
+  "message": zod.string().max(createContactSubmissionBodyMessageMax).nullish()
+})
+
+export const CreateContactSubmissionResponse = zod.object({
+  "id": zod.number().int(),
+  "fullName": zod.string(),
+  "email": zod.string().email(),
+  "phone": zod.string(),
+  "clientType": zod.enum(['individual', 'business']),
+  "companyName": zod.string().nullable(),
+  "companyRegistrationNumber": zod.string().nullable(),
+  "vatNumber": zod.string().nullable(),
+  "serviceRequest": zod.enum(['Tax Services', 'Payroll Services', 'Registration & Consulting', 'Accounting & Bookkeeping', 'Other / Multiple services']),
+  "message": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+})
+
+
 export const GetTeamMemberPhotoParams = zod.object({
   "teamMemberId": zod.coerce.number().int()
 })

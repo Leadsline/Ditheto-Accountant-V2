@@ -46,6 +46,99 @@ export interface TeamMember {
   updatedAt: string;
 }
 
+export type ContactSubmissionClientType = typeof ContactSubmissionClientType[keyof typeof ContactSubmissionClientType];
+
+
+export const ContactSubmissionClientType = {
+  individual: 'individual',
+  business: 'business',
+} as const;
+
+export type ContactSubmissionServiceRequest = typeof ContactSubmissionServiceRequest[keyof typeof ContactSubmissionServiceRequest];
+
+
+export const ContactSubmissionServiceRequest = {
+  Tax_Services: 'Tax Services',
+  Payroll_Services: 'Payroll Services',
+  'Registration_&_Consulting': 'Registration & Consulting',
+  'Accounting_&_Bookkeeping': 'Accounting & Bookkeeping',
+  'Other_/_Multiple_services': 'Other / Multiple services',
+} as const;
+
+export interface ContactSubmission {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  clientType: ContactSubmissionClientType;
+  /** @nullable */
+  companyName: string | null;
+  /** @nullable */
+  companyRegistrationNumber: string | null;
+  /** @nullable */
+  vatNumber: string | null;
+  serviceRequest: ContactSubmissionServiceRequest;
+  /** @nullable */
+  message: string | null;
+  createdAt: string;
+}
+
+export type ContactSubmissionInputClientType = typeof ContactSubmissionInputClientType[keyof typeof ContactSubmissionInputClientType];
+
+
+export const ContactSubmissionInputClientType = {
+  individual: 'individual',
+  business: 'business',
+} as const;
+
+export type ContactSubmissionInputServiceRequest = typeof ContactSubmissionInputServiceRequest[keyof typeof ContactSubmissionInputServiceRequest];
+
+
+export const ContactSubmissionInputServiceRequest = {
+  Tax_Services: 'Tax Services',
+  Payroll_Services: 'Payroll Services',
+  'Registration_&_Consulting': 'Registration & Consulting',
+  'Accounting_&_Bookkeeping': 'Accounting & Bookkeeping',
+  'Other_/_Multiple_services': 'Other / Multiple services',
+} as const;
+
+export interface ContactSubmissionInput {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  fullName: string;
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 10
+     * @maxLength 30
+     */
+  phone: string;
+  clientType: ContactSubmissionInputClientType;
+  /**
+     * @maxLength 160
+     * @nullable
+     */
+  companyName?: string | null;
+  /**
+     * @maxLength 80
+     * @nullable
+     */
+  companyRegistrationNumber?: string | null;
+  /**
+     * @maxLength 80
+     * @nullable
+     */
+  vatNumber?: string | null;
+  serviceRequest: ContactSubmissionInputServiceRequest;
+  /**
+     * @maxLength 3000
+     * @nullable
+     */
+  message?: string | null;
+}
+
 export type TeamMemberInputLevel = typeof TeamMemberInputLevel[keyof typeof TeamMemberInputLevel];
 
 

@@ -19,3 +19,4 @@
 
 export * from "./admin";
 export * from "./team";
+export * from "./contact";

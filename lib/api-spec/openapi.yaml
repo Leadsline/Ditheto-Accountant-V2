@@ -14,6 +14,7 @@ tags:
   - name: Document Requests
   - name: Integrations
   - name: Storage
+  - name: Contact
 paths:
   /healthz:
     get:
@@ -39,6 +40,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TeamMember"
+  /contact-submissions:
+    post:
+      operationId: createContactSubmission
+      tags: [Contact]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactSubmissionInput"
+      responses:
+        "201":
+          description: Contact request received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactSubmission"
+        "400":
+          description: Invalid contact request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
   /team-members/{teamMemberId}/photo:
     get:
       operationId: getTeamMemberPhoto
@@ -366,6 +390,38 @@ components:
         imageUrl: { type: [string, "null"] }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
+    ContactSubmission:
+      type: object
+      required: [id, fullName, email, phone, clientType, companyName, companyRegistrationNumber, vatNumber, serviceRequest, message, createdAt]
+      properties:
+        id: { type: integer }
+        fullName: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        clientType: { type: string, enum: [individual, business] }
+        companyName: { type: [string, "null"] }
+        companyRegistrationNumber: { type: [string, "null"] }
+        vatNumber: { type: [string, "null"] }
+        serviceRequest:
+          type: string
+          enum: [Tax Services, Payroll Services, Registration & Consulting, Accounting & Bookkeeping, Other / Multiple services]
+        message: { type: [string, "null"] }
+        createdAt: { type: string, format: date-time }
+    ContactSubmissionInput:
+      type: object
+      required: [fullName, email, phone, clientType, serviceRequest]
+      properties:
+        fullName: { type: string, minLength: 2, maxLength: 120 }
+        email: { type: string, format: email, maxLength: 254 }
+        phone: { type: string, minLength: 10, maxLength: 30 }
+        clientType: { type: string, enum: [individual, business] }
+        companyName: { type: [string, "null"], maxLength: 160 }
+        companyRegistrationNumber: { type: [string, "null"], maxLength: 80 }
+        vatNumber: { type: [string, "null"], maxLength: 80 }
+        serviceRequest:
+          type: string
+          enum: [Tax Services, Payroll Services, Registration & Consulting, Accounting & Bookkeeping, Other / Multiple services]
+        message: { type: [string, "null"], maxLength: 3000 }
     TeamMemberInput:
       type: object
       required: [name, title, bio, email, level, accent, sortOrder]

@@ -2,6 +2,12 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
+import heroOne from "@assets/ditheto-accountants-hero_1789472037427.jpg";
+import heroTwo from "@assets/ditheto-accountants-hero-v2_1789472037428.jpg";
+import heroThree from "@assets/ditheto-accountants-hero-v3_1789472037429.jpg";
+import heroFour from "@assets/ditheto-accountants-hero-v4_1789472037429.jpg";
+
+const heroImages = [heroOne, heroTwo, heroThree, heroFour];
 
 const services = [
   { number: "01", title: "Tax services", description: "ITR12, IRP6, VAT201, PAYE and SARS support — submitted accurately and ahead of time.", icon: Calculator, href: "/services#tax", count: "13 services" },
@@ -23,7 +29,7 @@ export default function Home() {
         <div className="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full border border-primary/20 bg-primary/10 blur-3xl" />
         <div className="absolute bottom-0 left-1/2 h-px w-1/2 bg-white/10" />
         <div className="site-container relative z-10">
-          <div className="grid min-h-[610px] items-center gap-14 py-20 lg:grid-cols-[1.2fr_.8fr] lg:py-28">
+          <div className="grid min-h-[650px] items-center gap-12 py-16 lg:grid-cols-[1.03fr_.97fr] lg:py-24">
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .75, ease: [0.22, 1, .36, 1] }} className="max-w-3xl">
               <p className="mb-7 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent">
                 <span className="h-px w-9 bg-accent" /> Built for the filing season
@@ -44,12 +50,25 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="lg:justify-self-end">
-              <div className="max-w-sm border-l border-white/20 pl-7 sm:pl-10">
-                <p className="serif-display text-[8rem] leading-[.8] text-accent">29</p>
-                <p className="mt-6 max-w-[15rem] text-sm leading-6 text-slate-300">services under one roof — tax, payroll, registrations and books, so you deal with one firm, not three.</p>
-                <div className="mt-10 h-px w-full bg-white/15" />
-                <p className="mt-5 text-xs font-bold uppercase tracking-[.18em] text-white/55">Pretoria · Secunda · Gauteng</p>
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0">
+              <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-2 shadow-[0_28px_70px_-35px_rgba(0,0,0,.8)]">
+                <motion.div
+                  className="flex w-max"
+                  animate={{ x: ["0%", "-50%"] }}
+                  transition={{ duration: 18, ease: "linear", repeat: Infinity }}
+                >
+                  {[...heroImages, ...heroImages].map((image, index) => (
+                    <div key={`${image}-${index}`} className="w-[calc(100vw-4rem)] shrink-0 pr-2 sm:w-[34rem] lg:w-[31rem] xl:w-[35rem]">
+                      <img
+                        src={image}
+                        alt={index < heroImages.length ? `Ditheto Accountants welcome image ${index + 1}` : ""}
+                        aria-hidden={index >= heroImages.length}
+                        className="aspect-[3/2] w-full rounded-xl object-cover"
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                    </div>
+                  ))}
+                </motion.div>
               </div>
             </motion.div>
           </div>

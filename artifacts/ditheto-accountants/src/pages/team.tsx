@@ -110,27 +110,21 @@ export default function Team() {
     () => team.find((member) => member.level === "lead" && member.parentId === director?.id),
     [team, director],
   );
+  
+  // Connect to Senior Manager if present, else directly to CEO
   const branchManagers = useMemo(
-    () => team.filter((member) => member.level === "lead" && member.parentId === seniorManager?.id)
+    () => team.filter((member) => member.level === "lead" && (seniorManager ? member.parentId === seniorManager.id : member.parentId === director?.id))
       .sort((a, b) => a.sortOrder - b.sortOrder),
-    [team, seniorManager],
+    [team, seniorManager, director],
   );
 
   const branches = useMemo(() => {
     return branchManagers.map(manager => {
       const assistants = team.filter((member) => member.level === "team" && member.parentId === manager.id)
         .sort((a, b) => a.sortOrder - b.sortOrder);
-      return {
-        manager,
-        assistants,
-        colSpan: Math.max(1, assistants.length)
-      };
+      return { manager, assistants };
     });
   }, [branchManagers, team]);
-
-  const totalCols = branches.reduce((sum, b) => sum + b.colSpan, 0) || 1;
-  const firstBranchCenter = branches.length > 0 ? (branches[0].colSpan / 2 / totalCols) * 100 : 50;
-  const lastBranchCenter = branches.length > 0 ? (branches[branches.length - 1].colSpan / 2 / totalCols) * 100 : 50;
 
   return (
     <div className="min-h-screen bg-white">
@@ -164,110 +158,138 @@ export default function Team() {
             {isLoading && <div className="rounded-3xl border border-secondary/10 bg-card p-12 text-center text-muted-foreground">Loading team structure…</div>}
             {isError && <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center text-red-700">The team structure could not be loaded. Please try again shortly.</div>}
             {!isLoading && !isError && (
-              <div className="overflow-hidden rounded-3xl border border-secondary/10 bg-card p-6 shadow-[0_24px_70px_-50px_hsl(var(--secondary))] sm:p-10 lg:p-16">
+              <div className="overflow-hidden rounded-3xl border border-secondary/10 bg-card py-10 sm:py-16 px-4 shadow-[0_24px_70px_-50px_hsl(var(--secondary))]">
                 
-                {/* Level 1: CEO & HR Box */}
-                <div className="relative flex flex-col items-center justify-center w-full">
-                  <div className="relative z-10 w-full max-w-[280px]">
-                    {director && <MemberCard member={director} onSelect={setSelected} variant="solid" />}
-                  </div>
-
-                  {/* Desktop HR Box connected to CEO */}
-                  <div className="absolute left-[calc(50%+140px)] top-1/2 -translate-y-1/2 hidden xl:flex items-center">
-                    <div className="w-16 lg:w-24 xl:w-32 border-t-2 border-dashed border-accent/70" />
-                    <div className="w-[220px] rounded-xl border-2 border-dashed border-accent/70 bg-accent/5 p-4 text-center">
-                      <p className="text-[9px] font-bold uppercase tracking-[.16em] text-amber-700">Outsourced service</p>
-                      <p className="mt-1 font-heading font-bold text-secondary text-sm">HR Function</p>
-                      <p className="mt-0.5 text-[10px] text-muted-foreground">NPM Consulting</p>
+                {/* DESKTOP LAYOUT (Vertical Rails) */}
+                <div className="hidden lg:flex flex-col items-center w-full max-w-7xl mx-auto">
+                  {director && (
+                    <div className="relative flex justify-center w-full">
+                      <div className="w-[280px]">
+                        <MemberCard member={director} onSelect={setSelected} variant="solid" />
+                      </div>
+                      
+                      {/* HR Outsourced Box */}
+                      <div className="absolute left-[calc(50%+140px)] top-1/2 -translate-y-1/2 flex items-center shrink-0 z-10">
+                        <div className="w-8 xl:w-20 border-t-2 border-dashed border-accent/70 shrink-0" />
+                        <div className="w-[200px] xl:w-[220px] rounded-xl border-2 border-dashed border-accent/70 bg-accent/5 p-4 text-center shrink-0">
+                          <p className="text-[9px] font-bold uppercase tracking-[.16em] text-amber-700">Outsourced service</p>
+                          <p className="mt-1 font-heading font-bold text-secondary text-sm">HR Function</p>
+                          <p className="mt-0.5 text-[10px] text-muted-foreground">NPM Consulting</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="mt-7 flex w-full max-w-[280px] flex-col items-center xl:hidden">
-                    <div className="h-7 border-l-2 border-dashed border-accent/70" />
-                    <div className="w-full rounded-xl border-2 border-dashed border-accent/70 bg-accent/5 p-4 text-center">
-                      <p className="text-[9px] font-bold uppercase tracking-[.16em] text-amber-700">Outsourced service</p>
-                      <p className="mt-1 font-heading text-sm font-bold text-secondary">HR Function</p>
-                      <p className="mt-0.5 text-[10px] text-muted-foreground">NPM Consulting</p>
-                    </div>
-                  </div>
-                </div>
+                  {seniorManager && (
+                    <>
+                      <div className="w-[2px] h-10 bg-primary/40 shrink-0" />
+                      <div className="w-[300px]">
+                        <MemberCard member={seniorManager} onSelect={setSelected} />
+                      </div>
+                    </>
+                  )}
 
-                {/* Level 2: Senior Manager */}
-                {seniorManager && (
-                  <>
-                    <div className="mx-auto h-10 w-px bg-primary/40 hidden xl:block" />
-                    <div className="mx-auto h-8 w-px bg-primary/40 xl:hidden mt-6" />
-                    <div className="relative z-10 w-full max-w-[320px] mx-auto">
-                      <MemberCard member={seniorManager} onSelect={setSelected} />
-                    </div>
-                  </>
-                )}
-
-                {/* Level 3: Branches */}
-                {branches.length > 0 && (
-                  <>
-                    <div className="mx-auto h-10 w-px bg-primary/40 hidden lg:block" />
-                    <div className="mx-auto h-8 w-px bg-primary/40 lg:hidden mt-6" />
-                    
-                    <div className="relative w-full flex flex-col lg:flex-row gap-y-16">
-                      {branches.length > 1 && (
-                        <div 
-                          className="absolute top-0 h-px bg-primary/40 hidden lg:block" 
-                          style={{ left: `${firstBranchCenter}%`, right: `${lastBranchCenter}%` }} 
-                        />
-                      )}
-
-                      {branches.map((branch) => {
-                        const branchName = branch.manager.title.includes("—") ? branch.manager.title.split("—")[1]?.trim() : "Branch";
-                        const astFirstCenter = branch.assistants.length > 0 ? (1 / 2 / branch.assistants.length) * 100 : 50;
-                        const astLastCenter = branch.assistants.length > 0 ? (1 / 2 / branch.assistants.length) * 100 : 50;
-
-                        return (
-                          <section 
-                            key={branch.manager.id} 
-                            className="relative flex flex-col items-center px-2 sm:px-4 w-full"
-                            style={{ flex: branch.colSpan }}
-                          >
-                            <div className="absolute top-0 h-8 w-px bg-primary/40 hidden lg:block" />
-                            
-                            <div className="mt-8 lg:mt-8 mb-4 inline-flex rounded-full bg-secondary px-4 py-1.5 shadow-sm">
-                              <p className="text-[10px] font-bold uppercase tracking-[.18em] text-white">{branchName}</p>
-                            </div>
-                            
-                            <div className="w-full max-w-[280px]">
-                              <MemberCard member={branch.manager} onSelect={setSelected} />
-                            </div>
-
-                            {branch.assistants.length > 0 && (
-                              <>
-                                <div className="h-10 w-px bg-primary/40 hidden xl:block" />
-                                <div className="h-8 w-px bg-primary/40 xl:hidden mt-6" />
-                                
-                                <div className="relative w-full">
-                                  {branch.assistants.length > 1 && (
-                                    <div 
-                                      className="absolute top-0 h-px bg-primary/40 hidden xl:block" 
-                                      style={{ left: `${astFirstCenter}%`, right: `${astLastCenter}%` }} 
-                                    />
-                                  )}
-                                  
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:flex xl:flex-row xl:justify-center gap-3 w-full">
-                                    {branch.assistants.map((ast) => (
-                                      <div key={ast.id} className="relative pt-6 xl:pt-8 xl:flex-1 xl:max-w-[240px]">
-                                        <div className="absolute top-0 left-1/2 w-px h-8 -translate-x-1/2 bg-primary/40 hidden xl:block" />
-                                        <MemberCard member={ast} onSelect={setSelected} compact />
-                                      </div>
-                                    ))}
+                  {branches.length > 0 && (
+                    <>
+                      <div className="w-[2px] h-10 bg-primary/40 shrink-0" />
+                      <div 
+                        className="w-full grid" 
+                        style={{ gridTemplateColumns: `repeat(${branches.length}, minmax(0, 1fr))` }}
+                      >
+                        {branches.map((branch, idx) => {
+                          const branchName = branch.manager.title.includes("—") ? branch.manager.title.split("—")[1]?.trim() : "Branch";
+                          
+                          return (
+                            <div key={branch.manager.id} className="flex flex-col items-center relative">
+                              {/* Horizontal connector line drawn between centers of the grid columns */}
+                              {branches.length > 1 && (
+                                <div className="absolute top-0 w-full h-8 flex">
+                                  <div className={`w-1/2 border-t-2 border-primary/40 ${idx === 0 ? 'border-transparent' : ''}`} />
+                                  <div className={`w-1/2 border-t-2 border-primary/40 ${idx === branches.length - 1 ? 'border-transparent' : ''}`} />
+                                </div>
+                              )}
+                              
+                              <div className="w-[2px] h-8 bg-primary/40 shrink-0" />
+                              
+                              <div className="mb-4 inline-flex rounded-full bg-secondary px-4 py-1.5 shadow-sm relative z-10">
+                                <p className="text-[10px] font-bold uppercase tracking-[.18em] text-white">{branchName}</p>
+                              </div>
+                              
+                              <div className="w-[280px]">
+                                <MemberCard member={branch.manager} onSelect={setSelected} />
+                              </div>
+                              
+                              {/* Vertical assistants rail */}
+                              {branch.assistants.map(ast => (
+                                <div key={ast.id} className="flex flex-col items-center w-full">
+                                  <div className="w-[2px] h-6 bg-primary/40 shrink-0" />
+                                  <div className="w-[240px]">
+                                    <MemberCard member={ast} onSelect={setSelected} compact />
                                   </div>
                                 </div>
-                              </>
-                            )}
-                          </section>
-                        );
-                      })}
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* MOBILE LAYOUT (Stacked) */}
+                <div className="flex lg:hidden flex-col items-center w-full max-w-sm mx-auto">
+                  {director && (
+                    <div className="w-full">
+                      <MemberCard member={director} onSelect={setSelected} variant="solid" />
                     </div>
-                  </>
-                )}
+                  )}
+
+                  {director && (
+                    <>
+                      <div className="h-8 w-0 border-l-2 border-dashed border-accent/70 shrink-0" />
+                      <div className="w-full rounded-xl border-2 border-dashed border-accent/70 bg-accent/5 p-4 text-center shadow-sm">
+                        <p className="text-[9px] font-bold uppercase tracking-[.16em] text-amber-700">Outsourced service</p>
+                        <p className="mt-1 font-heading font-bold text-secondary text-sm">HR Function</p>
+                        <p className="mt-0.5 text-[10px] text-muted-foreground">NPM Consulting</p>
+                      </div>
+                    </>
+                  )}
+
+                  {seniorManager && (
+                    <>
+                      <div className="h-8 w-[2px] bg-primary/40 shrink-0" />
+                      <div className="w-full">
+                        <MemberCard member={seniorManager} onSelect={setSelected} />
+                      </div>
+                    </>
+                  )}
+
+                  {branches.map(branch => {
+                    const branchName = branch.manager.title.includes("—") ? branch.manager.title.split("—")[1]?.trim() : "Branch";
+                    return (
+                      <div key={branch.manager.id} className="flex flex-col items-center w-full mt-2">
+                        <div className="h-8 w-[2px] bg-primary/40 shrink-0" />
+                        
+                        <div className="mb-4 inline-flex rounded-full bg-secondary px-4 py-1.5 shadow-sm">
+                          <p className="text-[10px] font-bold uppercase tracking-[.18em] text-white">{branchName}</p>
+                        </div>
+                        
+                        <div className="w-full">
+                          <MemberCard member={branch.manager} onSelect={setSelected} />
+                        </div>
+                        
+                        {branch.assistants.map(ast => (
+                          <div key={ast.id} className="flex flex-col items-center w-full">
+                            <div className="h-6 w-[2px] bg-primary/40 shrink-0" />
+                            <div className="w-[85%]">
+                              <MemberCard member={ast} onSelect={setSelected} compact />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
 
               </div>
             )}

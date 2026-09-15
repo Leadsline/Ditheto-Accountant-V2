@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle, HardHat, Building2, Database, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import heroOne from "@assets/ditheto-accountants-hero_1789472037427.jpg";
@@ -13,17 +13,22 @@ const heroImages = [heroOne, heroTwo, heroThree, heroFour];
 function HeroCarousel() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [direction, setDirection] = useState(1);
 
   const showSlide = (index: number) => {
-    setDirection(index >= activeSlide ? 1 : -1);
     setActiveSlide((index + heroImages.length) % heroImages.length);
   };
 
   useEffect(() => {
+    heroImages.forEach((source) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = source;
+    });
+  }, []);
+
+  useEffect(() => {
     if (paused) return;
     const timer = window.setInterval(() => {
-      setDirection(1);
       setActiveSlide((current) => (current + 1) % heroImages.length);
     }, 7200);
     return () => window.clearInterval(timer);
@@ -40,19 +45,25 @@ function HeroCarousel() {
       aria-label="Ditheto Accountants welcome images"
     >
       <div className="relative h-full min-h-[280px] overflow-hidden rounded-[1.75rem]">
-        <AnimatePresence initial={false} custom={direction}>
+        {heroImages.map((source, index) => (
           <motion.img
-            key={activeSlide}
-            src={heroImages[activeSlide]}
+            key={source}
+            src={source}
             alt={`Ditheto Accountants welcome image ${activeSlide + 1}`}
-            custom={direction}
-            initial={{ opacity: 0, x: direction > 0 ? 45 : -45, scale: 1.02 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: direction > 0 ? -45 : 45, scale: 1.01 }}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0 h-full w-full object-cover"
+            initial={{ opacity: 0, scale: 1.03 }}
+            animate={{
+              opacity: index === activeSlide ? 1 : 0,
+              scale: index === activeSlide ? 1 : 1.03,
+            }}
+            transition={{
+              opacity: { duration: 0.9, ease: "easeInOut" },
+              scale: { duration: 1.15, ease: [0.22, 1, 0.36, 1] },
+            }}
+            className="absolute inset-0 h-full w-full object-cover [will-change:opacity,transform]"
+            loading={index === 0 ? "eager" : "lazy"}
+            fetchPriority={index === 0 ? "high" : "auto"}
           />
-        </AnimatePresence>
+        ))}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-secondary/20 via-transparent to-secondary/10" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-secondary/35 to-transparent" />
       </div>

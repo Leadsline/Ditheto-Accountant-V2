@@ -57,10 +57,10 @@ export function Navbar() {
 
       <header className="sticky top-0 z-50 w-full border-b border-secondary/10 bg-background/95 shadow-[0_8px_30px_-24px_hsl(var(--secondary))] backdrop-blur-xl">
         <div className="site-container">
-        <div className="flex h-[78px] items-center justify-between">
+        <div className="flex h-[84px] items-center justify-between">
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center gap-2">
-               <img src={logo} alt="Ditheto Accountants" className="h-11 w-auto mix-blend-multiply sm:h-12" />
+               <img src={logo} alt="Ditheto Accountants" className="h-14 w-auto mix-blend-multiply sm:h-16" />
             </Link>
           </div>
             <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">

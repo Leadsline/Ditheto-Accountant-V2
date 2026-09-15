@@ -63,32 +63,46 @@ async function resolveStaffUser(req: Request): Promise<StaffUser | null> {
   });
 }
 
-export async function requireStaff(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const staffUser = await resolveStaffUser(req);
-  if (!staffUser) {
-    res.status(401).json({ error: "Authentication required" });
-    return;
-  }
+type StaffUserResolver = (req: Request) => Promise<StaffUser | null>;
+
+function attachStaffUser(req: Request, staffUser: StaffUser): void {
   const adminReq = req as AdminRequest;
   adminReq.staffUser = staffUser;
   adminReq.authUserId = staffUser.clerkUserId;
-  next();
 }
 
-export async function requireFullAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const staffUser = await resolveStaffUser(req);
-  if (!staffUser) {
-    res.status(401).json({ error: "Authentication required" });
-    return;
-  }
-  if (!hasFullAccess(staffUser.role)) {
-    res.status(403).json({ error: "Full portal access required" });
-    return;
-  }
-  const adminReq = req as AdminRequest;
-  adminReq.staffUser = staffUser;
-  adminReq.authUserId = staffUser.clerkUserId;
-  next();
+export function createRequireStaff(
+  resolveUser: StaffUserResolver = resolveStaffUser,
+): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const staffUser = await resolveUser(req);
+    if (!staffUser) {
+      res.status(401).json({ error: "Authentication required" });
+      return;
+    }
+    attachStaffUser(req, staffUser);
+    next();
+  };
 }
 
+export function createRequireFullAccess(
+  resolveUser: StaffUserResolver = resolveStaffUser,
+): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const staffUser = await resolveUser(req);
+    if (!staffUser) {
+      res.status(401).json({ error: "Authentication required" });
+      return;
+    }
+    if (!hasFullAccess(staffUser.role)) {
+      res.status(403).json({ error: "Full portal access required" });
+      return;
+    }
+    attachStaffUser(req, staffUser);
+    next();
+  };
+}
+
+export const requireStaff = createRequireStaff();
+export const requireFullAccess = createRequireFullAccess();
 export const requireSuperAdmin = requireFullAccess;

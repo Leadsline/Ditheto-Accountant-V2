@@ -23,6 +23,27 @@ The root `vercel.json` contains these settings and sends `/api/*` requests to
 the Express function in `api/[...path].ts`. All other unknown routes return the
 React application so direct links such as `/services` and `/admin/team` work.
 
+## Production uptime monitoring
+
+The GitHub Actions workflow
+`.github/workflows/production-uptime.yml` is an external check for the
+`ditheto-accountants-portal` Vercel project. It runs every five minutes and
+checks:
+
+- `https://ditheto-accountants-portal.vercel.app/`
+- `https://ditheto-accountants-portal.vercel.app/api/healthz`
+
+Each endpoint must return HTTP 200, and the health endpoint must include
+`"status": "ok"`. Every endpoint is retried three times before the run is
+marked as failed. A failed run opens one GitHub issue titled
+`[Uptime] ditheto-accountants-portal production is unavailable`; subsequent
+checks do not create duplicate incidents. GitHub Actions failure notifications
+and repository issue notifications provide the team alert channel. When both
+endpoints recover, the workflow comments on and closes the open incident.
+
+This monitor deliberately targets only `ditheto-accountants-portal`; it does
+not check or deploy `ditheto-website`.
+
 Before promoting the deployment, configure every value listed in
 `.env.production.example`. The PostgreSQL service must accept secure external
 connections from serverless functions and should use a pooled connection URL.

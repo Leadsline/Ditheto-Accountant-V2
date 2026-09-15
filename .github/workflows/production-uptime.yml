@@ -1,0 +1,160 @@
+name: Production uptime monitor
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  PORTAL_BASE_URL: https://ditheto-accountants-portal.vercel.app
+  INCIDENT_TITLE: "[Uptime] ditheto-accountants-portal production is unavailable"
+
+jobs:
+  check-production:
+    name: Check public portal and API
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check production endpoints
+        id: checks
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          report_file="$RUNNER_TEMP/uptime-report.md"
+          : > "$report_file"
+          failed=0
+
+          check_endpoint() {
+            local label="$1"
+            local url="$2"
+            local response_file="$RUNNER_TEMP/response-${label//[^a-zA-Z0-9]/-}.txt"
+            local error_file="$RUNNER_TEMP/error-${label//[^a-zA-Z0-9]/-}.txt"
+            local passed=0
+            local attempt
+
+            for attempt in 1 2 3; do
+              : > "$response_file"
+              : > "$error_file"
+              set +e
+              http_status="$(curl \
+                --silent \
+                --show-error \
+                --max-time 20 \
+                --output "$response_file" \
+                --write-out "%{http_code}" \
+                "$url" 2>"$error_file")"
+              curl_status=$?
+              set -e
+
+              if [[ "$curl_status" -eq 0 && "$http_status" == "200" ]]; then
+                if [[ "$label" == "API health endpoint" ]] &&
+                  ! grep -Eq '"status"[[:space:]]*:[[:space:]]*"ok"' "$response_file"; then
+                  printf '%s\n' "The response did not contain status=ok." > "$error_file"
+                else
+                  passed=1
+                  break
+                fi
+              fi
+
+              if [[ "$attempt" -lt 3 ]]; then
+                sleep 5
+              fi
+            done
+
+            if [[ "$passed" -eq 1 ]]; then
+              printf -- '- ✅ **%s** — HTTP 200\n' "$label" >> "$report_file"
+            else
+              failed=1
+              detail="$(tr '\n' ' ' < "$error_file" | cut -c1-240)"
+              printf -- '- ❌ **%s** — unavailable after 3 attempts (HTTP %s). %s\n' \
+                "$label" "${http_status:-no response}" "${detail:-No response body.}" \
+                >> "$report_file"
+            fi
+          }
+
+          check_endpoint \
+            "Public homepage" \
+            "${PORTAL_BASE_URL}/"
+          check_endpoint \
+            "API health endpoint" \
+            "${PORTAL_BASE_URL}/api/healthz"
+
+          {
+            echo "## Production uptime check"
+            echo
+            echo "**Target:** \`${PORTAL_BASE_URL}\`"
+            echo
+            cat "$report_file"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "failed=$failed"
+            echo "report<<UPTIME_REPORT"
+            cat "$report_file"
+            echo "UPTIME_REPORT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open or keep the outage incident
+        if: steps.checks.outputs.failed == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECK_REPORT: ${{ steps.checks.outputs.report }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          incident_number="$(gh issue list \
+            --state open \
+            --search "${INCIDENT_TITLE} in:title" \
+            --json number \
+            --limit 1 | jq -r '.[0].number // empty')"
+
+          if [[ -z "$incident_number" ]]; then
+            gh issue create \
+              --title "$INCIDENT_TITLE" \
+              --body "$(cat <<EOF
+          ## Production outage detected
+
+          The scheduled external uptime monitor could not confirm that the Ditheto Accountants production homepage and API were healthy. Each endpoint was attempted three times.
+
+          **Target:** ${PORTAL_BASE_URL}
+          **Monitor run:** ${RUN_URL}
+
+          ${CHECK_REPORT}
+
+          GitHub Actions will continue checking every five minutes. This issue will be updated when the service recovers.
+          EOF
+          )"
+          fi
+
+      - name: Close a recovered outage incident
+        if: steps.checks.outputs.failed == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          incident_number="$(gh issue list \
+            --state open \
+            --search "${INCIDENT_TITLE} in:title" \
+            --json number \
+            --limit 1 | jq -r '.[0].number // empty')"
+
+          if [[ -n "$incident_number" ]]; then
+            gh issue close "$incident_number" \
+              --comment "Recovery confirmed by the scheduled uptime monitor. Both the public homepage and /api/healthz returned healthy responses."
+          fi
+
+      - name: Fail the check while production is unavailable
+        if: steps.checks.outputs.failed == '1'
+        run: |
+          echo "Production uptime check failed. See the incident issue and step summary."
+          exit 1

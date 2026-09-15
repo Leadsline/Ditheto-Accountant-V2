@@ -231,7 +231,7 @@ router.patch("/admin/team-members/:teamMemberId", requireFullAccess, async (req:
   if (existing.imageObjectPath && body.data.imageObjectPath !== undefined && body.data.imageObjectPath !== existing.imageObjectPath) {
     try {
       const oldPhoto = await storage.getObjectEntityFile(existing.imageObjectPath);
-      await oldPhoto.delete({ ignoreNotFound: true });
+       await storage.deleteObject(oldPhoto);
     } catch (error) {
       req.log.warn({ err: error, teamMemberId: existing.id }, "Employee updated but previous profile photo cleanup failed");
     }
@@ -257,7 +257,7 @@ router.delete("/admin/team-members/:teamMemberId", requireFullAccess, async (req
   if (member.imageObjectPath) {
     try {
       const photo = await storage.getObjectEntityFile(member.imageObjectPath);
-      await photo.delete({ ignoreNotFound: true });
+       await storage.deleteObject(photo);
     } catch (error) {
       req.log.warn({ err: error, teamMemberId: member.id }, "Employee deleted but profile photo cleanup failed");
     }

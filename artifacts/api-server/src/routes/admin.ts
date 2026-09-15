@@ -202,7 +202,7 @@ router.delete("/admin/documents/:documentId", requireFullAccess, async (req: Req
   }
   try {
     const file = await storage.getObjectEntityFile(document.objectPath);
-    await file.delete({ ignoreNotFound: true });
+     await storage.deleteObject(file);
   } catch (error) {
     req.log.warn({ err: error, documentId: document.id }, "Document metadata deleted but stored object cleanup failed");
   }

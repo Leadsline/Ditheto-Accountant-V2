@@ -28,10 +28,10 @@ Before promoting the deployment, configure every value listed in
 connections from serverless functions and should use a pooled connection URL.
 
 Replit Object Storage depends on a local Replit credential sidecar and is not
-portable to Vercel. Public pages and database APIs can be deployed after their
-environment values are configured, but staff photo and private document
-uploads require a portable storage provider before those features are
-production-ready.
+portable to Vercel. The API uses Supabase Storage when `SUPABASE_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` are present, with `private-documents` for private
+files and `public-assets` for public files. The same provider works from
+Afrihost/cPanel, so staff photos and private documents remain portable.
 
 ## cPanel / Afrihost
 

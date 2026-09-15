@@ -11,6 +11,10 @@ import {
 } from './objectAcl';
 
 const REPLIT_SIDECAR_ENDPOINT = 'http://127.0.0.1:1106';
+const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabasePrivateBucket = process.env.SUPABASE_PRIVATE_BUCKET || 'private-documents';
+const supabasePublicBucket = process.env.SUPABASE_PUBLIC_BUCKET || 'public-assets';
 
 export const objectStorageClient = new Storage({
   credentials: {
@@ -38,8 +42,29 @@ export class ObjectNotFoundError extends Error {
   }
 }
 
+type SupabaseObject = {
+  provider: 'supabase';
+  bucket: string;
+  objectName: string;
+};
+
+type StoredObject = File | SupabaseObject;
+
 export class ObjectStorageService {
   constructor() {}
+
+  private usesSupabase(): boolean {
+    return Boolean(supabaseUrl && supabaseServiceKey);
+  }
+
+  private requireSupabaseConfig(): { url: string; key: string } {
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error(
+        'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for portable object storage.',
+      );
+    }
+    return { url: supabaseUrl, key: supabaseServiceKey };
+  }
 
   getPublicObjectSearchPaths(): Array<string> {
     const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || '';
@@ -71,7 +96,15 @@ export class ObjectStorageService {
     return dir;
   }
 
-  async searchPublicObject(filePath: string): Promise<File | null> {
+  async searchPublicObject(filePath: string): Promise<StoredObject | null> {
+    if (this.usesSupabase()) {
+      return {
+        provider: 'supabase',
+        bucket: supabasePublicBucket,
+        objectName: filePath.replace(/^\/+/, ''),
+      };
+    }
+
     for (const searchPath of this.getPublicObjectSearchPaths()) {
       const fullPath = `${searchPath}/${filePath}`;
 
@@ -89,10 +122,34 @@ export class ObjectStorageService {
   }
 
   async downloadObject(
-    file: File,
+    file: StoredObject,
     cacheTtlSec: number = 3600,
   ): Promise<Response> {
-    const [metadata] = await file.getMetadata();
+    if (isSupabaseObject(file)) {
+      const { url, key } = this.requireSupabaseConfig();
+      const response = await fetch(
+        `${url}/storage/v1/object/${file.bucket}/${encodeStoragePath(file.objectName)}`,
+        {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+          },
+        },
+      );
+      if (response.status === 404) {
+        throw new ObjectNotFoundError();
+      }
+      if (!response.ok) {
+        throw new Error(`Supabase Storage download failed with ${response.status}`);
+      }
+      const headers = new Headers(response.headers);
+      headers.set(
+        'Cache-Control',
+        `${file.bucket === supabasePublicBucket ? 'public' : 'private'}, max-age=${cacheTtlSec}`,
+      );
+      return new Response(response.body, { status: response.status, headers });
+    }
+
     const aclPolicy = await getObjectAclPolicy(file);
     const isPublic = aclPolicy?.visibility === 'public';
 
@@ -101,9 +158,10 @@ export class ObjectStorageService {
 
     const headers: Record<string, string> = {
       'Content-Type':
-        (metadata.contentType as string) || 'application/octet-stream',
+        (await file.getMetadata())[0].contentType as string || 'application/octet-stream',
       'Cache-Control': `${isPublic ? 'public' : 'private'}, max-age=${cacheTtlSec}`,
     };
+    const [metadata] = await file.getMetadata();
     if (metadata.size) {
       headers['Content-Length'] = String(metadata.size);
     }
@@ -112,6 +170,11 @@ export class ObjectStorageService {
   }
 
   async getObjectEntityUploadURL(): Promise<string> {
+    if (this.usesSupabase()) {
+      const objectName = `uploads/${randomUUID()}`;
+      return `/api/storage/uploads/put?object=${encodeURIComponent(objectName)}`;
+    }
+
     const privateObjectDir = this.getPrivateObjectDir();
     if (!privateObjectDir) {
       throw new Error(
@@ -122,9 +185,7 @@ export class ObjectStorageService {
 
     const objectId = randomUUID();
     const fullPath = `${privateObjectDir}/uploads/${objectId}`;
-
     const { bucketName, objectName } = parseObjectPath(fullPath);
-
     return signObjectURL({
       bucketName,
       objectName,
@@ -133,7 +194,85 @@ export class ObjectStorageService {
     });
   }
 
-  async getObjectEntityFile(objectPath: string): Promise<File> {
+  async uploadSupabaseObject(objectName: string, body: Buffer, contentType: string): Promise<void> {
+    const { url, key } = this.requireSupabaseConfig();
+    const response = await fetch(
+      `${url}/storage/v1/object/${supabasePrivateBucket}/${encodeStoragePath(objectName)}`,
+      {
+        method: 'POST',
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          'Content-Type': contentType || 'application/octet-stream',
+          'x-upsert': 'true',
+        },
+        body,
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`Supabase Storage upload failed with ${response.status}`);
+    }
+  }
+
+  async deleteObject(file: StoredObject): Promise<void> {
+    if (isSupabaseObject(file)) {
+      const { url, key } = this.requireSupabaseConfig();
+      const response = await fetch(
+        `${url}/storage/v1/object/${file.bucket}/${encodeStoragePath(file.objectName)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+          },
+        },
+      );
+      if (!response.ok && response.status !== 404) {
+        throw new Error(`Supabase Storage delete failed with ${response.status}`);
+      }
+      return;
+    }
+    await file.delete({ ignoreNotFound: true });
+  }
+
+  normalizeUploadObjectPath(rawObjectName: string): string {
+    return `/objects/${rawObjectName.replace(/^\/+/, '')}`;
+  }
+
+  async getObjectEntityFile(objectPath: string): Promise<StoredObject> {
+    if (this.usesSupabase()) {
+      if (!objectPath.startsWith('/objects/')) {
+        throw new ObjectNotFoundError();
+      }
+      const objectName = objectPath.slice('/objects/'.length);
+      if (!objectName) {
+        throw new ObjectNotFoundError();
+      }
+      const storedObject: SupabaseObject = {
+        provider: 'supabase',
+        bucket: supabasePrivateBucket,
+        objectName,
+      };
+      const { url, key } = this.requireSupabaseConfig();
+      const response = await fetch(
+        `${url}/storage/v1/object/${storedObject.bucket}/${encodeStoragePath(objectName)}`,
+        {
+          method: 'HEAD',
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+          },
+        },
+      );
+      if (response.status === 404) {
+        throw new ObjectNotFoundError();
+      }
+      if (!response.ok) {
+        throw new Error(`Supabase Storage lookup failed with ${response.status}`);
+      }
+      return storedObject;
+    }
+
     if (!objectPath.startsWith('/objects/')) {
       throw new ObjectNotFoundError();
     }
@@ -159,6 +298,44 @@ export class ObjectStorageService {
     return objectFile;
   }
 
+  async trySetObjectEntityAclPolicy(
+    rawPath: string,
+    aclPolicy: ObjectAclPolicy,
+  ): Promise<string> {
+    const normalizedPath = this.normalizeObjectEntityPath(rawPath);
+    if (this.usesSupabase()) {
+      return normalizedPath;
+    }
+    if (!normalizedPath.startsWith('/')) {
+      return normalizedPath;
+    }
+
+    const objectFile = await this.getObjectEntityFile(normalizedPath);
+    if (isSupabaseObject(objectFile)) {
+      return normalizedPath;
+    }
+    await setObjectAclPolicy(objectFile, aclPolicy);
+    return normalizedPath;
+  }
+
+  async canAccessObjectEntity({
+    userId,
+    objectFile,
+    requestedPermission,
+  }: {
+    userId?: string;
+    objectFile: StoredObject;
+    requestedPermission?: ObjectPermission;
+  }): Promise<boolean> {
+    if (isSupabaseObject(objectFile)) {
+      return true;
+    }
+    return canAccessObject({
+      userId,
+      objectFile,
+      requestedPermission: requestedPermission ?? ObjectPermission.READ,
+    });
+  }
   normalizeObjectEntityPath(rawPath: string): string {
     if (!rawPath.startsWith('https://storage.googleapis.com/')) {
       return rawPath;
@@ -180,35 +357,14 @@ export class ObjectStorageService {
     return `/objects/${entityId}`;
   }
 
-  async trySetObjectEntityAclPolicy(
-    rawPath: string,
-    aclPolicy: ObjectAclPolicy,
-  ): Promise<string> {
-    const normalizedPath = this.normalizeObjectEntityPath(rawPath);
-    if (!normalizedPath.startsWith('/')) {
-      return normalizedPath;
-    }
+}
 
-    const objectFile = await this.getObjectEntityFile(normalizedPath);
-    await setObjectAclPolicy(objectFile, aclPolicy);
-    return normalizedPath;
-  }
+function isSupabaseObject(object: StoredObject): object is SupabaseObject {
+  return 'provider' in object && object.provider === 'supabase';
+}
 
-  async canAccessObjectEntity({
-    userId,
-    objectFile,
-    requestedPermission,
-  }: {
-    userId?: string;
-    objectFile: File;
-    requestedPermission?: ObjectPermission;
-  }): Promise<boolean> {
-    return canAccessObject({
-      userId,
-      objectFile,
-      requestedPermission: requestedPermission ?? ObjectPermission.READ,
-    });
-  }
+function encodeStoragePath(path: string): string {
+  return path.split('/').map((segment) => encodeURIComponent(segment)).join('/');
 }
 
 function parseObjectPath(path: string): {

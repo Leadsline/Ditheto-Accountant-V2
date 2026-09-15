@@ -4,6 +4,7 @@ import {
   RequestUploadUrlResponse,
 } from '@workspace/api-zod';
 import { Router, type IRouter, type Request, type Response } from 'express';
+import express from 'express';
 import {
   ObjectNotFoundError,
   ObjectStorageService,
@@ -36,7 +37,11 @@ router.post(
 
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
       const objectPath =
-        objectStorageService.normalizeObjectEntityPath(uploadURL);
+        uploadURL.startsWith('/api/storage/uploads/put')
+          ? objectStorageService.normalizeUploadObjectPath(
+              new URL(uploadURL, 'http://localhost').searchParams.get('object') || '',
+            )
+          : objectStorageService.normalizeObjectEntityPath(uploadURL);
 
       res.json(
         RequestUploadUrlResponse.parse({
@@ -48,6 +53,30 @@ router.post(
     } catch (error) {
       req.log.error({ err: error }, 'Error generating upload URL');
       res.status(500).json({ error: 'Failed to generate upload URL' });
+    }
+  },
+);
+
+router.put(
+  '/storage/uploads/put',
+  requireFullAccess,
+  express.raw({ type: '*/*', limit: '25mb' }),
+  async (req: Request, res: Response) => {
+    const objectName = typeof req.query.object === 'string' ? req.query.object : '';
+    if (!objectName || !Buffer.isBuffer(req.body)) {
+      res.status(400).json({ error: 'Missing upload body or object path' });
+      return;
+    }
+    try {
+      await objectStorageService.uploadSupabaseObject(
+        objectName,
+        req.body,
+        req.header('content-type') || 'application/octet-stream',
+      );
+      res.status(204).end();
+    } catch (error) {
+      req.log.error({ err: error }, 'Error uploading object');
+      res.status(500).json({ error: 'Failed to upload object' });
     }
   },
 );

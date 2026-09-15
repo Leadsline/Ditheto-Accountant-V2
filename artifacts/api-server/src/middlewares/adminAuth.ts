@@ -1,5 +1,5 @@
 import { getAuth } from "@clerk/express";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import { db, staffUsersTable, type StaffUser } from "@workspace/db";
 
@@ -27,9 +27,18 @@ async function resolveStaffUser(req: Request): Promise<StaffUser | null> {
     .limit(1);
   if (existing) return existing;
 
-  // Staff access is an explicit allowlist. Do not auto-provision users here:
-  // accounts must be created by a Super Admin through the protected endpoint.
-  return null;
+  // The first authenticated staff account owns the initial portal setup.
+  // Later accounts must be provisioned by a Super Admin through the protected endpoint.
+  const [{ count: staffCount }] = await db
+    .select({ count: count() })
+    .from(staffUsersTable);
+  if (Number(staffCount) !== 0) return null;
+
+  const [bootstrapped] = await db
+    .insert(staffUsersTable)
+    .values({ clerkUserId: userId, role: "super_admin" })
+    .returning();
+  return bootstrapped ?? null;
 }
 
 export async function requireStaff(req: Request, res: Response, next: NextFunction): Promise<void> {

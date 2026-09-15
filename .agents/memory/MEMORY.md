@@ -1,1 +1,2 @@
 - [Vercel monorepo deployment](vercel-monorepo-deployment.md) — bundle the Express TypeScript API before Vercel packages a JavaScript adapter, and explicitly route `/api/*` to the catch-all function.
+- [Clerk environment staff bootstrap](clerk-environment-staff-bootstrap.md) — development and production Clerk users have different IDs, so initialize portal ownership per Clerk issuer when the role database is shared.

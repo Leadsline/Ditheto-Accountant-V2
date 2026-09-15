@@ -166,7 +166,9 @@ router.get("/team-members", async (_req: Request, res: Response): Promise<void> 
   res.json(ListTeamMembersResponse.parse(members.map(toResponse)));
 });
 
-router.get("/team-members/:teamMemberId/photo", async (req: Request, res: Response): Promise<void> => {
+// Profile photos are stored with the same private object policy as client
+// documents; only full-access staff may download them.
+router.get("/team-members/:teamMemberId/photo", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = GetTeamMemberPhotoParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: "Invalid employee ID" });

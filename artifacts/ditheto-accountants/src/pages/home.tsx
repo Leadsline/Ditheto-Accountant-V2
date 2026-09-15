@@ -36,7 +36,7 @@ function HeroCarousel() {
 
   return (
     <div
-      className="group relative h-full min-h-[280px] overflow-hidden rounded-[1.75rem] shadow-[0_35px_110px_-48px_rgba(46,188,179,.55),0_30px_80px_-46px_rgba(0,0,0,.9)]"
+      className="group relative aspect-[79/53] w-full overflow-hidden rounded-[1.75rem] bg-secondary shadow-[0_35px_110px_-48px_rgba(46,188,179,.55),0_30px_80px_-46px_rgba(0,0,0,.9)]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -44,22 +44,16 @@ function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label="Ditheto Accountants welcome images"
     >
-      <div className="relative h-full min-h-[280px] overflow-hidden rounded-[1.75rem]">
+      <div className="absolute inset-0 overflow-hidden rounded-[1.75rem]">
         {heroImages.map((source, index) => (
           <motion.img
             key={source}
             src={source}
-            alt={`Ditheto Accountants welcome image ${activeSlide + 1}`}
-            initial={{ opacity: 0, scale: 1.03 }}
-            animate={{
-              opacity: index === activeSlide ? 1 : 0,
-              scale: index === activeSlide ? 1 : 1.03,
-            }}
-            transition={{
-              opacity: { duration: 0.9, ease: "easeInOut" },
-              scale: { duration: 1.15, ease: [0.22, 1, 0.36, 1] },
-            }}
-            className="absolute inset-0 h-full w-full object-cover [will-change:opacity,transform]"
+            alt={index === activeSlide ? `Ditheto Accountants welcome image ${index + 1}` : ""}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: index === activeSlide ? 1 : 0 }}
+            transition={{ opacity: { duration: 0.9, ease: "easeInOut" } }}
+            className="absolute inset-0 h-full w-full object-contain [will-change:opacity]"
             loading={index === 0 ? "eager" : "lazy"}
             fetchPriority={index === 0 ? "high" : "auto"}
           />
@@ -129,7 +123,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:col-start-2 lg:row-start-2 lg:h-full lg:-mr-14 xl:-mr-24">
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:col-start-2 lg:row-start-2 lg:self-center">
               <HeroCarousel />
             </motion.div>
           </div>

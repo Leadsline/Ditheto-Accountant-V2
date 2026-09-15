@@ -1,5 +1,5 @@
 import { getAuth } from "@clerk/express";
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import { db, staffUsersTable, type StaffUser } from "@workspace/db";
 
@@ -20,25 +20,9 @@ async function resolveStaffUser(req: Request): Promise<StaffUser | null> {
     .limit(1);
   if (existing) return existing;
 
-  const [firstUser] = await db
-    .select()
-    .from(staffUsersTable)
-    .orderBy(asc(staffUsersTable.id))
-    .limit(1);
-  const role = firstUser ? "staff" : "super_admin";
-  const [created] = await db
-    .insert(staffUsersTable)
-    .values({ clerkUserId: userId, role })
-    .onConflictDoNothing({ target: staffUsersTable.clerkUserId })
-    .returning();
-
-  if (created) return created;
-  const [concurrent] = await db
-    .select()
-    .from(staffUsersTable)
-    .where(eq(staffUsersTable.clerkUserId, userId))
-    .limit(1);
-  return concurrent ?? null;
+  // Staff access is an explicit allowlist. Do not auto-provision users here:
+  // accounts must be created by a Super Admin through the protected endpoint.
+  return null;
 }
 
 export async function requireStaff(req: Request, res: Response, next: NextFunction): Promise<void> {

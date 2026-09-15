@@ -27,6 +27,7 @@ import {
   db,
   documentRequestsTable,
   integrationStateTable,
+  staffUsersTable,
 } from "@workspace/db";
 import { requireStaff, requireSuperAdmin, type AdminRequest } from "../middlewares/adminAuth";
 import { ObjectStorageService } from "../lib/objectStorage";
@@ -37,6 +38,75 @@ const storage = new ObjectStorageService();
 router.get("/admin/me", requireStaff, async (req: Request, res: Response): Promise<void> => {
   const staffUser = (req as AdminRequest).staffUser;
   res.json({ role: staffUser?.role ?? "staff" });
+});
+
+router.post("/admin/staff-users", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+  const body = req.body as {
+    email?: unknown;
+    password?: unknown;
+    firstName?: unknown;
+    lastName?: unknown;
+  };
+  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+  const password = typeof body.password === "string" ? body.password : "";
+  const firstName = typeof body.firstName === "string" ? body.firstName.trim() : "";
+  const lastName = typeof body.lastName === "string" ? body.lastName.trim() : "";
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    res.status(400).json({ error: "Enter a valid staff email address." });
+    return;
+  }
+  if (password.length < 12) {
+    res.status(400).json({ error: "Staff passwords must be at least 12 characters." });
+    return;
+  }
+  if (!process.env.CLERK_SECRET_KEY) {
+    res.status(503).json({ error: "Staff account creation is not configured yet." });
+    return;
+  }
+
+  const clerkResponse = await fetch("https://api.clerk.com/v1/users", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email_address: [email],
+      password,
+      ...(firstName ? { first_name: firstName } : {}),
+      ...(lastName ? { last_name: lastName } : {}),
+    }),
+  });
+
+  if (!clerkResponse.ok) {
+    const clerkError = await clerkResponse.json().catch(() => null) as { errors?: Array<{ message?: string }> } | null;
+    const message = clerkError?.errors?.[0]?.message;
+    res.status(clerkResponse.status === 422 ? 409 : 502).json({
+      error: message || "The staff account could not be created.",
+    });
+    return;
+  }
+
+  const clerkUser = await clerkResponse.json() as { id?: string };
+  if (!clerkUser.id) {
+    res.status(502).json({ error: "The authentication account was created without a usable user ID." });
+    return;
+  }
+
+  try {
+    const [staffUser] = await db.insert(staffUsersTable)
+      .values({ clerkUserId: clerkUser.id, role: "staff" })
+      .returning({ id: staffUsersTable.id, role: staffUsersTable.role });
+    res.status(201).json({ id: staffUser.id, email, role: staffUser.role });
+  } catch (error) {
+    await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(clerkUser.id)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` },
+    }).catch(() => undefined);
+    req.log.error({ err: error }, "Staff account database record could not be created");
+    res.status(500).json({ error: "The staff account could not be completed." });
+  }
 });
 
 router.get("/admin/clients", requireStaff, async (_req: Request, res: Response): Promise<void> => {

@@ -39,7 +39,6 @@ export function Footer() {
               <li><Link href="/team" className="text-gray-300 hover:text-accent transition-colors block">Our Team</Link></li>
               <li><Link href="/quote" className="text-gray-300 hover:text-accent transition-colors block">Request a Quote</Link></li>
               <li><Link href="/contact" className="text-gray-300 hover:text-accent transition-colors block">Contact Us</Link></li>
-              <li><Link href="/admin" className="text-gray-500 hover:text-white transition-colors block mt-4 text-xs">Staff Portal</Link></li>
             </ul>
           </div>
 

@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Route, Switch, useLocation, Router as WouterRouter, Redirect } from 'wouter';
-import { ClerkProvider, SignIn, SignUp, useAuth, useClerk } from '@clerk/react';
+import { ClerkProvider, SignIn, useAuth, useClerk } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 
@@ -67,12 +67,6 @@ function Router() {
             <SignIn routing="path" path={`${basePath}/sign-in`} forceRedirectUrl={`${basePath}/admin/clients`} />
           </div>
         )} />
-        <Route path="/sign-up/*?" component={() => (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-            <SignUp routing="path" path={`${basePath}/sign-up`} forceRedirectUrl={`${basePath}/admin/clients`} />
-          </div>
-        )} />
-
         {/* Admin Routes */}
         <Route path="/admin"><AdminGuard><AdminDashboard /></AdminGuard></Route>
         <Route path="/admin/clients"><AdminGuard><AdminClients /></AdminGuard></Route>
@@ -123,10 +117,12 @@ function App() {
       publishableKey={clerkPubKey}
       proxyUrl={clerkProxyUrl}
       signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
       appearance={{
         theme: shadcn,
         cssLayerName: "clerk",
+        elements: {
+          socialButtonsBlockButton: "hidden",
+        },
         variables: {
           colorPrimary: "#008E8A",
           colorForeground: "#17324D",
@@ -140,7 +136,6 @@ function App() {
       }}
       localization={{
         signIn: { start: { title: "Ditheto Admin Portal", subtitle: "Use your email address and password to manage client records securely" } },
-        signUp: { start: { title: "Create staff account", subtitle: "The first staff account becomes Super Admin; later accounts are Staff" } },
       }}
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}

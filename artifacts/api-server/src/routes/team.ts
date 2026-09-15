@@ -77,9 +77,9 @@ async function seedTeamIfEmpty(): Promise<void> {
       sortOrder: 0,
     },
     {
-      name: "Motsie Malebe",
+      name: "Motsei Malebe",
       title: "Branch Manager — Secunda Branch",
-      bio: "Motsie manages the Secunda branch, coordinating client service and supporting the branch accounting team.",
+      bio: "Motsei manages the Secunda branch, coordinating client service and supporting the branch accounting team.",
       email: "motsie@dithetoaccountants.co.za",
       phone: null,
       level: "lead",

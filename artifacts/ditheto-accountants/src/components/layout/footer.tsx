@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin, MessageCircle } from "lucide-react";
-import logo from "@assets/Logo_1789472037430.png";
+import logo from "@assets/Logo_NRG_1789474380486.png";
 
 export function Footer() {
   return (
@@ -9,8 +9,8 @@ export function Footer() {
         <div className="mb-14 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_.7fr_1fr_1fr]">
           
           <div className="space-y-6">
-            <div className="inline-block rounded-xl bg-white/80 px-3 py-2.5 shadow-[0_10px_30px_-18px_rgba(0,0,0,.9)] backdrop-blur-sm">
-              <img src={logo} alt="Ditheto Accountants" className="h-12 w-auto opacity-90" />
+            <div className="inline-block rounded-xl bg-[#f2eee4]/90 px-3 py-2.5 shadow-[0_12px_30px_-18px_rgba(0,0,0,.9)] ring-1 ring-white/10 backdrop-blur-sm">
+              <img src={logo} alt="Ditheto Accountants" className="h-12 w-auto" />
             </div>
             <p className="max-w-sm pr-4 text-sm leading-relaxed text-gray-300">
               A 100% black-owned South African accounting, tax, payroll, bookkeeping, and business registration firm serving Pretoria and Secunda. Integrity you can count on.

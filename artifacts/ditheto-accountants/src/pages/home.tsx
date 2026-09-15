@@ -39,7 +39,7 @@ function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label="Ditheto Accountants welcome images"
     >
-      <div className="relative aspect-[16/10] overflow-hidden rounded-[1.75rem]">
+      <div className="relative h-full min-h-[280px] overflow-hidden rounded-[1.75rem]">
         <AnimatePresence initial={false} custom={direction}>
           <motion.img
             key={activeSlide}
@@ -93,11 +93,11 @@ export default function Home() {
         <div className="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full border border-primary/20 bg-primary/10 blur-3xl" />
         <div className="absolute bottom-0 left-1/2 h-px w-1/2 bg-white/10" />
         <div className="site-container relative z-10">
-          <div className="grid min-h-[700px] items-center gap-10 py-16 lg:grid-cols-[.78fr_1.22fr] lg:py-24">
-            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .75, ease: [0.22, 1, .36, 1] }} className="max-w-3xl">
-              <p className="mb-7 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent">
-                <span className="h-px w-9 bg-accent" /> Built for the filing season
-              </p>
+          <div className="grid min-h-[700px] items-start gap-10 py-16 lg:grid-cols-[.78fr_1.22fr] lg:grid-rows-[auto_auto] lg:py-24">
+            <p className="mb-0 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent lg:col-start-1 lg:row-start-1">
+              <span className="h-px w-9 bg-accent" /> Built for the filing season
+            </p>
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .75, ease: [0.22, 1, .36, 1] }} className="max-w-3xl lg:col-start-1 lg:row-start-2">
               <h1 className="serif-display text-balance text-5xl leading-[.98] sm:text-6xl lg:text-[5.6rem]">
                 Accounting and tax you <em className="text-accent">never</em> have to chase.
               </h1>
@@ -114,7 +114,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:-mr-14 xl:-mr-24">
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:col-start-2 lg:row-start-2 lg:h-full lg:-mr-14 xl:-mr-24">
               <HeroCarousel />
             </motion.div>
           </div>

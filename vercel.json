@@ -1,15 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter @workspace/ditheto-accountants run build",
+  "buildCommand": "pnpm --filter @workspace/api-server run build:vercel && pnpm --filter @workspace/ditheto-accountants run build",
   "outputDirectory": "artifacts/ditheto-accountants/dist/public",
   "framework": "vite",
   "functions": {
-    "api/[...path].ts": {
+    "api/[...path].js": {
       "maxDuration": 30
     }
   },
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/[...path]"
+    },
     {
       "handle": "filesystem"
     },

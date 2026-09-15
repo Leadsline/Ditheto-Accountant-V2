@@ -8,7 +8,7 @@ import {
   ObjectNotFoundError,
   ObjectStorageService,
 } from '../lib/objectStorage';
-import { requireStaff, requireSuperAdmin } from '../middlewares/adminAuth';
+import { requireFullAccess } from '../middlewares/adminAuth';
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
@@ -23,7 +23,7 @@ const objectStorageService = new ObjectStorageService();
  */
 router.post(
   '/storage/uploads/request-url',
-  requireSuperAdmin,
+  requireFullAccess,
   async (req: Request, res: Response) => {
     const parsed = RequestUploadUrlBody.safeParse(req.body);
     if (!parsed.success) {
@@ -98,7 +98,7 @@ router.get(
  * These are served from a separate path from /public-objects and can optionally
  * be protected with authentication or ACL checks based on the use case.
  */
-router.get('/storage/objects/*path', requireStaff, async (req: Request, res: Response) => {
+router.get('/storage/objects/*path', requireFullAccess, async (req: Request, res: Response) => {
   try {
     const raw = req.params.path;
     const wildcardPath = Array.isArray(raw) ? raw.join('/') : raw;

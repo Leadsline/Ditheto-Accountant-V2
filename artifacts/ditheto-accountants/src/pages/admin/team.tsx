@@ -90,7 +90,7 @@ async function uploadProfilePhoto(file: File): Promise<string> {
 
 export default function AdminTeam() {
   const queryClient = useQueryClient();
-  const { isSuperAdmin, isLoaded: roleLoaded } = useRole();
+  const { isFullAccess, isLoaded: roleLoaded } = useRole();
   const { data: people = [], isLoading, isError } = useListTeamMembers();
   const createMember = useCreateTeamMember();
   const updateMember = useUpdateTeamMember();
@@ -100,7 +100,7 @@ export default function AdminTeam() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const [saving, setSaving] = useState(false);
-  const [accountDraft, setAccountDraft] = useState({ email: "", password: "", firstName: "", lastName: "" });
+  const [accountDraft, setAccountDraft] = useState({ email: "", password: "", firstName: "", lastName: "", role: "marketing_staff" });
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [accountNotice, setAccountNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -223,12 +223,13 @@ export default function AdminTeam() {
           password: accountDraft.password,
           firstName: accountDraft.firstName.trim(),
           lastName: accountDraft.lastName.trim(),
+          role: accountDraft.role,
         }),
       });
       const result = await response.json().catch(() => ({})) as { error?: string };
       if (!response.ok) throw new Error(result.error || "The staff account could not be created.");
       setAccountNotice({ kind: "success", text: `Staff login created for ${accountDraft.email.trim()}. Share the credentials securely with that staff member.` });
-      setAccountDraft({ email: "", password: "", firstName: "", lastName: "" });
+      setAccountDraft({ email: "", password: "", firstName: "", lastName: "", role: "marketing_staff" });
     } catch (error) {
       setAccountNotice({ kind: "error", text: error instanceof Error ? error.message : "The staff account could not be created." });
     } finally {
@@ -244,7 +245,7 @@ export default function AdminTeam() {
           <h1 className="mt-1 font-heading text-3xl font-bold text-secondary">Manage Team</h1>
           <p className="mt-2 max-w-2xl text-gray-500">Maintain the profiles, photos, contact details, and reporting structure shown on the public Team page.</p>
         </div>
-        {roleLoaded && isSuperAdmin && (
+        {roleLoaded && isFullAccess && (
           <Button onClick={startAdd} className="gap-2 bg-primary text-white hover:bg-primary/90">
             <Plus className="h-4 w-4" /> Add team member
           </Button>
@@ -253,9 +254,9 @@ export default function AdminTeam() {
 
       <div className="mb-6 flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-secondary">
         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-        <p>{isSuperAdmin
-          ? <><strong>Super Admin controls.</strong> Changes saved here are published to the Team page immediately.</>
-          : <><strong>Read-only access.</strong> Only a Super Admin can add, amend, or remove employee profiles and photos.</>}</p>
+        <p>{isFullAccess
+          ? <><strong>Full-access controls.</strong> Changes saved here are published to the Team page immediately.</>
+          : <><strong>Restricted access.</strong> This area requires a full-access role.</>}</p>
       </div>
 
       {notice && (
@@ -264,11 +265,11 @@ export default function AdminTeam() {
         </div>
       )}
 
-      {roleLoaded && isSuperAdmin && (
+      {roleLoaded && isFullAccess && (
         <Card className="mb-6 border-primary/20">
           <CardHeader className="border-b">
             <CardTitle className="flex items-center gap-2 font-heading text-lg"><KeyRound className="h-5 w-5 text-primary" /> Create staff login</CardTitle>
-            <p className="text-sm text-gray-500">Only Super Admins can create staff accounts. Staff use the email and password you set here; public sign-up and Google sign-in are not available.</p>
+            <p className="text-sm text-gray-500">Create a secure staff login and assign the portal access that matches the person’s responsibilities.</p>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
             {accountNotice && (
@@ -280,6 +281,15 @@ export default function AdminTeam() {
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="staff-email">Staff email / username</Label>
                 <Input id="staff-email" type="email" autoComplete="off" value={accountDraft.email} onChange={(event) => setAccountDraft((current) => ({ ...current, email: event.target.value }))} placeholder="staff@dithetoaccountants.co.za" />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="staff-role">Portal role</Label>
+                <select id="staff-role" value={accountDraft.role} onChange={(event) => setAccountDraft((current) => ({ ...current, role: event.target.value }))} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-secondary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <option value="ceo">CEO — full portal rights</option>
+                  <option value="senior_manager">Senior Manager — full portal rights</option>
+                  <option value="marketing_staff">Staff Team — Marketing / Posters only</option>
+                </select>
+                <p className="text-xs text-gray-500">Full-access roles can manage clients, documents, team profiles, reminders, integrations, and staff logins.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="staff-first-name">First name</Label>
@@ -322,7 +332,7 @@ export default function AdminTeam() {
                         <p className="mt-1 text-xs text-gray-400">Reports to: {manager?.name ?? "Leadership"}</p>
                       </div>
                     </div>
-                    {isSuperAdmin && (
+                    {isFullAccess && (
                       <div className="flex gap-2 sm:shrink-0">
                         <Button variant="outline" size="sm" onClick={() => startEdit(person)} className="gap-2"><Pencil className="h-3.5 w-3.5" /> Edit</Button>
                         <Button variant="outline" size="sm" onClick={() => remove(person)} disabled={deleteMember.isPending} className="gap-2 text-red-600 hover:text-red-700"><Trash2 className="h-3.5 w-3.5" /> Delete</Button>
@@ -335,7 +345,7 @@ export default function AdminTeam() {
           </CardContent>
         </Card>
 
-        {isSuperAdmin && editing ? (
+        {isFullAccess && editing ? (
           <Card className="h-fit xl:sticky xl:top-28">
             <CardHeader className="flex flex-row items-start justify-between border-b">
               <div>
@@ -374,10 +384,10 @@ export default function AdminTeam() {
           <Card className="h-fit bg-secondary text-white">
             <CardContent className="p-6">
               <ImagePlus className="h-8 w-8 text-accent" />
-              <p className="mt-4 text-sm font-bold uppercase tracking-wider text-accent">{isSuperAdmin ? "Organogram controls" : "Team directory"}</p>
-              <h2 className="mt-3 font-heading text-2xl font-bold">{isSuperAdmin ? "Keep every public profile current." : "Employee profiles are protected."}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-gray-300">{isSuperAdmin ? "Add or select a person to maintain titles, biographies, contact details, photos, and reporting relationships." : "You can view the current hierarchy. A Super Admin is required to publish profile changes."}</p>
-              {isSuperAdmin && <Button onClick={startAdd} className="mt-6 gap-2 bg-accent text-secondary hover:bg-accent/90"><Plus className="h-4 w-4" /> Add a profile</Button>}
+              <p className="mt-4 text-sm font-bold uppercase tracking-wider text-accent">{isFullAccess ? "Organogram controls" : "Team directory"}</p>
+              <h2 className="mt-3 font-heading text-2xl font-bold">{isFullAccess ? "Keep every public profile current." : "Employee profiles are protected."}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-gray-300">{isFullAccess ? "Add or select a person to maintain titles, biographies, contact details, photos, and reporting relationships." : "A full-access role is required to publish profile changes."}</p>
+              {isFullAccess && <Button onClick={startAdd} className="mt-6 gap-2 bg-accent text-secondary hover:bg-accent/90"><Plus className="h-4 w-4" /> Add a profile</Button>}
             </CardContent>
           </Card>
         )}

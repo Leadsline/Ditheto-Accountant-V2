@@ -29,7 +29,7 @@ import {
   integrationStateTable,
   staffUsersTable,
 } from "@workspace/db";
-import { requireStaff, requireSuperAdmin, type AdminRequest } from "../middlewares/adminAuth";
+import { requireFullAccess, requireStaff, type AdminRequest, type StaffRole } from "../middlewares/adminAuth";
 import { ObjectStorageService } from "../lib/objectStorage";
 
 const router: IRouter = Router();
@@ -40,17 +40,22 @@ router.get("/admin/me", requireStaff, async (req: Request, res: Response): Promi
   res.json({ role: staffUser?.role ?? "staff" });
 });
 
-router.post("/admin/staff-users", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.post("/admin/staff-users", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const body = req.body as {
     email?: unknown;
     password?: unknown;
     firstName?: unknown;
     lastName?: unknown;
+    role?: unknown;
   };
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body.password === "string" ? body.password : "";
   const firstName = typeof body.firstName === "string" ? body.firstName.trim() : "";
   const lastName = typeof body.lastName === "string" ? body.lastName.trim() : "";
+  const allowedRoles: StaffRole[] = ["ceo", "senior_manager", "marketing_staff"];
+  const role = typeof body.role === "string" && allowedRoles.includes(body.role as StaffRole)
+    ? body.role as StaffRole
+    : null;
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     res.status(400).json({ error: "Enter a valid staff email address." });
@@ -58,6 +63,10 @@ router.post("/admin/staff-users", requireSuperAdmin, async (req: Request, res: R
   }
   if (password.length < 12) {
     res.status(400).json({ error: "Staff passwords must be at least 12 characters." });
+    return;
+  }
+  if (!role) {
+    res.status(400).json({ error: "Select a valid portal role." });
     return;
   }
   if (!process.env.CLERK_SECRET_KEY) {
@@ -96,7 +105,7 @@ router.post("/admin/staff-users", requireSuperAdmin, async (req: Request, res: R
 
   try {
     const [staffUser] = await db.insert(staffUsersTable)
-      .values({ clerkUserId: clerkUser.id, role: "staff" })
+      .values({ clerkUserId: clerkUser.id, role })
       .returning({ id: staffUsersTable.id, role: staffUsersTable.role });
     res.status(201).json({ id: staffUser.id, email, role: staffUser.role });
   } catch (error) {
@@ -109,12 +118,12 @@ router.post("/admin/staff-users", requireSuperAdmin, async (req: Request, res: R
   }
 });
 
-router.get("/admin/clients", requireStaff, async (_req: Request, res: Response): Promise<void> => {
+router.get("/admin/clients", requireFullAccess, async (_req: Request, res: Response): Promise<void> => {
   const clients = await db.select().from(adminClientsTable).orderBy(adminClientsTable.name);
   res.json(ListAdminClientsResponse.parse(clients));
 });
 
-router.get("/admin/clients/:clientId", requireStaff, async (req: Request, res: Response): Promise<void> => {
+router.get("/admin/clients/:clientId", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = GetAdminClientParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: "Invalid client ID" });
@@ -128,7 +137,7 @@ router.get("/admin/clients/:clientId", requireStaff, async (req: Request, res: R
   res.json(GetAdminClientResponse.parse(client));
 });
 
-router.get("/admin/clients/:clientId/documents", requireStaff, async (req: Request, res: Response): Promise<void> => {
+router.get("/admin/clients/:clientId/documents", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = ListClientDocumentsParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: "Invalid client ID" });
@@ -140,7 +149,7 @@ router.get("/admin/clients/:clientId/documents", requireStaff, async (req: Reque
   res.json(ListClientDocumentsResponse.parse(documents));
 });
 
-router.post("/admin/clients/:clientId/documents", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.post("/admin/clients/:clientId/documents", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = CreateClientDocumentParams.safeParse(req.params);
   const body = CreateClientDocumentBody.safeParse(req.body);
   if (!params.success || !body.success) {
@@ -157,7 +166,7 @@ router.post("/admin/clients/:clientId/documents", requireSuperAdmin, async (req:
   res.status(201).json(CreateClientDocumentResponse.parse(document));
 });
 
-router.patch("/admin/documents/:documentId", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.patch("/admin/documents/:documentId", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = UpdateClientDocumentParams.safeParse(req.params);
   const body = UpdateClientDocumentBody.safeParse(req.body);
   if (!params.success || !body.success) {
@@ -179,7 +188,7 @@ router.patch("/admin/documents/:documentId", requireSuperAdmin, async (req: Requ
   res.json(UpdateClientDocumentResponse.parse(document));
 });
 
-router.delete("/admin/documents/:documentId", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.delete("/admin/documents/:documentId", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = DeleteClientDocumentParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: "Invalid document ID" });
@@ -200,7 +209,7 @@ router.delete("/admin/documents/:documentId", requireSuperAdmin, async (req: Req
   res.sendStatus(204);
 });
 
-router.get("/admin/clients/:clientId/document-requests", requireStaff, async (req: Request, res: Response): Promise<void> => {
+router.get("/admin/clients/:clientId/document-requests", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = ListDocumentRequestsParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: "Invalid client ID" });
@@ -212,7 +221,7 @@ router.get("/admin/clients/:clientId/document-requests", requireStaff, async (re
   res.json(ListDocumentRequestsResponse.parse(requests));
 });
 
-router.post("/admin/clients/:clientId/document-requests", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.post("/admin/clients/:clientId/document-requests", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = CreateDocumentRequestParams.safeParse(req.params);
   const body = CreateDocumentRequestBody.safeParse(req.body);
   if (!params.success || !body.success) {
@@ -228,7 +237,7 @@ router.post("/admin/clients/:clientId/document-requests", requireSuperAdmin, asy
   res.status(201).json(CreateDocumentRequestResponse.parse(request));
 });
 
-router.get("/admin/integrations/odoo/status", requireStaff, async (_req: Request, res: Response): Promise<void> => {
+router.get("/admin/integrations/odoo/status", requireFullAccess, async (_req: Request, res: Response): Promise<void> => {
   const [state] = await db.select().from(integrationStateTable)
     .where(eq(integrationStateTable.provider, "odoo")).limit(1);
   res.json(GetOdooStatusResponse.parse({
@@ -239,7 +248,7 @@ router.get("/admin/integrations/odoo/status", requireStaff, async (_req: Request
   }));
 });
 
-router.post("/admin/integrations/odoo/sync", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.post("/admin/integrations/odoo/sync", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const body = SyncOdooClientBody.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: "Invalid client ID" });

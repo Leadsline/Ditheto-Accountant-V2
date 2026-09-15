@@ -12,11 +12,13 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 function AdminLayoutClerk({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { signOut } = useClerk();
-  const { isSuperAdmin } = useRole();
+  const { role, isFullAccess, isMarketingOnly } = useRole();
   
   return <AdminLayoutContent 
     user={user} 
-    isSuperAdmin={isSuperAdmin} 
+    role={role}
+    isFullAccess={isFullAccess}
+    isMarketingOnly={isMarketingOnly}
     signOut={() => signOut({ redirectUrl: import.meta.env.BASE_URL })} 
   >
     {children}
@@ -26,17 +28,21 @@ function AdminLayoutClerk({ children }: { children: ReactNode }) {
 function AdminLayoutContent({ 
   children, 
   user, 
-  isSuperAdmin, 
+  role,
+  isFullAccess,
+  isMarketingOnly,
   signOut 
 }: { 
   children: ReactNode, 
   user: any, 
-  isSuperAdmin: boolean, 
+  role: string,
+  isFullAccess: boolean,
+  isMarketingOnly: boolean,
   signOut: () => void 
 }) {
   const [location] = useLocation();
 
-  const navItems = [
+  const allNavItems = [
     { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { path: "/admin/clients", label: "Client Database", icon: Users },
     { path: "/admin/reminders", label: "Reminders", icon: CalendarClock },
@@ -44,6 +50,16 @@ function AdminLayoutContent({
     { path: "/admin/team", label: "Team & Organogram", icon: UserRoundCog },
     { path: "/admin/settings/integrations", label: "Integrations", icon: Settings },
   ];
+  const navItems = isMarketingOnly
+    ? allNavItems.filter((item) => item.path === "/admin/campaigns")
+    : allNavItems;
+  const roleLabels: Record<string, string> = {
+    super_admin: "Super Admin",
+    ceo: "CEO — Full Access",
+    senior_manager: "Senior Manager — Full Access",
+    marketing_staff: "Staff Team — Marketing",
+    staff: "Staff Team — Marketing",
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -107,7 +123,7 @@ function AdminLayoutContent({
                   {user?.firstName} {user?.lastName}
                 </p>
                 <p className="text-gray-500 text-xs">
-                  {isSuperAdmin ? "Super Admin" : "Staff"}
+                  {roleLabels[role] ?? (isFullAccess ? "Full Access" : "Staff Team")}
                 </p>
               </div>
             </div>

@@ -12,7 +12,7 @@ import {
   UpdateTeamMemberResponse,
 } from "@workspace/api-zod";
 import { db, teamMembersTable, type TeamMemberRecord } from "@workspace/db";
-import { requireSuperAdmin } from "../middlewares/adminAuth";
+import { requireFullAccess } from "../middlewares/adminAuth";
 import { ObjectNotFoundError, ObjectStorageService } from "../lib/objectStorage";
 
 const router: IRouter = Router();
@@ -200,7 +200,7 @@ router.get("/team-members/:teamMemberId/photo", async (req: Request, res: Respon
   }
 });
 
-router.post("/admin/team-members", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.post("/admin/team-members", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const body = CreateTeamMemberBody.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: "Invalid employee profile" });
@@ -210,7 +210,7 @@ router.post("/admin/team-members", requireSuperAdmin, async (req: Request, res: 
   res.status(201).json(CreateTeamMemberResponse.parse(toResponse(member)));
 });
 
-router.patch("/admin/team-members/:teamMemberId", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.patch("/admin/team-members/:teamMemberId", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = UpdateTeamMemberParams.safeParse(req.params);
   const body = UpdateTeamMemberBody.safeParse(req.body);
   if (!params.success || !body.success) {
@@ -240,7 +240,7 @@ router.patch("/admin/team-members/:teamMemberId", requireSuperAdmin, async (req:
   res.json(UpdateTeamMemberResponse.parse(toResponse(member)));
 });
 
-router.delete("/admin/team-members/:teamMemberId", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+router.delete("/admin/team-members/:teamMemberId", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
   const params = DeleteTeamMemberParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: "Invalid employee ID" });

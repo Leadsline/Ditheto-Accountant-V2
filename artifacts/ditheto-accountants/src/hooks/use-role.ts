@@ -10,10 +10,13 @@ export function useRole() {
     },
     retry: false,
   });
-  const role = data?.role ?? "staff";
+  const role = data?.role ?? "marketing_staff";
+  const isFullAccess = ["super_admin", "ceo", "senior_manager"].includes(role);
   return {
     role,
     isSuperAdmin: role === "super_admin",
+    isFullAccess,
+    isMarketingOnly: role === "marketing_staff" || role === "staff",
     isLoaded: !isLoading,
   };
 }

@@ -8,6 +8,13 @@ export type AdminRequest = Request & {
   authUserId?: string;
 };
 
+export const FULL_ACCESS_ROLES = ["super_admin", "ceo", "senior_manager"] as const;
+export type StaffRole = typeof FULL_ACCESS_ROLES[number] | "marketing_staff";
+
+export function hasFullAccess(role: string): boolean {
+  return FULL_ACCESS_ROLES.includes(role as typeof FULL_ACCESS_ROLES[number]);
+}
+
 async function resolveStaffUser(req: Request): Promise<StaffUser | null> {
   const auth = getAuth(req);
   const userId = auth.userId;
@@ -37,14 +44,14 @@ export async function requireStaff(req: Request, res: Response, next: NextFuncti
   next();
 }
 
-export async function requireSuperAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function requireFullAccess(req: Request, res: Response, next: NextFunction): Promise<void> {
   const staffUser = await resolveStaffUser(req);
   if (!staffUser) {
     res.status(401).json({ error: "Authentication required" });
     return;
   }
-  if (staffUser.role !== "super_admin") {
-    res.status(403).json({ error: "Super Admin role required" });
+  if (!hasFullAccess(staffUser.role)) {
+    res.status(403).json({ error: "Full portal access required" });
     return;
   }
   const adminReq = req as AdminRequest;
@@ -52,3 +59,5 @@ export async function requireSuperAdmin(req: Request, res: Response, next: NextF
   adminReq.authUserId = staffUser.clerkUserId;
   next();
 }
+
+export const requireSuperAdmin = requireFullAccess;

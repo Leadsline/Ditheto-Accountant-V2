@@ -24,6 +24,7 @@ import AdminReminders from '@/pages/admin/reminders';
 import AdminCampaigns from '@/pages/admin/campaigns';
 import AdminTeam from '@/pages/admin/team';
 import NotFound from '@/pages/not-found';
+import { useRole } from '@/hooks/use-role';
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -39,10 +40,14 @@ function stripBase(path: string): string {
     : path;
 }
 
-function AdminGuard({ children }: { children: ReactNode }) {
+function AdminGuard({ children, fullAccess = false }: { children: ReactNode; fullAccess?: boolean }) {
   const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded: roleLoaded, isFullAccess, isMarketingOnly } = useRole();
   if (!isLoaded) return <div className="min-h-screen bg-gray-50" />;
   if (!isSignedIn) return <Redirect to="/sign-in" />;
+  if (!roleLoaded) return <div className="min-h-screen bg-gray-50" />;
+  if (fullAccess && !isFullAccess) return <Redirect to="/admin/campaigns" />;
+  if (!fullAccess && isMarketingOnly) return <>{children}</>;
   return <>{children}</>;
 }
 
@@ -68,13 +73,13 @@ function Router() {
           </div>
         )} />
         {/* Admin Routes */}
-        <Route path="/admin"><AdminGuard><AdminDashboard /></AdminGuard></Route>
-        <Route path="/admin/clients"><AdminGuard><AdminClients /></AdminGuard></Route>
-        <Route path="/admin/clients/:clientId"><AdminGuard><AdminClientProfile /></AdminGuard></Route>
-        <Route path="/admin/settings/integrations"><AdminGuard><AdminIntegrations /></AdminGuard></Route>
-        <Route path="/admin/reminders"><AdminGuard><AdminReminders /></AdminGuard></Route>
+        <Route path="/admin"><AdminGuard fullAccess><AdminDashboard /></AdminGuard></Route>
+        <Route path="/admin/clients"><AdminGuard fullAccess><AdminClients /></AdminGuard></Route>
+        <Route path="/admin/clients/:clientId"><AdminGuard fullAccess><AdminClientProfile /></AdminGuard></Route>
+        <Route path="/admin/settings/integrations"><AdminGuard fullAccess><AdminIntegrations /></AdminGuard></Route>
+        <Route path="/admin/reminders"><AdminGuard fullAccess><AdminReminders /></AdminGuard></Route>
         <Route path="/admin/campaigns"><AdminGuard><AdminCampaigns /></AdminGuard></Route>
-        <Route path="/admin/team"><AdminGuard><AdminTeam /></AdminGuard></Route>
+        <Route path="/admin/team"><AdminGuard fullAccess><AdminTeam /></AdminGuard></Route>
         
         {/* Public Routes with Layout */}
         <Route path="/services/:serviceId">

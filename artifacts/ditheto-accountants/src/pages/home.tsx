@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { motion } from "framer-motion";
-import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import heroOne from "@assets/ditheto-accountants-hero_1789472037427.jpg";
 import heroTwo from "@assets/ditheto-accountants-hero-v2_1789472037428.jpg";
@@ -8,6 +9,84 @@ import heroThree from "@assets/ditheto-accountants-hero-v3_1789472037429.jpg";
 import heroFour from "@assets/ditheto-accountants-hero-v4_1789472037429.jpg";
 
 const heroImages = [heroOne, heroTwo, heroThree, heroFour];
+
+function HeroCarousel() {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [direction, setDirection] = useState(1);
+
+  const showSlide = (index: number, nextDirection: number) => {
+    setDirection(nextDirection);
+    setActiveSlide((index + heroImages.length) % heroImages.length);
+  };
+
+  useEffect(() => {
+    if (paused) return;
+    const timer = window.setInterval(() => {
+      setDirection(1);
+      setActiveSlide((current) => (current + 1) % heroImages.length);
+    }, 8500);
+    return () => window.clearInterval(timer);
+  }, [paused]);
+
+  return (
+    <div
+      className="group relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-2 shadow-[0_28px_70px_-35px_rgba(0,0,0,.8)]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+      aria-roledescription="carousel"
+      aria-label="Ditheto Accountants welcome images"
+    >
+      <div className="relative aspect-[3/2] overflow-hidden rounded-xl">
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.img
+            key={activeSlide}
+            src={heroImages[activeSlide]}
+            alt={`Ditheto Accountants welcome image ${activeSlide + 1}`}
+            custom={direction}
+            initial={{ opacity: 0, x: direction > 0 ? 45 : -45, scale: 1.02 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: direction > 0 ? -45 : 45, scale: 1.01 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </AnimatePresence>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => showSlide(activeSlide - 1, -1)}
+        className="absolute left-5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-secondary/75 text-white shadow-lg backdrop-blur-md transition hover:border-accent hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-accent"
+        aria-label="Previous carousel image"
+      >
+        <ArrowLeft className="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => showSlide(activeSlide + 1, 1)}
+        className="absolute right-5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-secondary/75 text-white shadow-lg backdrop-blur-md transition hover:border-accent hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-accent"
+        aria-label="Next carousel image"
+      >
+        <ArrowRight className="h-4 w-4" />
+      </button>
+
+      <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/20 bg-secondary/70 px-3 py-2 backdrop-blur-md">
+        {heroImages.map((_, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => showSlide(index, index >= activeSlide ? 1 : -1)}
+            className={`h-2 rounded-full transition-all ${index === activeSlide ? "w-7 bg-accent" : "w-2 bg-white/65 hover:bg-white"}`}
+            aria-label={`Show carousel image ${index + 1}`}
+            aria-current={index === activeSlide ? "true" : undefined}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const services = [
   { number: "01", title: "Tax services", description: "ITR12, IRP6, VAT201, PAYE and SARS support — submitted accurately and ahead of time.", icon: Calculator, href: "/services#tax", count: "13 services" },
@@ -29,7 +108,7 @@ export default function Home() {
         <div className="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full border border-primary/20 bg-primary/10 blur-3xl" />
         <div className="absolute bottom-0 left-1/2 h-px w-1/2 bg-white/10" />
         <div className="site-container relative z-10">
-          <div className="grid min-h-[650px] items-center gap-12 py-16 lg:grid-cols-[1.03fr_.97fr] lg:py-24">
+          <div className="grid min-h-[680px] items-center gap-12 py-16 lg:grid-cols-[.85fr_1.15fr] lg:py-24">
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .75, ease: [0.22, 1, .36, 1] }} className="max-w-3xl">
               <p className="mb-7 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent">
                 <span className="h-px w-9 bg-accent" /> Built for the filing season
@@ -50,26 +129,8 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0">
-              <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-2 shadow-[0_28px_70px_-35px_rgba(0,0,0,.8)]">
-                <motion.div
-                  className="flex w-max"
-                  animate={{ x: ["0%", "-50%"] }}
-                  transition={{ duration: 18, ease: "linear", repeat: Infinity }}
-                >
-                  {[...heroImages, ...heroImages].map((image, index) => (
-                    <div key={`${image}-${index}`} className="w-[calc(100vw-4rem)] shrink-0 pr-2 sm:w-[34rem] lg:w-[31rem] xl:w-[35rem]">
-                      <img
-                        src={image}
-                        alt={index < heroImages.length ? `Ditheto Accountants welcome image ${index + 1}` : ""}
-                        aria-hidden={index >= heroImages.length}
-                        className="aspect-[3/2] w-full rounded-xl object-cover"
-                        loading={index === 0 ? "eager" : "lazy"}
-                      />
-                    </div>
-                  ))}
-                </motion.div>
-              </div>
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:-mr-8 xl:-mr-16">
+              <HeroCarousel />
             </motion.div>
           </div>
           <div className="grid border-t border-white/15 sm:grid-cols-4">

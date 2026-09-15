@@ -32,7 +32,14 @@ const clerkPubKey = publishableKeyFromHost(
   window.location.hostname,
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
 );
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+const configuredClerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+// A Vercel deployment can be configured with the development Clerk key while
+// it is being prepared. Clerk rejects that key through the production proxy
+// with `host_invalid`; let the development instance use its direct FAPI until
+// a live key is supplied. Replit production keys remain proxied.
+const clerkProxyUrl = clerkPubKey.startsWith("pk_test_")
+  ? ""
+  : configuredClerkProxyUrl;
 
 function stripBase(path: string): string {
   return basePath && path.startsWith(basePath)

@@ -18,6 +18,8 @@ type TeamMember = {
   image?: string | null;
   accent: "teal" | "gold" | "navy";
   level: "director" | "lead" | "team";
+  parentId?: number | null;
+  sortOrder: number;
 };
 
 const accentClasses = {
@@ -81,10 +83,19 @@ export default function Team() {
     image: member.imageUrl,
     accent: member.accent,
     level: member.level,
+    parentId: member.parentId,
+    sortOrder: member.sortOrder,
   })), [data]);
-  const directors = useMemo(() => team.filter((member) => member.level === "director"), [team]);
-  const leads = useMemo(() => team.filter((member) => member.level === "lead"), [team]);
-  const specialists = useMemo(() => team.filter((member) => member.level === "team"), [team]);
+  const director = useMemo(() => team.find((member) => member.level === "director" && !member.parentId), [team]);
+  const seniorManager = useMemo(
+    () => team.find((member) => member.level === "lead" && member.parentId === director?.id),
+    [team, director],
+  );
+  const branchManagers = useMemo(
+    () => team.filter((member) => member.level === "lead" && member.parentId === seniorManager?.id)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+    [team, seniorManager],
+  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -110,7 +121,7 @@ export default function Team() {
             <p className="eyebrow mb-4">Our team structure</p>
             <h2 className="serif-display text-4xl leading-none text-secondary sm:text-5xl">The right people in the right place.</h2>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
-              Our Pretoria and Secunda teams bring together specialist knowledge and personal attention. Select any team member to learn more about the person supporting your business.
+              Our Brooklyn and Secunda teams bring together specialist knowledge and personal attention. Select any team member to learn more about the person supporting your business.
             </p>
           </Reveal>
 
@@ -118,52 +129,53 @@ export default function Team() {
             {isLoading && <div className="rounded-3xl border border-secondary/10 bg-card p-12 text-center text-muted-foreground">Loading team structure…</div>}
             {isError && <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center text-red-700">The team structure could not be loaded. Please try again shortly.</div>}
             {!isLoading && !isError && (
-            <div className="rounded-3xl border border-secondary/10 bg-card p-5 shadow-[0_24px_70px_-50px_hsl(var(--secondary))] sm:p-8 lg:p-12">
-              <div className="space-y-8 lg:space-y-0">
-                <div className="grid gap-4 lg:grid-cols-[150px_1fr] lg:items-center">
-                  <div className="text-center lg:text-left">
-                    <p className="eyebrow text-secondary/55">Supervisory level</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Direction & accountability</p>
-                  </div>
-                  <div className="mx-auto w-full max-w-xs">
-                    {directors.map((member) => <MemberCard key={member.id} member={member} onSelect={setSelected} />)}
-                  </div>
-                </div>
-
-                <div className="mx-auto hidden h-10 w-px bg-primary/30 lg:block" />
-
-                <div className="grid gap-4 lg:grid-cols-[150px_1fr] lg:items-center">
-                  <div className="text-center lg:text-left">
-                    <p className="eyebrow text-secondary/55">Management level</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Specialist leads</p>
-                  </div>
-                  <div className="relative mx-auto grid w-full max-w-2xl gap-6 md:grid-cols-2">
-                    <div className="absolute left-1/4 right-1/4 top-0 hidden h-px bg-primary/30 md:block" />
-                    {leads.map((member) => (
-                      <div key={member.id} className="relative pt-4">
-                        <div className="absolute left-1/2 top-0 hidden h-4 w-px -translate-x-1/2 bg-primary/30 md:block" />
-                        <MemberCard member={member} onSelect={setSelected} />
-                      </div>
-                    ))}
+            <div className="overflow-hidden rounded-3xl border border-secondary/10 bg-card p-5 shadow-[0_24px_70px_-50px_hsl(var(--secondary))] sm:p-8 lg:p-10">
+              <div className="mx-auto max-w-6xl">
+                <div className="grid items-center gap-5 lg:grid-cols-[1fr_260px_1fr]">
+                  <div className="hidden lg:block" />
+                  {director && <MemberCard member={director} onSelect={setSelected} />}
+                  <div className="rounded-xl border-2 border-dashed border-accent/70 bg-accent/5 p-5 text-center">
+                    <p className="text-[10px] font-bold uppercase tracking-[.16em] text-amber-700">Outsourced service</p>
+                    <p className="mt-2 font-heading font-bold text-secondary">HR Function</p>
+                    <p className="mt-1 text-xs text-muted-foreground">NPM Consulting</p>
                   </div>
                 </div>
 
-                <div className="mx-auto hidden h-10 w-px bg-primary/30 lg:block" />
+                <div className="mx-auto h-10 w-px bg-primary/35" />
+                {seniorManager && (
+                  <div className="mx-auto max-w-sm">
+                    <MemberCard member={seniorManager} onSelect={setSelected} />
+                  </div>
+                )}
 
-                <div className="grid gap-4 lg:grid-cols-[150px_1fr] lg:items-center">
-                  <div className="text-center lg:text-left">
-                    <p className="eyebrow text-secondary/55">Team level</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Client-facing specialists</p>
-                  </div>
-                  <div className="relative mx-auto grid w-full max-w-4xl gap-6 md:grid-cols-3">
-                    <div className="absolute left-[16.66%] right-[16.66%] top-0 hidden h-px bg-primary/30 md:block" />
-                    {specialists.map((member) => (
-                      <div key={member.id} className="relative pt-4">
-                        <div className="absolute left-1/2 top-0 hidden h-4 w-px -translate-x-1/2 bg-primary/30 md:block" />
-                        <MemberCard member={member} onSelect={setSelected} />
-                      </div>
-                    ))}
-                  </div>
+                <div className="mx-auto h-10 w-px bg-primary/35" />
+                <div className="relative grid gap-12 lg:grid-cols-2 lg:gap-10">
+                  <div className="absolute left-1/4 right-1/4 top-0 hidden h-px bg-primary/35 lg:block" />
+                  {branchManagers.map((manager) => {
+                    const assistants = team.filter((member) => member.level === "team" && member.parentId === manager.id)
+                      .sort((a, b) => a.sortOrder - b.sortOrder);
+                    const branchName = manager.title.includes("—") ? manager.title.split("—")[1]?.trim() : "Branch";
+                    return (
+                      <section key={manager.id} className="relative pt-5">
+                        <div className="absolute left-1/2 top-0 h-5 w-px -translate-x-1/2 bg-primary/35" />
+                        <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-[.18em] text-primary">{branchName}</p>
+                        <div className="mx-auto max-w-xs">
+                          <MemberCard member={manager} onSelect={setSelected} />
+                        </div>
+                        {assistants.length > 0 && <div className="mx-auto h-8 w-px bg-primary/35" />}
+                        <div className={`relative grid gap-4 ${assistants.length > 2 ? "sm:grid-cols-2 xl:grid-cols-3" : assistants.length === 2 ? "sm:grid-cols-2" : "mx-auto max-w-xs"}`}>
+                          {assistants.length > 1 && <div className="absolute left-[16%] right-[16%] top-0 hidden h-px bg-primary/30 sm:block" />}
+                          {assistants.map((member) => (
+                            <div key={member.id} className="relative pt-4">
+                              <div className="absolute left-1/2 top-0 hidden h-4 w-px -translate-x-1/2 bg-primary/30 sm:block" />
+                              <MemberCard member={member} onSelect={setSelected} />
+                            </div>
+                          ))}
+                        </div>
+                        <p className="mt-4 text-center text-xs font-semibold text-muted-foreground">{assistants.length} Assistant {assistants.length === 1 ? "Accountant" : "Accountants"} — {branchName?.replace(" Branch", "")}</p>
+                      </section>
+                    );
+                  })}
                 </div>
               </div>
             </div>

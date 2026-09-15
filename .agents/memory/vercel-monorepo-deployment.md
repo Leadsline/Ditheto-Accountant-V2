@@ -7,4 +7,4 @@ Vercel may apply its own NodeNext TypeScript check to a TypeScript file under `a
 
 **Why:** Direct Vercel deployments initially built the frontend but sent API requests to the SPA fallback, and Vercel's standalone TypeScript check rejected the workspace's extensionless imports.
 
-**How to apply:** Keep the API bundle step in the Vercel build command, keep the adapter JavaScript-only, and smoke-test both a public page and an unauthenticated `/api` endpoint after every deployment configuration change.
+**How to apply:** Keep the API bundle step in the Vercel build command, keep the adapter JavaScript-only, and smoke-test both a public page and an unauthenticated `/api` endpoint after every deployment configuration change. To attach an existing Vercel project to GitHub, use the authenticated `POST /v9/projects/{projectId}/link` operation with `{ type: "github", repo: "owner/repository" }`; the general project PATCH rejects `gitRepository`.

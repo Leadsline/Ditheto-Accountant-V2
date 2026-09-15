@@ -31,7 +31,7 @@ function HeroCarousel() {
 
   return (
     <div
-      className="group relative overflow-hidden rounded-[1.75rem] shadow-[0_35px_110px_-48px_rgba(46,188,179,.55),0_30px_80px_-46px_rgba(0,0,0,.9)]"
+      className="group relative h-full min-h-[280px] overflow-hidden rounded-[1.75rem] shadow-[0_35px_110px_-48px_rgba(46,188,179,.55),0_30px_80px_-46px_rgba(0,0,0,.9)]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -93,7 +93,7 @@ export default function Home() {
         <div className="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full border border-primary/20 bg-primary/10 blur-3xl" />
         <div className="absolute bottom-0 left-1/2 h-px w-1/2 bg-white/10" />
         <div className="site-container relative z-10">
-          <div className="grid min-h-[700px] items-start gap-10 py-16 lg:grid-cols-[.78fr_1.22fr] lg:grid-rows-[auto_auto] lg:py-24">
+          <div className="grid min-h-[700px] items-start gap-10 py-16 lg:items-stretch lg:grid-cols-[.78fr_1.22fr] lg:grid-rows-[auto_auto] lg:py-24">
             <p className="mb-0 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent lg:col-start-1 lg:row-start-1">
               <span className="h-px w-9 bg-accent" /> Built for the filing season
             </p>

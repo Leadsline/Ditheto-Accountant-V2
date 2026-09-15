@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Facebook, Instagram, Linkedin, Mail, Menu, MessageCircle, Phone, X } from "lucide-react";
+import { ChevronDown, Facebook, Instagram, Linkedin, Mail, Menu, MessageCircle, Phone, X } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@assets/Logo_1789472037430.png";
 
 const socialLinks = [
@@ -10,8 +11,16 @@ const socialLinks = [
   { href: "https://wa.me/27677657387", label: "WhatsApp", icon: MessageCircle },
 ];
 
+const serviceLinks = [
+  { href: "/services/tax", label: "Tax Services" },
+  { href: "/services/payroll", label: "Payroll Services" },
+  { href: "/services/registration", label: "Registration & Consulting" },
+  { href: "/services/accounting", label: "Accounting & Bookkeeping" },
+];
+
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [location] = useLocation();
   const links = [
     { href: "/", label: "Home" },
@@ -23,6 +32,7 @@ export function Navbar() {
 
   useEffect(() => {
     setMenuOpen(false);
+    setMobileServicesOpen(false);
   }, [location]);
 
   return (
@@ -52,6 +62,31 @@ export function Navbar() {
             <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
             {links.map((link) => {
               const active = link.href === "/" ? location === "/" : location.startsWith(link.href);
+              if (link.href === "/services") {
+                return (
+                  <DropdownMenu key={link.href}>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        aria-current={active ? "page" : undefined}
+                        className={`flex items-center gap-1 rounded-sm px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 ${active ? "bg-primary/10 text-primary shadow-[inset_0_-2px_0_hsl(var(--accent))]" : "text-secondary/75 hover:bg-primary/5 hover:text-primary"}`}
+                      >
+                        Services <ChevronDown className="h-3.5 w-3.5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" sideOffset={10} className="w-64 rounded-xl border-secondary/10 bg-background p-2 shadow-xl">
+                      <DropdownMenuItem asChild className="mb-1 rounded-lg p-0">
+                        <Link href="/services" className="block w-full px-3 py-2.5 text-sm font-bold text-secondary">All Services</Link>
+                      </DropdownMenuItem>
+                      {serviceLinks.map((service) => (
+                        <DropdownMenuItem key={service.href} asChild className="rounded-lg p-0 focus:bg-primary/10">
+                          <Link href={service.href} className="block w-full px-3 py-2.5 text-sm text-secondary/75 transition-colors hover:text-primary">{service.label}</Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              }
                return <Link
                  key={link.href}
                  href={link.href}
@@ -89,6 +124,28 @@ export function Navbar() {
           {menuOpen && <nav className="border-t border-secondary/10 py-3 md:hidden" aria-label="Mobile navigation">
             {links.map((link) => {
               const active = link.href === "/" ? location === "/" : location.startsWith(link.href);
+              if (link.href === "/services") {
+                return (
+                  <div key={link.href} className="border-b border-secondary/5">
+                    <button
+                      type="button"
+                      onClick={() => setMobileServicesOpen((open) => !open)}
+                      aria-expanded={mobileServicesOpen}
+                      className={`flex w-full items-center justify-between px-3 py-3 text-sm font-semibold transition-colors ${active ? "border-l-2 border-l-primary bg-primary/10 text-primary" : "text-secondary hover:bg-primary/5 hover:text-primary"}`}
+                    >
+                      Services <ChevronDown className={`h-4 w-4 transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {mobileServicesOpen && (
+                      <div className="bg-secondary/[.03] pb-2 pl-5 pr-2">
+                        <Link href="/services" className="block rounded-md px-3 py-2.5 text-sm font-semibold text-secondary/70 hover:bg-primary/10 hover:text-primary">All Services</Link>
+                        {serviceLinks.map((service) => (
+                          <Link key={service.href} href={service.href} className="block rounded-md px-3 py-2.5 text-sm text-secondary/70 hover:bg-primary/10 hover:text-primary">{service.label}</Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
               return <Link
                 key={link.href}
                 href={link.href}

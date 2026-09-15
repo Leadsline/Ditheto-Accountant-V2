@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import heroOne from "@assets/ditheto-accountants-hero_1789472037427.jpg";
 import heroTwo from "@assets/ditheto-accountants-hero-v2_1789472037428.jpg";
@@ -15,8 +15,8 @@ function HeroCarousel() {
   const [paused, setPaused] = useState(false);
   const [direction, setDirection] = useState(1);
 
-  const showSlide = (index: number, nextDirection: number) => {
-    setDirection(nextDirection);
+  const showSlide = (index: number) => {
+    setDirection(index >= activeSlide ? 1 : -1);
     setActiveSlide((index + heroImages.length) % heroImages.length);
   };
 
@@ -31,7 +31,7 @@ function HeroCarousel() {
 
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-2 shadow-[0_28px_70px_-35px_rgba(0,0,0,.8)]"
+      className="group relative overflow-hidden rounded-[1.75rem] shadow-[0_35px_110px_-48px_rgba(46,188,179,.55),0_30px_80px_-46px_rgba(0,0,0,.9)]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -39,7 +39,7 @@ function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label="Ditheto Accountants welcome images"
     >
-      <div className="relative aspect-[3/2] overflow-hidden rounded-xl">
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[1.75rem]">
         <AnimatePresence initial={false} custom={direction}>
           <motion.img
             key={activeSlide}
@@ -53,32 +53,17 @@ function HeroCarousel() {
             className="absolute inset-0 h-full w-full object-cover"
           />
         </AnimatePresence>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-secondary/20 via-transparent to-secondary/10" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-secondary/35 to-transparent" />
       </div>
 
-      <button
-        type="button"
-        onClick={() => showSlide(activeSlide - 1, -1)}
-        className="absolute left-5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-secondary/75 text-white shadow-lg backdrop-blur-md transition hover:border-accent hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-accent"
-        aria-label="Previous carousel image"
-      >
-        <ArrowLeft className="h-4 w-4" />
-      </button>
-      <button
-        type="button"
-        onClick={() => showSlide(activeSlide + 1, 1)}
-        className="absolute right-5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-secondary/75 text-white shadow-lg backdrop-blur-md transition hover:border-accent hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-accent"
-        aria-label="Next carousel image"
-      >
-        <ArrowRight className="h-4 w-4" />
-      </button>
-
-      <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/20 bg-secondary/70 px-3 py-2 backdrop-blur-md">
+      <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2">
         {heroImages.map((_, index) => (
           <button
             key={index}
             type="button"
-            onClick={() => showSlide(index, index >= activeSlide ? 1 : -1)}
-            className={`h-2 rounded-full transition-all ${index === activeSlide ? "w-7 bg-accent" : "w-2 bg-white/65 hover:bg-white"}`}
+            onClick={() => showSlide(index)}
+            className={`h-1.5 rounded-full shadow-sm transition-all ${index === activeSlide ? "w-6 bg-accent" : "w-1.5 bg-white/60 hover:bg-white"}`}
             aria-label={`Show carousel image ${index + 1}`}
             aria-current={index === activeSlide ? "true" : undefined}
           />
@@ -89,10 +74,10 @@ function HeroCarousel() {
 }
 
 const services = [
-  { number: "01", title: "Tax services", description: "ITR12, IRP6, VAT201, PAYE and SARS support — submitted accurately and ahead of time.", icon: Calculator, href: "/services#tax", count: "13 services" },
-  { number: "02", title: "Payroll services", description: "Confidential payroll that runs on time, so your team is paid correctly and your returns look after themselves.", icon: FileSpreadsheet, href: "/services#payroll", count: "6 services" },
-  { number: "03", title: "Registration & consulting", description: "Get your entity registered properly and presented professionally, from CIPC to tender-ready profiles.", icon: BriefcaseBusiness, href: "/services#registration", count: "6 services" },
-  { number: "04", title: "Accounting & bookkeeping", description: "Books that are current, reconciled and useful — so you always know what the business is doing.", icon: BookOpen, href: "/services#accounting", count: "4 services" },
+  { number: "01", title: "Tax services", description: "ITR12, IRP6, VAT201, PAYE and SARS support — submitted accurately and ahead of time.", icon: Calculator, href: "/services/tax", count: "13 services" },
+  { number: "02", title: "Payroll services", description: "Confidential payroll that runs on time, so your team is paid correctly and your returns look after themselves.", icon: FileSpreadsheet, href: "/services/payroll", count: "6 services" },
+  { number: "03", title: "Registration & consulting", description: "Get your entity registered properly and presented professionally, from CIPC to tender-ready profiles.", icon: BriefcaseBusiness, href: "/services/registration", count: "6 services" },
+  { number: "04", title: "Accounting & bookkeeping", description: "Books that are current, reconciled and useful — so you always know what the business is doing.", icon: BookOpen, href: "/services/accounting", count: "4 services" },
 ];
 
 const proofPoints = [
@@ -108,7 +93,7 @@ export default function Home() {
         <div className="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full border border-primary/20 bg-primary/10 blur-3xl" />
         <div className="absolute bottom-0 left-1/2 h-px w-1/2 bg-white/10" />
         <div className="site-container relative z-10">
-          <div className="grid min-h-[680px] items-center gap-12 py-16 lg:grid-cols-[.85fr_1.15fr] lg:py-24">
+          <div className="grid min-h-[700px] items-center gap-10 py-16 lg:grid-cols-[.78fr_1.22fr] lg:py-24">
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .75, ease: [0.22, 1, .36, 1] }} className="max-w-3xl">
               <p className="mb-7 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent">
                 <span className="h-px w-9 bg-accent" /> Built for the filing season
@@ -129,7 +114,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:-mr-8 xl:-mr-16">
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:-mr-14 xl:-mr-24">
               <HeroCarousel />
             </motion.div>
           </div>

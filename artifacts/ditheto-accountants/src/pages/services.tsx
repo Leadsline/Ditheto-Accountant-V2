@@ -3,7 +3,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Calculator, FileSpreadsheet, Briefcase, FileText, CheckCircle, ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 
-const services = [
+export const serviceCategories = [
   {
     id: "tax",
     title: "Tax Services",
@@ -79,10 +79,10 @@ export default function Services() {
             <p className="mt-7 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Four practice areas, one accountable team. Open any of them to see exactly what is included before you ask for a quote.</p>
           </Reveal>
           <div className="mt-12 grid gap-3 sm:grid-cols-4">
-            {services.map((category, index) => (
-              <a href={`#${category.id}`} key={category.id} className="border-t border-white/20 pt-4 text-sm text-white/75 transition-colors hover:text-accent" data-testid={`link-service-index-${category.id}`}>
+            {serviceCategories.map((category, index) => (
+              <Link href={`/services/${category.id}`} key={category.id} className="border-t border-white/20 pt-4 text-sm text-white/75 transition-colors hover:text-accent" data-testid={`link-service-index-${category.id}`}>
                 <span className="serif-display mr-2 text-xl text-accent/80">0{index + 1}</span>{category.title}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function Services() {
 
       <div className="site-container mt-16 sm:mt-24">
         <div className="space-y-20">
-          {services.map((category, categoryIndex) => {
+          {serviceCategories.map((category, categoryIndex) => {
             const Icon = category.icon;
             return (
               <Reveal key={category.id} delay={categoryIndex * .06} className="scroll-mt-24" >

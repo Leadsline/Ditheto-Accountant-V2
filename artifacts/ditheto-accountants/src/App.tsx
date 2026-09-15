@@ -11,6 +11,7 @@ import { shadcn } from '@clerk/themes';
 import { Layout } from '@/components/layout/layout';
 import Home from '@/pages/home';
 import Services from '@/pages/services';
+import ServiceDetail from '@/pages/service-detail';
 import Quote from '@/pages/quote';
 import About from '@/pages/about';
 import Team from '@/pages/team';
@@ -82,6 +83,11 @@ function Router() {
         <Route path="/admin/team"><AdminGuard><AdminTeam /></AdminGuard></Route>
         
         {/* Public Routes with Layout */}
+        <Route path="/services/:serviceId">
+          <Layout>
+            <ServiceDetail />
+          </Layout>
+        </Route>
         <Route path="/">
           <Layout>
             <Home />

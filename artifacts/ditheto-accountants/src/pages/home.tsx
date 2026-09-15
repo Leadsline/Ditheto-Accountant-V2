@@ -25,7 +25,7 @@ function HeroCarousel() {
     const timer = window.setInterval(() => {
       setDirection(1);
       setActiveSlide((current) => (current + 1) % heroImages.length);
-    }, 8500);
+    }, 7200);
     return () => window.clearInterval(timer);
   }, [paused]);
 

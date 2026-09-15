@@ -9,8 +9,8 @@ export function Footer() {
         <div className="mb-14 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_.7fr_1fr_1fr]">
           
           <div className="space-y-6">
-            <div className="inline-block rounded-sm bg-background px-3 py-2">
-              <img src={logo} alt="Ditheto Accountants" className="h-9 w-auto" />
+            <div className="inline-block rounded-xl bg-white/80 px-3 py-2.5 shadow-[0_10px_30px_-18px_rgba(0,0,0,.9)] backdrop-blur-sm">
+              <img src={logo} alt="Ditheto Accountants" className="h-12 w-auto opacity-90" />
             </div>
             <p className="max-w-sm pr-4 text-sm leading-relaxed text-gray-300">
               A 100% black-owned South African accounting, tax, payroll, bookkeeping, and business registration firm serving Pretoria and Secunda. Integrity you can count on.

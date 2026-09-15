@@ -8,3 +8,9 @@ When the Vercel build contains a development Clerk publishable key (`pk_test_…
 **Why:** The externally hosted Vercel project can retain Replit development environment variables even though Vercel reports `production`; Replit-managed production publishing swaps keys automatically, but Vercel does not.
 
 **How to apply:** Keep the proxy enabled for `pk_live_…` keys. Treat the direct development path as a compatibility bridge until Vercel is configured with the production Clerk key and secret.
+
+Vercel's canonical `CLERK_PUBLISHABLE_KEY` can itself still be configured with a `pk_test_…` value. Removing a stale `VITE_CLERK_PUBLISHABLE_KEY` override is not sufficient unless the replacement value is verified as live.
+
+**Why:** A rebuilt bundle can be healthy and render sign-in while still showing Clerk's Development mode when the linked Vercel production environment contains development credentials.
+
+**How to apply:** Inspect the compiled public bundle for the active key environment and confirm the live alias visually before declaring production sign-in ready; configure Clerk Production credentials and allowed origins separately from the source fallback.

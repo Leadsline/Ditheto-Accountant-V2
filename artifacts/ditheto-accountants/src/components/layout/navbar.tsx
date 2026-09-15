@@ -16,6 +16,10 @@ const serviceLinks = [
   { href: "/services/payroll", label: "Payroll Services" },
   { href: "/services/registration", label: "Registration & Consulting" },
   { href: "/services/accounting", label: "Accounting & Bookkeeping" },
+  { href: "/services/cidb-registration", label: "CIDB Registration" },
+  { href: "/services/company-registration", label: "Company Registration" },
+  { href: "/services/csd-registration", label: "CSD Registration" },
+  { href: "/services/coida-registration", label: "COIDA Registration" },
 ];
 
 export function Navbar() {
@@ -74,9 +78,12 @@ export function Navbar() {
                         Services <ChevronDown className="h-3.5 w-3.5" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" sideOffset={10} className="w-64 rounded-xl border-secondary/10 bg-background p-2 shadow-xl">
+                    <DropdownMenuContent align="start" sideOffset={10} className="max-h-[70vh] w-72 overflow-y-auto rounded-xl border-secondary/10 bg-background p-2 shadow-xl">
                       <DropdownMenuItem asChild className="mb-1 rounded-lg p-0">
                         <Link href="/services" className="block w-full px-3 py-2.5 text-sm font-bold text-secondary">All Services</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="mb-1 rounded-lg p-0 focus:bg-primary/10">
+                        <Link href="/services#service-search" className="block w-full px-3 py-2.5 text-sm font-bold text-primary">Search Services</Link>
                       </DropdownMenuItem>
                       {serviceLinks.map((service) => (
                         <DropdownMenuItem key={service.href} asChild className="rounded-lg p-0 focus:bg-primary/10">
@@ -138,6 +145,7 @@ export function Navbar() {
                     {mobileServicesOpen && (
                       <div className="bg-secondary/[.03] pb-2 pl-5 pr-2">
                         <Link href="/services" className="block rounded-md px-3 py-2.5 text-sm font-semibold text-secondary/70 hover:bg-primary/10 hover:text-primary">All Services</Link>
+                        <Link href="/services#service-search" className="block rounded-md px-3 py-2.5 text-sm font-semibold text-primary hover:bg-primary/10">Search Services</Link>
                         {serviceLinks.map((service) => (
                           <Link key={service.href} href={service.href} className="block rounded-md px-3 py-2.5 text-sm text-secondary/70 hover:bg-primary/10 hover:text-primary">{service.label}</Link>
                         ))}

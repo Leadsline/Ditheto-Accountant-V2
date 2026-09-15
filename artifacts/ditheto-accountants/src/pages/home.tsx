@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle, HardHat, Building2, Database, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import heroOne from "@assets/ditheto-accountants-hero_1789472037427.jpg";
 import heroTwo from "@assets/ditheto-accountants-hero-v2_1789472037428.jpg";
@@ -76,8 +76,12 @@ function HeroCarousel() {
 const services = [
   { number: "01", title: "Tax services", description: "ITR12, IRP6, VAT201, PAYE and SARS support — submitted accurately and ahead of time.", icon: Calculator, href: "/services/tax", count: "13 services" },
   { number: "02", title: "Payroll services", description: "Confidential payroll that runs on time, so your team is paid correctly and your returns look after themselves.", icon: FileSpreadsheet, href: "/services/payroll", count: "6 services" },
-  { number: "03", title: "Registration & consulting", description: "Get your entity registered properly and presented professionally, from CIPC to tender-ready profiles.", icon: BriefcaseBusiness, href: "/services/registration", count: "6 services" },
+  { number: "03", title: "Registration & consulting", description: "Get your entity registered properly and presented professionally, from CIPC to tender-ready profiles.", icon: BriefcaseBusiness, href: "/services/registration", count: "4 services" },
   { number: "04", title: "Accounting & bookkeeping", description: "Books that are current, reconciled and useful — so you always know what the business is doing.", icon: BookOpen, href: "/services/accounting", count: "4 services" },
+  { number: "05", title: "CIDB registration", description: "Register or renew your construction business with the CIDB and stay ready for tender opportunities.", icon: HardHat, href: "/services/cidb-registration", count: "2 services" },
+  { number: "06", title: "Company registration", description: "Start and maintain your company with CIPC registrations, amendments, annual returns and beneficial ownership filings.", icon: Building2, href: "/services/company-registration", count: "4 services" },
+  { number: "07", title: "CSD registration", description: "Register or update your supplier profile on the Central Supplier Database for government opportunities.", icon: Database, href: "/services/csd-registration", count: "2 services" },
+  { number: "08", title: "COIDA registration", description: "Register with the Compensation Fund and complete the annual renewal due at the end of April.", icon: ShieldCheck, href: "/services/coida-registration", count: "2 services" },
 ];
 
 const proofPoints = [
@@ -139,7 +143,7 @@ export default function Home() {
           <Reveal className="max-w-2xl">
             <p className="eyebrow mb-5">Everything in one place</p>
             <h2 className="serif-display text-balance text-4xl leading-[1.02] text-secondary sm:text-5xl">Clear numbers. Calm decisions. A firm that follows through.</h2>
-            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground">Four practice areas, one accountable team. Open any of them to see exactly what is included before you ask for a quote.</p>
+            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground">Eight focused service areas, one accountable team. Open any of them to see exactly what is included before you ask for a quote.</p>
           </Reveal>
           <div className="mt-14 border-t editorial-rule">
             {services.map((service, index) => {

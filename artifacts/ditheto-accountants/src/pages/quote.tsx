@@ -29,11 +29,22 @@ const serviceCatalogue = {
     "Full Payroll Processing", "Employee Benefits Administration"
   ],
   "Registration & Consulting": [
-    "Company Registration (Pty) Ltd", "Co-operative Registration", "NPO Registration", 
-    "CIDB Registration", "Company Profiles", "Business Consulting"
+    "Co-operative Registration", "NPO Registration", "Company Profiles", "Business Consulting"
   ],
   "Accounting & Bookkeeping": [
     "Monthly Bookkeeping", "Management Accounts", "Bank Reconciliations", "Mentoring"
+  ],
+  "CIDB Registration": [
+    "CIDB Registration", "CIDB Renewals (3-year renewals)"
+  ],
+  "Company Registration": [
+    "Company Registration", "Company Amendments", "Annual Returns (AR)", "Beneficial Ownership (BO)"
+  ],
+  "CSD Registration": [
+    "CSD Registration", "CSD Amendments"
+  ],
+  "COIDA Registration": [
+    "COIDA Registration", "COIDA Renewal (due every end of April)"
   ]
 };
 

@@ -3,12 +3,11 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle, HardHat, Building2, Database, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
-import heroOne from "@assets/ditheto-accountants-hero_1789472037427.jpg";
-import heroTwo from "@assets/ditheto-accountants-hero-v2_1789472037428.jpg";
-import heroThree from "@assets/ditheto-accountants-hero-v3_1789472037429.jpg";
-import heroFour from "@assets/ditheto-accountants-hero-v4_1789472037429.jpg";
+import heroOne from "@assets/ditheto-accountants-hero-v2-corrected-v2_1789576958004.jpg";
+import heroTwo from "@assets/ditheto-accountants-hero-v3-corrected_1789576958005.jpg";
+import heroThree from "@assets/ditheto-accountants-hero-v4-corrected_1789576958002.jpg";
 
-const heroImages = [heroOne, heroTwo, heroThree, heroFour];
+const heroImages = [heroOne, heroTwo, heroThree];
 
 function HeroCarousel() {
   const [activeSlide, setActiveSlide] = useState(0);

@@ -3,14 +3,14 @@ name: Vercel Clerk proxy
 description: Clerk proxy behavior for the externally hosted Vercel deployment.
 ---
 
-When the Vercel build contains a development Clerk publishable key (`pk_test_…`), bypass the `/api/__clerk` proxy and let Clerk use its direct development frontend API. Clerk rejects a development key when it is sent through the production proxy host with `host_invalid`.
+For an external Clerk Production instance configured in proxy-domain mode, the frontend, Express middleware, and Vercel function route must use the exact proxy URL registered on the Clerk domain. For this portal that path is `/__clerk`, not `/api/__clerk`.
 
-**Why:** The externally hosted Vercel project can retain Replit development environment variables even though Vercel reports `production`; Replit-managed production publishing swaps keys automatically, but Vercel does not.
+**Why:** A mismatched proxy URL makes Clerk return `host_invalid`. Disabling the proxy is not a valid fallback for this instance because its live key resolves through a custom `clerk.*.vercel.app` host that cannot complete TLS, leaving the auth page blank.
 
-**How to apply:** Keep the proxy enabled for `pk_live_…` keys. Treat the direct development path as a compatibility bridge until Vercel is configured with the production Clerk key and secret.
+**How to apply:** Keep `/__clerk` enabled for `pk_live_…` builds and verify `/__clerk/v1/client` plus `/__clerk/v1/environment` return 200 on the canonical alias. Development `pk_test_…` builds should continue using their direct frontend API.
 
 Vercel's canonical `CLERK_PUBLISHABLE_KEY` can itself still be configured with a `pk_test_…` value. Removing a stale `VITE_CLERK_PUBLISHABLE_KEY` override is not sufficient unless the replacement value is verified as live.
 
 **Why:** A rebuilt bundle can be healthy and render sign-in while still showing Clerk's Development mode when the linked Vercel production environment contains development credentials.
 
-**How to apply:** Inspect the compiled public bundle for the active key environment and confirm the live alias visually before declaring production sign-in ready; configure Clerk Production credentials and allowed origins separately from the source fallback.
+**How to apply:** Inspect the compiled public bundle for the active key environment and confirm the live alias in a real browser before declaring production sign-in ready; configure Clerk Production credentials, proxy URL, and allowed origins separately from the source fallback.

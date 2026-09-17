@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ReactNode, useEffect, useRef } from 'react';
 import type { QueryClient } from '@tanstack/react-query';
-import { ClerkProvider, SignIn, useAuth, useClerk } from '@clerk/react';
+import { ClerkProvider, SignIn, SignUp, useAuth, useClerk } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { Redirect, Route, Switch, useLocation } from 'wouter';
@@ -108,6 +108,20 @@ function AuthRouter() {
               <SignIn
                 routing="path"
                 path={`${basePath}/sign-in`}
+                signUpUrl={`${basePath}/sign-up`}
+                forceRedirectUrl={`${basePath}/admin/clients`}
+              />
+            </div>
+          )}
+        />
+        <Route
+          path="/sign-up/*?"
+          component={() => (
+            <div className="flex min-h-screen items-center justify-center bg-background">
+              <SignUp
+                routing="path"
+                path={`${basePath}/sign-up`}
+                signInUrl={`${basePath}/sign-in`}
                 forceRedirectUrl={`${basePath}/admin/clients`}
               />
             </div>
@@ -176,6 +190,7 @@ export default function AuthenticatedApp({
       publishableKey={clerkPubKey}
       proxyUrl={clerkProxyUrl}
       signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
       appearance={{
         theme: shadcn,
         cssLayerName: 'clerk',

@@ -27,6 +27,7 @@ import {
   db,
   documentRequestsTable,
   integrationStateTable,
+  staffRoleAuditTable,
   staffUsersTable,
 } from "@workspace/db";
 import { requireFullAccess, requireStaff, type AdminRequest, type StaffRole } from "../middlewares/adminAuth";
@@ -34,6 +35,17 @@ import { ObjectStorageService } from "../lib/objectStorage";
 
 const router: IRouter = Router();
 const storage = new ObjectStorageService();
+const assignableRoles: StaffRole[] = ["ceo", "senior_manager", "marketing_staff"];
+
+function parseStaffUserId(value: unknown): number | null {
+  const id = typeof value === "string" ? Number(value) : NaN;
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+function parseAuditLimit(value: unknown): number {
+  const limit = typeof value === "string" ? Number(value) : NaN;
+  return Number.isInteger(limit) && limit > 0 ? Math.min(limit, 100) : 100;
+}
 
 router.get("/admin/me", requireStaff, async (req: Request, res: Response): Promise<void> => {
   const staffUser = (req as AdminRequest).staffUser;
@@ -52,8 +64,7 @@ router.post("/admin/staff-users", requireFullAccess, async (req: Request, res: R
   const password = typeof body.password === "string" ? body.password : "";
   const firstName = typeof body.firstName === "string" ? body.firstName.trim() : "";
   const lastName = typeof body.lastName === "string" ? body.lastName.trim() : "";
-  const allowedRoles: StaffRole[] = ["ceo", "senior_manager", "marketing_staff"];
-  const role = typeof body.role === "string" && allowedRoles.includes(body.role as StaffRole)
+  const role = typeof body.role === "string" && assignableRoles.includes(body.role as StaffRole)
     ? body.role as StaffRole
     : null;
 
@@ -71,6 +82,11 @@ router.post("/admin/staff-users", requireFullAccess, async (req: Request, res: R
   }
   if (!process.env.CLERK_SECRET_KEY) {
     res.status(503).json({ error: "Staff account creation is not configured yet." });
+    return;
+  }
+  const actorStaffUser = (req as AdminRequest).staffUser;
+  if (!actorStaffUser) {
+    res.status(401).json({ error: "Authentication required" });
     return;
   }
 
@@ -102,20 +118,112 @@ router.post("/admin/staff-users", requireFullAccess, async (req: Request, res: R
     res.status(502).json({ error: "The authentication account was created without a usable user ID." });
     return;
   }
+  const clerkUserId = clerkUser.id;
 
   try {
-    const [staffUser] = await db.insert(staffUsersTable)
-      .values({ clerkUserId: clerkUser.id, role })
-      .returning({ id: staffUsersTable.id, role: staffUsersTable.role });
+    const { staffUser } = await db.transaction(async (tx) => {
+      const [createdStaffUser] = await tx.insert(staffUsersTable)
+        .values({ clerkUserId, role })
+        .returning({ id: staffUsersTable.id, role: staffUsersTable.role });
+      if (!createdStaffUser) {
+        throw new Error("Staff account database record was not created");
+      }
+      await tx.insert(staffRoleAuditTable).values({
+        actorStaffUserId: actorStaffUser.id,
+        targetStaffUserId: createdStaffUser.id,
+        previousRole: null,
+        newRole: createdStaffUser.role,
+      });
+      return { staffUser: createdStaffUser };
+    });
     res.status(201).json({ id: staffUser.id, email, role: staffUser.role });
   } catch (error) {
-    await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(clerkUser.id)}`, {
+    await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(clerkUserId)}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` },
     }).catch(() => undefined);
     req.log.error({ err: error }, "Staff account database record could not be created");
     res.status(500).json({ error: "The staff account could not be completed." });
   }
+});
+
+router.patch("/admin/staff-users/:staffUserId", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
+  const staffUserId = parseStaffUserId(req.params.staffUserId);
+  const requestedRole = (req.body as { role?: unknown })?.role;
+  const role = typeof requestedRole === "string" && assignableRoles.includes(requestedRole as StaffRole)
+    ? requestedRole as StaffRole
+    : null;
+
+  if (!staffUserId) {
+    res.status(400).json({ error: "Enter a valid staff account ID." });
+    return;
+  }
+  if (!role) {
+    res.status(400).json({ error: "Select a valid portal role." });
+    return;
+  }
+
+  const actorStaffUser = (req as AdminRequest).staffUser;
+  if (!actorStaffUser) {
+    res.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  const result = await db.transaction(async (tx) => {
+    const [targetStaffUser] = await tx.select({
+      id: staffUsersTable.id,
+      role: staffUsersTable.role,
+    }).from(staffUsersTable)
+      .where(eq(staffUsersTable.id, staffUserId))
+      .limit(1);
+
+    if (!targetStaffUser || targetStaffUser.role === "instance_marker") {
+      return null;
+    }
+    if (targetStaffUser.role === role) {
+      return { targetStaffUser, changed: false };
+    }
+
+    const [updatedStaffUser] = await tx.update(staffUsersTable)
+      .set({ role })
+      .where(eq(staffUsersTable.id, staffUserId))
+      .returning({ id: staffUsersTable.id, role: staffUsersTable.role });
+    if (!updatedStaffUser) {
+      return null;
+    }
+
+    await tx.insert(staffRoleAuditTable).values({
+      actorStaffUserId: actorStaffUser.id,
+      targetStaffUserId: updatedStaffUser.id,
+      previousRole: targetStaffUser.role,
+      newRole: updatedStaffUser.role,
+    });
+    return { targetStaffUser: updatedStaffUser, changed: true };
+  });
+
+  if (!result) {
+    res.status(404).json({ error: "Staff account not found." });
+    return;
+  }
+  res.json({
+    id: result.targetStaffUser.id,
+    role: result.targetStaffUser.role,
+    changed: result.changed,
+  });
+});
+
+router.get("/admin/audit/staff-role-changes", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
+  const auditEntries = await db.select({
+    id: staffRoleAuditTable.id,
+    actorStaffUserId: staffRoleAuditTable.actorStaffUserId,
+    targetStaffUserId: staffRoleAuditTable.targetStaffUserId,
+    previousRole: staffRoleAuditTable.previousRole,
+    newRole: staffRoleAuditTable.newRole,
+    changedAt: staffRoleAuditTable.changedAt,
+  }).from(staffRoleAuditTable)
+    .orderBy(desc(staffRoleAuditTable.changedAt), desc(staffRoleAuditTable.id))
+    .limit(parseAuditLimit(req.query.limit));
+  res.json(auditEntries);
 });
 
 router.get("/admin/clients", requireFullAccess, async (_req: Request, res: Response): Promise<void> => {

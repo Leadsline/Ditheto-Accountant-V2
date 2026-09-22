@@ -161,6 +161,11 @@ router.get(
         res.end();
       }
     } catch (error) {
+      if (error instanceof ObjectNotFoundError) {
+        req.log.warn({ err: error }, 'Public object not found');
+        res.status(404).json({ error: 'File not found' });
+        return;
+      }
       req.log.error({ err: error }, 'Error serving public object');
       res.status(500).json({ error: 'Failed to serve public object' });
     }

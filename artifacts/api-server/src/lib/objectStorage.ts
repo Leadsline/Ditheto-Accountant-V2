@@ -138,7 +138,7 @@ export class ObjectStorageService {
           },
         },
       );
-      if (response.status === 404) {
+      if (await isSupabaseObjectNotFound(response)) {
         throw new ObjectNotFoundError();
       }
       if (!response.ok) {
@@ -266,7 +266,7 @@ export class ObjectStorageService {
           },
         },
       );
-      if (response.status === 404) {
+      if (await isSupabaseObjectNotFound(response)) {
         throw new ObjectNotFoundError();
       }
       if (!response.ok) {
@@ -363,6 +363,31 @@ export class ObjectStorageService {
 
 function isSupabaseObject(object: StoredObject): object is SupabaseObject {
   return 'provider' in object && object.provider === 'supabase';
+}
+
+async function isSupabaseObjectNotFound(response: Response): Promise<boolean> {
+  if (response.status === 404) {
+    return true;
+  }
+
+  if (response.status !== 400) {
+    return false;
+  }
+
+  try {
+    const payload = (await response.clone().json()) as {
+      statusCode?: number | string;
+      code?: string;
+      error?: string;
+    };
+    return (
+      Number(payload.statusCode) === 404 ||
+      payload.code === 'NoSuchKey' ||
+      payload.error === 'not_found'
+    );
+  } catch {
+    return false;
+  }
 }
 
 function encodeStoragePath(path: string): string {

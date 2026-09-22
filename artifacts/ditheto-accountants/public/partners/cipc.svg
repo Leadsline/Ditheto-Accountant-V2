@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="64" viewBox="0 0 180 64" role="img" aria-label="CIPC">
-  <rect x="9" y="16" width="32" height="32" rx="7" fill="#f4b938"/>
-  <path d="M17 39V25h6l4 6 4-6h5v14h-5v-7l-4 5-4-5v7z" fill="#122b42"/>
-  <text x="52" y="39" fill="#fff" font-family="Arial, sans-serif" font-size="27" font-weight="700" letter-spacing="2">CIPC</text>
-</svg>

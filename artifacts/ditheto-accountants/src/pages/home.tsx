@@ -84,11 +84,11 @@ const proofPoints = [
 ];
 
 const professionalBodies = [
-  { name: "SARS", src: `${import.meta.env.BASE_URL}partners/sars.png`, fallback: `${import.meta.env.BASE_URL}partners/sars.svg` },
-  { name: "CIPC", src: `${import.meta.env.BASE_URL}partners/cipc.png`, fallback: `${import.meta.env.BASE_URL}partners/cipc.svg` },
-  { name: "SAIT", src: `${import.meta.env.BASE_URL}partners/sait.png`, fallback: `${import.meta.env.BASE_URL}partners/sait.svg` },
-  { name: "SAIPA", src: `${import.meta.env.BASE_URL}partners/saipa.png`, fallback: `${import.meta.env.BASE_URL}partners/saipa.svg` },
-  { name: "SAICA", src: `${import.meta.env.BASE_URL}partners/saica.png`, fallback: `${import.meta.env.BASE_URL}partners/saica.svg` },
+  { name: "SARS", src: `${import.meta.env.BASE_URL}partners/sars.png` },
+  { name: "CIPC", src: `${import.meta.env.BASE_URL}partners/cipc.png` },
+  { name: "SAIT", src: `${import.meta.env.BASE_URL}partners/sait.png` },
+  { name: "SAIPA", src: `${import.meta.env.BASE_URL}partners/saipa.png` },
+  { name: "SAICA", src: `${import.meta.env.BASE_URL}partners/saica.png` },
 ];
 
 export default function Home() {
@@ -210,11 +210,7 @@ export default function Home() {
                   <img
                     src={body.src}
                     alt={index >= professionalBodies.length ? "" : body.name}
-                    onError={(event) => {
-                      event.currentTarget.onerror = null;
-                      event.currentTarget.src = body.fallback;
-                    }}
-                    className="h-9 w-auto max-w-[9rem] object-contain opacity-90"
+                    className="max-h-10 w-auto max-w-[9rem] object-contain opacity-95"
                   />
                 </span>
               ))}

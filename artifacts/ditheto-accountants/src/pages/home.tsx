@@ -187,34 +187,26 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-primary py-16 text-white sm:py-20">
-        <div className="site-container grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-accent">Let's get it sorted</p>
-            <h2 className="serif-display mt-4 max-w-2xl text-4xl leading-[1] sm:text-5xl">Your next filing does not need to become a fire drill.</h2>
-            <p className="mt-5 max-w-xl text-sm leading-6 text-white/75">Tell us what you need and we will come back with a clear, tailored quote.</p>
-            <div className="mt-8 overflow-hidden rounded-xl border border-white/15 bg-secondary/15 py-4" aria-label="Professional bodies and organisations we work with">
-              <p className="px-5 text-[10px] font-bold uppercase tracking-[.18em] text-white/60">Professional bodies &amp; partners</p>
-              <div className="mt-4 overflow-hidden">
-                <div className="partner-marquee flex w-max items-center gap-3 px-5" role="list">
-                  {[...professionalBodies, ...professionalBodies].map((body, index) => (
-                    <span
-                      key={`${body}-${index}`}
-                      role="listitem"
-                      aria-hidden={index >= professionalBodies.length}
-                      className="inline-flex h-11 items-center gap-2 rounded-lg border border-white/20 bg-white/[.07] px-5 text-sm font-bold tracking-wide text-white/90"
-                    >
-                      <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
-                      {body}
-                    </span>
-                  ))}
-                </div>
-              </div>
+      <section className="border-y border-accent/30 bg-secondary py-16 text-white sm:py-20">
+        <div className="site-container">
+          <p className="text-center text-[11px] font-bold uppercase tracking-[.24em] text-accent">Professional bodies &amp; partners</p>
+          <div className="relative mt-8 overflow-hidden" aria-label="Professional bodies and organisations we work with">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-secondary to-transparent sm:w-28" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-secondary to-transparent sm:w-28" />
+            <div className="partner-marquee flex w-max items-center gap-5 px-5" role="list">
+              {[...professionalBodies, ...professionalBodies].map((body, index) => (
+                <span
+                  key={`${body}-${index}`}
+                  role="listitem"
+                  aria-hidden={index >= professionalBodies.length}
+                  className="inline-flex h-14 min-w-32 items-center justify-center gap-3 rounded-lg border border-white/15 bg-white/[.055] px-7 text-sm font-bold tracking-[.12em] text-white/85 shadow-sm"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+                  {body}
+                </span>
+              ))}
             </div>
           </div>
-          <Link href="/quote" className="inline-flex h-14 items-center justify-center gap-2 rounded-sm bg-accent px-7 text-sm font-bold text-secondary transition-transform hover:-translate-y-1" data-testid="link-home-final-quote">
-            Start with a quote <ArrowUpRight className="h-4 w-4" />
-          </Link>
         </div>
       </section>
     </div>

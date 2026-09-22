@@ -8,7 +8,7 @@ import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 const Layout = lazy(() =>
   import('@/components/layout/layout').then(({ Layout }) => ({ default: Layout })),
 );
-const AuthenticatedApp = lazy(() => import('@/components/authenticated-app'));
+const AdminApp = lazy(() => import('@/components/admin-app'));
 
 const Home = lazy(() => import('@/pages/home'));
 const Services = lazy(() => import('@/pages/services'));
@@ -75,7 +75,7 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 
 function App() {
   const [location] = useLocation();
-  const isAuthenticatedRoute =
+  const isAdminRoute =
     location === '/sign-in' ||
     location.startsWith('/sign-in/') ||
     location === '/sign-up' ||
@@ -88,8 +88,8 @@ function App() {
       <TooltipProvider>
         <RoutedErrorBoundary>
           <Suspense fallback={<RouteLoading />}>
-            {isAuthenticatedRoute ? (
-              <AuthenticatedApp queryClient={queryClient} />
+            {isAdminRoute ? (
+              <AdminApp />
             ) : (
               <PublicRouter />
             )}

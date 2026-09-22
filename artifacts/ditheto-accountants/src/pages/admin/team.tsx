@@ -16,8 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useRole } from "@/hooks/use-role";
-import { ImagePlus, KeyRound, Loader2, Pencil, Plus, ShieldCheck, Trash2, Upload, X } from "lucide-react";
+import { ImagePlus, Loader2, Pencil, Plus, ShieldCheck, Trash2, Upload, X } from "lucide-react";
 
 type Draft = {
   name: string;
@@ -90,7 +89,8 @@ async function uploadProfilePhoto(file: File): Promise<string> {
 
 export default function AdminTeam() {
   const queryClient = useQueryClient();
-  const { isFullAccess, isLoaded: roleLoaded } = useRole();
+  const isFullAccess = true;
+  const roleLoaded = true;
   const { data: people = [], isLoading, isError } = useListTeamMembers();
   const createMember = useCreateTeamMember();
   const updateMember = useUpdateTeamMember();
@@ -100,9 +100,6 @@ export default function AdminTeam() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const [saving, setSaving] = useState(false);
-  const [accountDraft, setAccountDraft] = useState({ email: "", password: "", firstName: "", lastName: "", role: "marketing_staff" });
-  const [creatingAccount, setCreatingAccount] = useState(false);
-  const [accountNotice, setAccountNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const parentOptions = useMemo(
@@ -206,37 +203,6 @@ export default function AdminTeam() {
     }
   };
 
-  const createStaffAccount = async () => {
-    if (!accountDraft.email.trim() || accountDraft.password.length < 12) {
-      setAccountNotice({ kind: "error", text: "Enter a valid email and a password with at least 12 characters." });
-      return;
-    }
-    setCreatingAccount(true);
-    setAccountNotice(null);
-    try {
-      const response = await fetch("/api/admin/staff-users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          email: accountDraft.email.trim(),
-          password: accountDraft.password,
-          firstName: accountDraft.firstName.trim(),
-          lastName: accountDraft.lastName.trim(),
-          role: accountDraft.role,
-        }),
-      });
-      const result = await response.json().catch(() => ({})) as { error?: string };
-      if (!response.ok) throw new Error(result.error || "The staff account could not be created.");
-      setAccountNotice({ kind: "success", text: `Staff login created for ${accountDraft.email.trim()}. Share the credentials securely with that staff member.` });
-      setAccountDraft({ email: "", password: "", firstName: "", lastName: "", role: "marketing_staff" });
-    } catch (error) {
-      setAccountNotice({ kind: "error", text: error instanceof Error ? error.message : "The staff account could not be created." });
-    } finally {
-      setCreatingAccount(false);
-    }
-  };
-
   return (
     <AdminLayout>
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-start">
@@ -263,53 +229,6 @@ export default function AdminTeam() {
         <div className={`mb-6 rounded-lg border px-4 py-3 text-sm font-medium ${notice.kind === "success" ? "border-green-200 bg-green-50 text-green-800" : "border-red-200 bg-red-50 text-red-700"}`}>
           {notice.text}
         </div>
-      )}
-
-      {roleLoaded && isFullAccess && (
-        <Card className="mb-6 border-primary/20">
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2 font-heading text-lg"><KeyRound className="h-5 w-5 text-primary" /> Create staff login</CardTitle>
-            <p className="text-sm text-gray-500">Create a secure staff login and assign the portal access that matches the person’s responsibilities.</p>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-6">
-            {accountNotice && (
-              <div className={`rounded-lg border px-4 py-3 text-sm font-medium ${accountNotice.kind === "success" ? "border-green-200 bg-green-50 text-green-800" : "border-red-200 bg-red-50 text-red-700"}`}>
-                {accountNotice.text}
-              </div>
-            )}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="staff-email">Staff email / username</Label>
-                <Input id="staff-email" type="email" autoComplete="off" value={accountDraft.email} onChange={(event) => setAccountDraft((current) => ({ ...current, email: event.target.value }))} placeholder="staff@dithetoaccountants.co.za" />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="staff-role">Portal role</Label>
-                <select id="staff-role" value={accountDraft.role} onChange={(event) => setAccountDraft((current) => ({ ...current, role: event.target.value }))} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-secondary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <option value="ceo">CEO — full portal rights</option>
-                  <option value="senior_manager">Senior Manager — full portal rights</option>
-                  <option value="marketing_staff">Staff Team — Marketing / Posters only</option>
-                </select>
-                <p className="text-xs text-gray-500">Full-access roles can manage clients, documents, team profiles, reminders, integrations, and staff logins.</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="staff-first-name">First name</Label>
-                <Input id="staff-first-name" autoComplete="off" value={accountDraft.firstName} onChange={(event) => setAccountDraft((current) => ({ ...current, firstName: event.target.value }))} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="staff-last-name">Last name</Label>
-                <Input id="staff-last-name" autoComplete="off" value={accountDraft.lastName} onChange={(event) => setAccountDraft((current) => ({ ...current, lastName: event.target.value }))} />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="staff-password">Temporary password</Label>
-                <Input id="staff-password" type="password" autoComplete="new-password" minLength={12} value={accountDraft.password} onChange={(event) => setAccountDraft((current) => ({ ...current, password: event.target.value }))} placeholder="At least 12 characters" />
-              </div>
-            </div>
-            <Button type="button" onClick={createStaffAccount} disabled={creatingAccount} className="gap-2 bg-primary text-white hover:bg-primary/90">
-              {creatingAccount ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
-              {creatingAccount ? "Creating login…" : "Create staff login"}
-            </Button>
-          </CardContent>
-        </Card>
       )}
 
       <div className="grid gap-6 xl:grid-cols-[1fr_400px]">

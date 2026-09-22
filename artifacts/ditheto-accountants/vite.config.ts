@@ -13,25 +13,6 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 const basePath = process.env.BASE_PATH ?? '/';
-const productionAuthExpected =
-  process.env.CLERK_PRODUCTION_AUTH_EXPECTED === '1' ||
-  process.env.VERCEL_ENV === 'production';
-const configuredClerkKeys = [
-  process.env.CLERK_PUBLISHABLE_KEY,
-  process.env.EXTERNAL_CLERK_PUBLISHABLE_KEY,
-  process.env.VITE_CLERK_PUBLISHABLE_KEY,
-].filter((key): key is string => Boolean(key));
-const clerkKeyForFrontend = configuredClerkKeys.find(
-  (key) =>
-    /^pk_(live|test)_/.test(key) &&
-    (!productionAuthExpected || key.startsWith('pk_live_')),
-);
-
-if (productionAuthExpected && !clerkKeyForFrontend) {
-  throw new Error(
-    'Production Clerk builds require a pk_live publishable key. Set CLERK_PUBLISHABLE_KEY or EXTERNAL_CLERK_PUBLISHABLE_KEY in the production environment.',
-  );
-}
 
 export default defineConfig({
   base: basePath,
@@ -70,14 +51,6 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, 'dist/public'),
     emptyOutDir: true,
   },
-  // Vercel stores the production Clerk publishable key as CLERK_PUBLISHABLE_KEY
-  // so the API and frontend cannot silently use different Clerk environments.
-  // Keep the VITE variable as the development fallback for local builds.
-  define: clerkKeyForFrontend
-    ? {
-        'import.meta.env.VITE_CLERK_PUBLISHABLE_KEY': JSON.stringify(clerkKeyForFrontend),
-      }
-    : undefined,
   server: {
     port,
     strictPort: true,

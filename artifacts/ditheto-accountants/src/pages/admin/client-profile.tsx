@@ -19,7 +19,6 @@ import {
   CheckCircle2, FileText, UploadCloud, Trash2, Send, Download, Eye, Edit
 } from "lucide-react";
 import { format } from "date-fns";
-import { useRole } from "@/hooks/use-role";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef } from "react";
 import {
@@ -40,7 +39,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 export default function AdminClientProfile() {
   const { clientId: clientIdStr } = useParams();
   const clientId = parseInt(clientIdStr || "0", 10);
-  const { role, isSuperAdmin } = useRole();
+  const isSuperAdmin = true;
   const { toast } = useToast();
 
   const { data: client, isLoading: isClientLoading } = useGetAdminClient(clientId);

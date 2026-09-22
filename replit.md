@@ -1,6 +1,6 @@
 # Ditheto Accountants
 
-Professional public website and secure staff portal for managing accounting clients, documents, communications, and future Odoo synchronization.
+Professional public website and public-preview admin portal for managing accounting clients, documents, communications, and future Odoo synchronization.
 
 ## Run & Operate
 
@@ -14,7 +14,7 @@ Professional public website and secure staff portal for managing accounting clie
 ## Stack
 
 - React 19, Vite, TypeScript, Tailwind CSS and Wouter
-- Clerk authentication with a production Frontend API proxy
+- Public admin preview with authentication intentionally disabled
 - Express 5 API with generated Zod request/response validation
 - PostgreSQL with Drizzle ORM
 - Replit App Storage for private client documents
@@ -24,15 +24,14 @@ Professional public website and secure staff portal for managing accounting clie
 
 - Public and admin UI: `artifacts/ditheto-accountants/src`
 - API routes: `artifacts/api-server/src/routes`
-- Authentication and role enforcement: `artifacts/api-server/src/middlewares`
+- Public admin access middleware: `artifacts/api-server/src/middlewares`
 - Source-of-truth API contract: `lib/api-spec/openapi.yaml`
 - Database schema: `lib/db/src/schema`
 
 ## Architecture decisions
 
-- Browser authentication is cookie-based through Clerk; browser code must not add bearer tokens.
-- The first authenticated staff account is bootstrapped as `super_admin`; later accounts default to read-only `staff`.
-- Super Admin permissions are enforced on the server for uploads, edits, deletes, requests, and sync actions. Hiding buttons is not treated as authorization.
+- Authentication is intentionally disabled while the portal is being prepared; admin pages and routes are public previews.
+- Write-capable admin routes are public during this preview and must be protected before production use.
 - Client files upload directly to private App Storage with short-lived signed URLs; PostgreSQL stores metadata and object paths, not file blobs.
 - Odoo is modular and disabled by default. Its UI and API report `Disconnected` until an authorized connector is attached.
 - Without messaging connectors, email and WhatsApp requests are logged in PostgreSQL and opened in the staff member's email app or WhatsApp for final sending.
@@ -40,7 +39,7 @@ Professional public website and secure staff portal for managing accounting clie
 ## Product
 
 - Public Home, Services, Quote, About, Team, and Contact pages
-- Secure staff sign-in and sign-up
+- Public admin preview
 - Searchable client database and detailed client profiles
 - Client document library with status/category management and private uploads
 - Outstanding-document request composer and communication history
@@ -50,5 +49,5 @@ Professional public website and secure staff portal for managing accounting clie
 ## Gotchas
 
 - Run OpenAPI code generation immediately after editing `lib/api-spec/openapi.yaml`.
-- Private object routes must remain behind Clerk staff authentication.
+- Private object routes are public during the admin preview and must be protected before production use.
 - Do not present Odoo, email, or WhatsApp delivery as connected until the relevant integration has been authorized.

@@ -29,30 +29,19 @@ import {
   db,
   documentRequestsTable,
   integrationStateTable,
-  staffRoleAuditTable,
-  staffUsersTable,
 } from "@workspace/db";
 import {
   requireCampaignAccess,
   requireFullAccess,
   requireStaff,
   type AdminRequest,
-  type StaffRole,
 } from "../middlewares/adminAuth";
 import { ObjectNotFoundError, ObjectStorageService } from "../lib/objectStorage";
 
 const router: IRouter = Router();
 const storage = new ObjectStorageService();
-const assignableRoles: StaffRole[] = ["ceo", "senior_manager", "marketing_staff"];
-
-function parseStaffUserId(value: unknown): number | null {
-  const id = typeof value === "string" ? Number(value) : NaN;
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
-
 router.get("/admin/me", requireStaff, async (req: Request, res: Response): Promise<void> => {
-  const staffUser = (req as AdminRequest).staffUser;
-  res.json({ role: staffUser?.role ?? "staff" });
+  res.json({ role: "public_admin" });
 });
 
 router.post("/admin/campaigns/send", requireCampaignAccess, async (req: Request, res: Response): Promise<void> => {
@@ -95,166 +84,6 @@ router.post("/admin/campaigns/send", requireCampaignAccess, async (req: Request,
     deliveryUrl,
     message: "Campaign approved. WhatsApp is ready for the final send.",
   }));
-});
-
-router.post("/admin/staff-users", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
-  const body = req.body as {
-    email?: unknown;
-    password?: unknown;
-    firstName?: unknown;
-    lastName?: unknown;
-    role?: unknown;
-  };
-  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const password = typeof body.password === "string" ? body.password : "";
-  const firstName = typeof body.firstName === "string" ? body.firstName.trim() : "";
-  const lastName = typeof body.lastName === "string" ? body.lastName.trim() : "";
-  const role = typeof body.role === "string" && assignableRoles.includes(body.role as StaffRole)
-    ? body.role as StaffRole
-    : null;
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    res.status(400).json({ error: "Enter a valid staff email address." });
-    return;
-  }
-  if (password.length < 12) {
-    res.status(400).json({ error: "Staff passwords must be at least 12 characters." });
-    return;
-  }
-  if (!role) {
-    res.status(400).json({ error: "Select a valid portal role." });
-    return;
-  }
-  if (!process.env.CLERK_SECRET_KEY) {
-    res.status(503).json({ error: "Staff account creation is not configured yet." });
-    return;
-  }
-  const actorStaffUser = (req as AdminRequest).staffUser;
-  if (!actorStaffUser) {
-    res.status(401).json({ error: "Authentication required" });
-    return;
-  }
-
-  const clerkResponse = await fetch("https://api.clerk.com/v1/users", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email_address: [email],
-      password,
-      ...(firstName ? { first_name: firstName } : {}),
-      ...(lastName ? { last_name: lastName } : {}),
-    }),
-  });
-
-  if (!clerkResponse.ok) {
-    const clerkError = await clerkResponse.json().catch(() => null) as { errors?: Array<{ message?: string }> } | null;
-    const message = clerkError?.errors?.[0]?.message;
-    res.status(clerkResponse.status === 422 ? 409 : 502).json({
-      error: message || "The staff account could not be created.",
-    });
-    return;
-  }
-
-  const clerkUser = await clerkResponse.json() as { id?: string };
-  if (!clerkUser.id) {
-    res.status(502).json({ error: "The authentication account was created without a usable user ID." });
-    return;
-  }
-  const clerkUserId = clerkUser.id;
-
-  try {
-    const { staffUser } = await db.transaction(async (tx) => {
-      const [createdStaffUser] = await tx.insert(staffUsersTable)
-        .values({ clerkUserId, role })
-        .returning({ id: staffUsersTable.id, role: staffUsersTable.role });
-      if (!createdStaffUser) {
-        throw new Error("Staff account database record was not created");
-      }
-      await tx.insert(staffRoleAuditTable).values({
-        actorStaffUserId: actorStaffUser.id,
-        targetStaffUserId: createdStaffUser.id,
-        previousRole: null,
-        newRole: createdStaffUser.role,
-      });
-      return { staffUser: createdStaffUser };
-    });
-    res.status(201).json({ id: staffUser.id, email, role: staffUser.role });
-  } catch (error) {
-    await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(clerkUserId)}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` },
-    }).catch(() => undefined);
-    req.log.error({ err: error }, "Staff account database record could not be created");
-    res.status(500).json({ error: "The staff account could not be completed." });
-  }
-});
-
-router.patch("/admin/staff-users/:staffUserId", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
-  const staffUserId = parseStaffUserId(req.params.staffUserId);
-  const requestedRole = (req.body as { role?: unknown })?.role;
-  const role = typeof requestedRole === "string" && assignableRoles.includes(requestedRole as StaffRole)
-    ? requestedRole as StaffRole
-    : null;
-
-  if (!staffUserId) {
-    res.status(400).json({ error: "Enter a valid staff account ID." });
-    return;
-  }
-  if (!role) {
-    res.status(400).json({ error: "Select a valid portal role." });
-    return;
-  }
-
-  const actorStaffUser = (req as AdminRequest).staffUser;
-  if (!actorStaffUser) {
-    res.status(401).json({ error: "Authentication required" });
-    return;
-  }
-
-  const result = await db.transaction(async (tx) => {
-    const [targetStaffUser] = await tx.select({
-      id: staffUsersTable.id,
-      role: staffUsersTable.role,
-    }).from(staffUsersTable)
-      .where(eq(staffUsersTable.id, staffUserId))
-      .limit(1);
-
-    if (!targetStaffUser || targetStaffUser.role === "instance_marker") {
-      return null;
-    }
-    if (targetStaffUser.role === role) {
-      return { targetStaffUser, changed: false };
-    }
-
-    const [updatedStaffUser] = await tx.update(staffUsersTable)
-      .set({ role })
-      .where(eq(staffUsersTable.id, staffUserId))
-      .returning({ id: staffUsersTable.id, role: staffUsersTable.role });
-    if (!updatedStaffUser) {
-      return null;
-    }
-
-    await tx.insert(staffRoleAuditTable).values({
-      actorStaffUserId: actorStaffUser.id,
-      targetStaffUserId: updatedStaffUser.id,
-      previousRole: targetStaffUser.role,
-      newRole: updatedStaffUser.role,
-    });
-    return { targetStaffUser: updatedStaffUser, changed: true };
-  });
-
-  if (!result) {
-    res.status(404).json({ error: "Staff account not found." });
-    return;
-  }
-  res.json({
-    id: result.targetStaffUser.id,
-    role: result.targetStaffUser.role,
-    changed: result.changed,
-  });
 });
 
 router.get("/admin/clients", requireFullAccess, async (_req: Request, res: Response): Promise<void> => {

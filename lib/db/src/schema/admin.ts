@@ -2,23 +2,6 @@ import { integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const staffUsersTable = pgTable("staff_users", {
-  id: serial("id").primaryKey(),
-  clerkUserId: text("clerk_user_id").notNull().unique(),
-  role: text("role").notNull().default("staff"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-});
-
-export const staffRoleAuditTable = pgTable("staff_role_audit", {
-  id: serial("id").primaryKey(),
-  actorStaffUserId: integer("actor_staff_user_id").notNull().references(() => staffUsersTable.id, { onDelete: "restrict" }),
-  targetStaffUserId: integer("target_staff_user_id").notNull().references(() => staffUsersTable.id, { onDelete: "restrict" }),
-  previousRole: text("previous_role"),
-  newRole: text("new_role").notNull(),
-  changedAt: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
-});
-
 export const adminClientsTable = pgTable("admin_clients", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -72,14 +55,9 @@ export const integrationStateTable = pgTable("integration_state", {
 export const insertAdminClientSchema = createInsertSchema(adminClientsTable).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertClientDocumentSchema = createInsertSchema(clientDocumentsTable).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertDocumentRequestSchema = createInsertSchema(documentRequestsTable).omit({ id: true, sentAt: true });
-export const insertStaffRoleAuditSchema = createInsertSchema(staffRoleAuditTable).omit({ id: true, changedAt: true });
-
-export type StaffUser = typeof staffUsersTable.$inferSelect;
-export type StaffRoleAudit = typeof staffRoleAuditTable.$inferSelect;
 export type AdminClient = typeof adminClientsTable.$inferSelect;
 export type ClientDocument = typeof clientDocumentsTable.$inferSelect;
 export type DocumentRequest = typeof documentRequestsTable.$inferSelect;
 export type InsertAdminClient = z.infer<typeof insertAdminClientSchema>;
 export type InsertClientDocument = z.infer<typeof insertClientDocumentSchema>;
 export type InsertDocumentRequest = z.infer<typeof insertDocumentRequestSchema>;
-export type InsertStaffRoleAudit = z.infer<typeof insertStaffRoleAuditSchema>;

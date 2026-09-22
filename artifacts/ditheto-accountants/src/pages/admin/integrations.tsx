@@ -4,11 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useGetOdooStatus } from "@workspace/api-client-react";
 import { RefreshCw, CheckCircle2, XCircle, Database, AlertCircle, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
-import { useRole } from "@/hooks/use-role";
 
 export default function AdminIntegrations() {
   const { data: odooStatus, isLoading, error } = useGetOdooStatus();
-  const { isSuperAdmin } = useRole();
+  const isSuperAdmin = true;
 
   return (
     <AdminLayout>

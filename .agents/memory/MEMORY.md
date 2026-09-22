@@ -7,3 +7,4 @@
 - [Replit Git provider authentication](replit-git-provider-auth.md) — an authenticated GitHub connector can coexist with a stale Git pane connection; recover by reconnecting GitHub under account Git Providers.
 - [Campaign media delivery](campaign-media-delivery.md) — campaign posters use scoped private storage routes and an explicit WhatsApp handoff until a direct messaging connector exists.
 - [Supabase missing-object responses](supabase-missing-object-responses.md) — Storage can report a missing object as HTTP 400 with nested 404/NoSuchKey details.
+- [Auth-provider removal checks](auth-provider-removal-checks.md) — removing an auth provider requires a repo-wide reference scan plus a frozen-lockfile build check.

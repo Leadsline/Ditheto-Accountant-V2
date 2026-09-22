@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "CLERK_PRODUCTION_AUTH_EXPECTED=1 pnpm run build:vercel",
+  "buildCommand": "pnpm run build:vercel",
   "outputDirectory": "artifacts/ditheto-accountants/dist/public",
   "framework": "vite",
   "functions": {
@@ -10,10 +10,6 @@
     }
   },
   "routes": [
-    {
-      "src": "/__clerk/(.*)",
-      "dest": "/api/[...path]"
-    },
     {
       "src": "/api/(.*)",
       "dest": "/api/[...path]"

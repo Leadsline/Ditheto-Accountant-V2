@@ -83,7 +83,11 @@ Before moving from Vercel to Afrihost:
 
 1. Export and import the PostgreSQL database.
 2. Copy object-storage files to the selected portable storage provider.
-3. Add the final domain to Clerk and update its allowed redirect URLs.
-4. Configure TLS, `/api` proxying, SPA fallback, and environment variables.
-5. Test sign-in, role restrictions, contact submissions, photos, and private
+3. Configure TLS, `/api` proxying, SPA fallback, and environment variables.
+4. Test contact submissions, photos, and private
    document upload/download before changing DNS.
+
+The admin portal is currently a public preview. No authentication keys or
+authentication provider configuration are required for the Vercel build. Add
+and verify a replacement access-control system before exposing write-capable
+admin routes in production.

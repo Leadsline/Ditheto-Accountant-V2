@@ -205,12 +205,12 @@ export default function Home() {
                   key={`${body.name}-${index}`}
                   role="listitem"
                   aria-hidden={index >= professionalBodies.length}
-                  className="inline-flex h-14 min-w-32 items-center justify-center rounded-lg border border-white/15 bg-white/[.055] px-7 shadow-sm"
+                  className="inline-flex h-20 min-w-[13rem] items-center justify-center rounded-lg border border-white/20 bg-white px-6 py-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,.7)]"
                 >
                   <img
                     src={body.src}
                     alt={index >= professionalBodies.length ? "" : body.name}
-                    className="max-h-10 w-auto max-w-[9rem] object-contain opacity-95"
+                    className="h-12 w-auto max-w-[12rem] object-contain"
                   />
                 </span>
               ))}

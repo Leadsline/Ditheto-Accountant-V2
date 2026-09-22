@@ -34,14 +34,17 @@ import {
   requireCampaignAccess,
   requireFullAccess,
   requireStaff,
+  requireSuperAdmin,
   type AdminRequest,
 } from "../middlewares/adminAuth";
 import { ObjectNotFoundError, ObjectStorageService } from "../lib/objectStorage";
+import { encryptOdooConfig, hasOdooConfig } from "../lib/integrationConfig";
 
 const router: IRouter = Router();
 const storage = new ObjectStorageService();
 router.get("/admin/me", requireStaff, async (req: Request, res: Response): Promise<void> => {
-  res.json({ role: "public_admin" });
+  const adminRequest = req as AdminRequest;
+  res.json({ role: adminRequest.authRole, email: adminRequest.authEmail });
 });
 
 router.post("/admin/campaigns/send", requireCampaignAccess, async (req: Request, res: Response): Promise<void> => {
@@ -208,12 +211,43 @@ router.post("/admin/clients/:clientId/document-requests", requireFullAccess, asy
 router.get("/admin/integrations/odoo/status", requireFullAccess, async (_req: Request, res: Response): Promise<void> => {
   const [state] = await db.select().from(integrationStateTable)
     .where(eq(integrationStateTable.provider, "odoo")).limit(1);
+  const configured = hasOdooConfig(state?.message);
   res.json(GetOdooStatusResponse.parse({
-    enabled: state?.enabled === 1,
-    connected: state?.connected === 1,
-    message: state?.message ?? "Odoo authorization was not completed. Connect Odoo to enable sync.",
+    enabled: state?.enabled === 1 || configured,
+    connected: state?.connected === 1 || configured,
+    message: configured
+      ? "Odoo configuration is saved. Client sync is ready to be connected."
+      : state?.message ?? "Odoo configuration has not been saved.",
     lastSyncAt: state?.lastSyncAt ?? null,
   }));
+});
+
+router.post("/admin/integrations/odoo/config", requireSuperAdmin, async (req: Request, res: Response): Promise<void> => {
+  const url = typeof req.body?.url === "string" ? req.body.url.trim().replace(/\/+$/, "") : "";
+  const database = typeof req.body?.database === "string" ? req.body.database.trim() : "";
+  const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+  if (!/^https?:\/\/\S+$/i.test(url) || !database || !username || !password) {
+    res.status(400).json({ error: "Odoo URL, database, username, and password are required." });
+    return;
+  }
+
+  const encryptedConfig = encryptOdooConfig({ url, database, username, password });
+  await db.insert(integrationStateTable).values({
+    provider: "odoo",
+    enabled: 1,
+    connected: 1,
+    message: encryptedConfig,
+  }).onConflictDoUpdate({
+    target: integrationStateTable.provider,
+    set: {
+      enabled: 1,
+      connected: 1,
+      message: encryptedConfig,
+      updatedAt: new Date(),
+    },
+  });
+  res.json({ success: true, message: "Odoo configuration saved securely." });
 });
 
 router.post("/admin/integrations/odoo/sync", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
@@ -224,8 +258,8 @@ router.post("/admin/integrations/odoo/sync", requireFullAccess, async (req: Requ
   }
   const [state] = await db.select().from(integrationStateTable)
     .where(and(eq(integrationStateTable.provider, "odoo"), eq(integrationStateTable.connected, 1))).limit(1);
-  if (!state) {
-    res.status(409).json({ error: "Odoo is disconnected. Authorize the Odoo integration before syncing clients." });
+  if (!state || !hasOdooConfig(state.message)) {
+    res.status(409).json({ error: "Odoo is not configured. Save the Odoo connection settings first." });
     return;
   }
   res.json({ success: false, message: "Odoo connector is enabled but no sync adapter has been attached.", externalId: null });

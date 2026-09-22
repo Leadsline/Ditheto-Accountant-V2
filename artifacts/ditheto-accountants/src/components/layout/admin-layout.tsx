@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, CalendarClock, Megaphone, Bell, UserRoundCog, Settings } from "lucide-react";
+import { LayoutDashboard, Users, CalendarClock, Megaphone, Bell, UserRoundCog, Settings, LogOut } from "lucide-react";
 import logo from "@assets/logo_1789318782052.png";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
 
   const navItems = [
     { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -14,6 +14,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { path: "/admin/team", label: "Team & Organogram", icon: UserRoundCog },
     { path: "/admin/settings/integrations", label: "Integrations", icon: Settings },
   ];
+
+  async function signOut() {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    navigate("/sign-in");
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -70,8 +75,17 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               </div>
               <div className="text-sm">
                 <p className="font-bold text-secondary">Admin Preview</p>
-                <p className="text-gray-500 text-xs">Public access</p>
+                <p className="text-gray-500 text-xs">Super Admin</p>
               </div>
+              <button
+                type="button"
+                onClick={signOut}
+                className="rounded-md p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-secondary"
+                aria-label="Sign out"
+                title="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </header>

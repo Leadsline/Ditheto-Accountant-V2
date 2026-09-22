@@ -6,3 +6,4 @@
 - [Campaign media delivery](campaign-media-delivery.md) — campaign posters use scoped private storage routes and an explicit WhatsApp handoff until a direct messaging connector exists.
 - [Supabase missing-object responses](supabase-missing-object-responses.md) — Storage can report a missing object as HTTP 400 with nested 404/NoSuchKey details.
 - [Auth-provider removal checks](auth-provider-removal-checks.md) — removing an auth provider requires a repo-wide reference scan plus a frozen-lockfile build check.
+- [Drizzle push schema drift](drizzle-push-drift.md) — schema push can prompt to truncate existing team roster rows; never force that destructive change.

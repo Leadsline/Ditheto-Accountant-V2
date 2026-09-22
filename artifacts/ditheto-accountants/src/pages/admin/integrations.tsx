@@ -1,13 +1,54 @@
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useGetOdooStatus } from "@workspace/api-client-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getGetOdooStatusQueryKey, useGetOdooStatus } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw, CheckCircle2, XCircle, Database, AlertCircle, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
+import { useEffect, useState, type FormEvent } from "react";
 
 export default function AdminIntegrations() {
+  const queryClient = useQueryClient();
   const { data: odooStatus, isLoading, error } = useGetOdooStatus();
-  const isSuperAdmin = true;
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [odooConfig, setOdooConfig] = useState({ url: "", database: "", username: "", password: "" });
+  const [saveState, setSaveState] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((response) => response.json() as Promise<{ role?: string }>)
+      .then((body) => setIsSuperAdmin(body.role === "super_admin"))
+      .catch(() => setIsSuperAdmin(false));
+  }, []);
+
+  async function saveOdooConfig(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setSaveState(null);
+    try {
+      const response = await fetch("/api/admin/integrations/odoo/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(odooConfig),
+      });
+      const body = await response.json() as { error?: string; message?: string };
+      if (!response.ok) throw new Error(body.error ?? "Could not save Odoo configuration.");
+      setOdooConfig((current) => ({ ...current, password: "" }));
+      setSaveState({ kind: "success", text: body.message ?? "Odoo configuration saved securely." });
+      await queryClient.invalidateQueries({ queryKey: getGetOdooStatusQueryKey() });
+    } catch (saveError) {
+      setSaveState({
+        kind: "error",
+        text: saveError instanceof Error ? saveError.message : "Could not save Odoo configuration.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <AdminLayout>
@@ -66,21 +107,41 @@ export default function AdminIntegrations() {
                 </div>
 
                 {isSuperAdmin && (
-                  <div className="flex gap-3">
-                    {!odooStatus?.connected ? (
-                      <Button disabled className="bg-[#714B67] hover:bg-[#5b3c53] text-white w-full">
-                        Authorization required
+                  <div className="space-y-4 rounded-lg border border-[#714B67]/20 bg-[#714B67]/5 p-4">
+                    <div>
+                      <h3 className="font-semibold text-secondary">Super Admin configuration</h3>
+                      <p className="mt-1 text-xs text-gray-500">
+                        Odoo credentials are encrypted before being stored and are never returned to the browser.
+                      </p>
+                    </div>
+                    <form onSubmit={saveOdooConfig} className="space-y-3">
+                      <div>
+                        <Label htmlFor="odoo-url">Odoo URL</Label>
+                        <Input id="odoo-url" type="url" placeholder="https://odoo.example.com" value={odooConfig.url} onChange={(event) => setOdooConfig({ ...odooConfig, url: event.target.value })} required />
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <Label htmlFor="odoo-database">Database</Label>
+                          <Input id="odoo-database" value={odooConfig.database} onChange={(event) => setOdooConfig({ ...odooConfig, database: event.target.value })} required />
+                        </div>
+                        <div>
+                          <Label htmlFor="odoo-username">Username</Label>
+                          <Input id="odoo-username" type="email" value={odooConfig.username} onChange={(event) => setOdooConfig({ ...odooConfig, username: event.target.value })} required />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="odoo-password">Password</Label>
+                        <Input id="odoo-password" type="password" autoComplete="new-password" value={odooConfig.password} onChange={(event) => setOdooConfig({ ...odooConfig, password: event.target.value })} required />
+                      </div>
+                      {saveState && (
+                        <p className={`text-sm ${saveState.kind === "success" ? "text-green-700" : "text-red-700"}`}>
+                          {saveState.text}
+                        </p>
+                      )}
+                      <Button type="submit" disabled={saving} className="bg-[#714B67] text-white hover:bg-[#5b3c53]">
+                        {saving ? "Saving securely…" : "Save Odoo configuration"}
                       </Button>
-                    ) : (
-                      <>
-                        <Button variant="outline" className="w-full text-gray-700">
-                          Force Global Sync
-                        </Button>
-                        <Button variant="outline" className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
-                          Disconnect
-                        </Button>
-                      </>
-                    )}
+                    </form>
                   </div>
                 )}
                 {!isSuperAdmin && (

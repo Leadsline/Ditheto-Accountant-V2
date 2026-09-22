@@ -77,7 +77,8 @@ PORT=$PORT NODE_ENV=production pnpm --filter @workspace/api-server run start
 
 Serve `artifacts/ditheto-accountants/dist/public` as the website document root.
 Configure Apache to return `index.html` for frontend routes and proxy `/api/*`
-to the Node application. Set the same environment variables used on Vercel.
+to the Node application. Set the same environment variables used on Vercel,
+including the Super Admin credentials and session secret.
 
 Before moving from Vercel to Afrihost:
 
@@ -87,7 +88,9 @@ Before moving from Vercel to Afrihost:
 4. Test contact submissions, photos, and private
    document upload/download before changing DNS.
 
-The admin portal is currently a public preview. No authentication keys or
-authentication provider configuration are required for the Vercel build. Add
-and verify a replacement access-control system before exposing write-capable
-admin routes in production.
+The admin portal is protected by the configured Super Admin email/password.
+Set `DITHETO_SUPER_ADMIN_EMAIL`, `DITHETO_SUPER_ADMIN_PASSWORD`, and a strong
+`SESSION_SECRET` in the hosting environment. Odoo credentials are entered
+through the protected Integrations page and encrypted before storage. WhatsApp
+API setup remains deferred; the current messaging handoff does not require
+WhatsApp API credentials.

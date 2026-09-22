@@ -1,5 +1,4 @@
 import { Router, type IRouter, type Request, type Response } from "express";
-import { z } from "zod";
 import {
   clearAdminSessionCookie,
   credentialsConfigured,
@@ -10,10 +9,6 @@ import {
 } from "../lib/adminSession";
 
 const router: IRouter = Router();
-const LoginBody = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-});
 
 router.get("/auth/me", (req: Request, res: Response): void => {
   const session = readAdminSession(req);
@@ -29,8 +24,9 @@ router.get("/auth/me", (req: Request, res: Response): void => {
 });
 
 router.post("/auth/login", (req: Request, res: Response): void => {
-  const body = LoginBody.safeParse(req.body);
-  if (!body.success) {
+  const email = typeof req.body?.email === "string" ? req.body.email : "";
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+  if (!email.includes("@") || !password) {
     res.status(400).json({ error: "Enter a valid email address and password." });
     return;
   }
@@ -38,15 +34,15 @@ router.post("/auth/login", (req: Request, res: Response): void => {
     res.status(503).json({ error: "Super Admin credentials are not configured." });
     return;
   }
-  if (!credentialsMatch(body.data.email, body.data.password)) {
+  if (!credentialsMatch(email, password)) {
     res.status(401).json({ error: "Incorrect email or password." });
     return;
   }
 
-  setAdminSessionCookie(res, createAdminSession(body.data.email.trim().toLowerCase()));
+  setAdminSessionCookie(res, createAdminSession(email.trim().toLowerCase()));
   res.json({
     authenticated: true,
-    email: body.data.email.trim().toLowerCase(),
+    email: email.trim().toLowerCase(),
     role: "super_admin",
   });
 });

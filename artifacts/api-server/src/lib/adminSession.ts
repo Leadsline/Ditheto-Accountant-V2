@@ -95,7 +95,7 @@ export function clearAdminSessionCookie(res: Response): void {
 export function credentialsConfigured(): boolean {
   return Boolean(
     process.env.DITHETO_SUPER_ADMIN_EMAIL &&
-      process.env.DITHETO_SUPER_ADMIN_PASSWORD &&
+      process.env.DITHETO_SUPER_ADMIN_PASSWORD
   );
 }
 

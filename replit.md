@@ -1,6 +1,6 @@
 # Ditheto Accountants
 
-Professional public website and public-preview admin portal for managing accounting clients, documents, communications, and future Odoo synchronization.
+Professional public website and protected admin portal for managing accounting clients, documents, communications, and future Odoo synchronization.
 
 ## Run & Operate
 
@@ -14,7 +14,7 @@ Professional public website and public-preview admin portal for managing account
 ## Stack
 
 - React 19, Vite, TypeScript, Tailwind CSS and Wouter
-- Public admin preview with authentication intentionally disabled
+- Super Admin email/password authentication with signed HttpOnly sessions
 - Express 5 API with generated Zod request/response validation
 - PostgreSQL with Drizzle ORM
 - Replit App Storage for private client documents
@@ -24,14 +24,14 @@ Professional public website and public-preview admin portal for managing account
 
 - Public and admin UI: `artifacts/ditheto-accountants/src`
 - API routes: `artifacts/api-server/src/routes`
-- Public admin access middleware: `artifacts/api-server/src/middlewares`
+- Admin access middleware: `artifacts/api-server/src/middlewares`
 - Source-of-truth API contract: `lib/api-spec/openapi.yaml`
 - Database schema: `lib/db/src/schema`
 
 ## Architecture decisions
 
-- Authentication is intentionally disabled while the portal is being prepared; admin pages and routes are public previews.
-- Write-capable admin routes are public during this preview and must be protected before production use.
+- The admin portal uses the configured Super Admin email/password and a signed HttpOnly session cookie; Clerk is not used.
+- Odoo configuration is restricted to Super Admin sessions and encrypts the Odoo password before storing it in integration state.
 - Client files upload directly to private App Storage with short-lived signed URLs; PostgreSQL stores metadata and object paths, not file blobs.
 - Odoo is modular and disabled by default. Its UI and API report `Disconnected` until an authorized connector is attached.
 - Without messaging connectors, email and WhatsApp requests are logged in PostgreSQL and opened in the staff member's email app or WhatsApp for final sending.
@@ -39,7 +39,7 @@ Professional public website and public-preview admin portal for managing account
 ## Product
 
 - Public Home, Services, Quote, About, Team, and Contact pages
-- Public admin preview
+- Protected admin portal
 - Searchable client database and detailed client profiles
 - Client document library with status/category management and private uploads
 - Outstanding-document request composer and communication history
@@ -49,5 +49,5 @@ Professional public website and public-preview admin portal for managing account
 ## Gotchas
 
 - Run OpenAPI code generation immediately after editing `lib/api-spec/openapi.yaml`.
-- Private object routes are public during the admin preview and must be protected before production use.
+- Admin API and private object routes require an authenticated admin session.
 - Do not present Odoo, email, or WhatsApp delivery as connected until the relevant integration has been authorized.

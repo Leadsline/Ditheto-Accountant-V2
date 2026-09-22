@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, Users, Target, Shield } from "lucide-react";
+import { CheckCircle2, Users, Target, Shield, Lightbulb, Zap } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 
 export default function About() {
@@ -68,35 +68,39 @@ export default function About() {
         </div>
       </section>
 
-      {/* Values */}
+      {/* Mission, vision and values */}
       <section className="bg-muted/60 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-heading font-bold text-secondary mb-12">Our Core Values</h2>
-          
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <Reveal className="lift-card rounded-2xl border border-secondary/10 bg-card p-8 shadow-sm">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <Shield className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-heading font-bold text-secondary mb-4">Integrity</h3>
-              <p className="text-gray-600">Honesty and transparency in every interaction. We do what is right, even when no one is looking, ensuring your finances are always handled ethically.</p>
+          <div className="mx-auto grid max-w-5xl gap-6 text-left md:grid-cols-2">
+            <Reveal className="rounded-2xl border border-secondary/10 bg-card p-8 shadow-sm">
+              <p className="eyebrow mb-3">Our Mission</p>
+              <h2 className="text-2xl font-heading font-bold text-secondary">An active partner in your success.</h2>
+              <p className="mt-4 text-base leading-7 text-gray-600">We aim to become an active partner to our clients with the purpose of establishing mutually beneficial and enduring relationships and achieving sustained commercial success through the provision of excellent transport, delivery and removal services.</p>
             </Reveal>
-            
-            <Reveal delay={.08} className="lift-card rounded-2xl border border-secondary/10 bg-card p-8 shadow-sm">
-              <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-6">
-                <Target className="h-8 w-8 text-accent" />
-              </div>
-              <h3 className="text-xl font-heading font-bold text-secondary mb-4">Accuracy</h3>
-              <p className="text-gray-600">Precision in numbers is non-negotiable. From complex tax submissions to daily bookkeeping, we pride ourselves on meticulous attention to detail.</p>
+            <Reveal delay={.08} className="rounded-2xl border border-secondary/10 bg-card p-8 shadow-sm">
+              <p className="eyebrow mb-3">Our Vision</p>
+              <h2 className="text-2xl font-heading font-bold text-secondary">Built for the future.</h2>
+              <p className="mt-4 text-base leading-7 text-gray-600">In the next five (5) years and beyond, to become a well-established, reputable and competitive SME participant in the formal stream economy. To continue to thrive as a business, we must look ahead, understand both internal and external environmental factors that will shape our business in the future and move swiftly to prepare for what’s to come. We conduct ourselves backward from the desired future!</p>
             </Reveal>
-            
-            <Reveal delay={.16} className="lift-card rounded-2xl border border-secondary/10 bg-card p-8 shadow-sm">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-heading font-bold text-secondary mb-4">Reliability</h3>
-              <p className="text-gray-600">You can count on us to meet deadlines and deliver on our promises. We take the stress out of compliance so you have peace of mind.</p>
-            </Reveal>
+          </div>
+
+          <h2 className="mt-20 mb-10 text-3xl font-heading font-bold text-secondary">Our Values</h2>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { name: "Integrity", icon: Shield, color: "bg-primary/10 text-primary" },
+              { name: "Performance", icon: Target, color: "bg-accent/20 text-accent" },
+              { name: "Respect", icon: Users, color: "bg-blue-50 text-blue-600" },
+              { name: "Innovation", icon: Lightbulb, color: "bg-primary/10 text-primary" },
+              { name: "Teamwork", icon: CheckCircle2, color: "bg-accent/20 text-accent" },
+              { name: "Speed", icon: Zap, color: "bg-blue-50 text-blue-600" },
+            ].map(({ name, icon: Icon, color }, index) => (
+              <Reveal key={name} delay={index * .05} className="rounded-2xl border border-secondary/10 bg-card p-6 text-left shadow-sm">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-full ${color}`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-xl font-heading font-bold text-secondary">{name}</h3>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>

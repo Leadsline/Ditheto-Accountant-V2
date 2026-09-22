@@ -1,0 +1,51 @@
+Update the Ditheto Accountants website with the following changes. Do not rewrite unrelated pages.
+
+### 1. Sticky Navigation (freeze on scroll)
+- Make the top navigation bar sticky / fixed so it stays frozen at the top of the screen when the user scrolls down.
+- Use: sticky top-0 z-50 with a solid or semi-transparent background (bg-white/95 + backdrop-blur) so content does not show through.
+- Ensure it works on both desktop and mobile.
+- Keep the current pill + golden underline active style.
+
+### 2. Top contact bar / Header
+- Show BOTH Pretoria and Secunda landline numbers next to each other at the top.
+  - Pretoria: 012 751 3200 (and mobile 067 765 7387 if space allows)
+  - Secunda: 017 631 1890 (and mobile 071 478 1810 if space allows)
+- Add Trading / Operating Hours:
+  Weekdays: 08:00 – 16:30
+  Weekends: Closed
+- Replace LinkedIn with TikTok (update any social links in header/footer). Use a TikTok icon.
+
+### 3. Home Page
+- Remove ALL the list of services / service cards section from the homepage.
+- Keep hero, Why Choose Us / trust section, CTAs, and branch teaser only.
+
+### 4. Services page – content updates
+- Rename the category “Registration & Consulting” to “Business Consulting”.
+- Under Company Registration: expand to list all types (Private Company (Pty) Ltd, Non-Profit Company / NPO, Co-operative, etc.).
+- Under CIDB Registration: add the CIDB grades (Grade 1 to Grade 9) with a short note that we assist with applications for the appropriate grade.
+- Remove the words CIDB, COIDA, CSD from general registration wording except where they belong under their own service.
+- Under Tax Services → Tax Registrations: remove COIDA. Keep only Individual, VAT, PAYE, UIF, SDL.
+
+### 5. About Us page – replace Mission, Vision and Values
+
+Our Mission:
+We aim to become an active partner to our clients with the purpose of establishing mutually beneficial and enduring relationships and achieving sustained commercial success through the provision of excellent transport, delivery and removal services.
+
+Our Vision:
+In the next five (5) years and beyond, to become a well-established, reputable and competitive SME participant in the formal stream economy. To continue to thrive as a business, we must look ahead, understand both internal and external environmental factors that will shape our business in the future and move swiftly to prepare for what’s to come. We conduct ourselves backward from the desired future!
+
+Our Values:
+- Integrity
+- Performance
+- Respect
+- Innovation
+- Teamwork
+- Speed
+
+Update the About page to display these cleanly. Remove the old values.
+
+### 6. General
+- Keep existing brand colours, navbar style, and design system.
+- Keep mobile responsiveness.
+- Do not break the RFQ form or other working pages.
+- After changes, list the files you modified.

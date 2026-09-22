@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, MessageCircle } from "lucide-react";
+import { SiTiktok } from "react-icons/si";
 import logo from "@assets/Logo_NRG_1789474380486.png";
 
 export function Footer() {
@@ -22,8 +23,8 @@ export function Footer() {
                 <a href="#" aria-label="Instagram" className="flex h-9 w-9 items-center justify-center rounded-sm bg-white/10 text-white transition-colors hover:bg-primary">
                 <Instagram className="h-4 w-4" />
               </a>
-                <a href="#" aria-label="LinkedIn" className="flex h-9 w-9 items-center justify-center rounded-sm bg-white/10 text-white transition-colors hover:bg-primary">
-                <Linkedin className="h-4 w-4" />
+                 <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="flex h-9 w-9 items-center justify-center rounded-sm bg-white/10 text-white transition-colors hover:bg-primary">
+                  <SiTiktok className="h-4 w-4" />
               </a>
             </div>
           </div>

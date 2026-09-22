@@ -23,7 +23,7 @@ export const serviceCategories = [
       { name: "EMP201 / EMP501", desc: "Monthly employer declarations and bi-annual reconciliations for PAYE, SDL, and UIF.", benefits: ["Employee compliance", "Accurate IRP5s"] },
       { name: "IT14 / ITR14 Business Income Tax", desc: "Corporate income tax return preparation and submission for registered companies.", benefits: ["Maximize corporate deductions", "Total compliance"] },
       { name: "Tax Clearance Certificates", desc: "Application and expediting of Good Standing certificates required for tenders and contracts.", benefits: ["Tender readiness", "Business credibility"] },
-      { name: "Tax Registrations", desc: "Initial setup for Individual Tax, VAT, PAYE, UIF, SDL, and COIDA.", benefits: ["Right from day one", "Complete setup"] },
+      { name: "Tax Registrations", desc: "Initial setup for Individual Tax, VAT, PAYE, UIF, and SDL.", benefits: ["Right from day one", "Complete setup"] },
     ]
   },
   {
@@ -42,7 +42,7 @@ export const serviceCategories = [
   },
   {
     id: "registration",
-    title: "Registration & Consulting",
+    title: "Business Consulting",
     icon: Briefcase,
     description: "Establish and structure your business for success.",
     items: [
@@ -70,7 +70,7 @@ export const serviceCategories = [
     icon: HardHat,
     description: "Registration and renewal support for construction businesses that need to remain tender-ready.",
     items: [
-      { name: "CIDB Registration", desc: "Construction Industry Development Board registration and grading assistance for eligible contractors.", benefits: ["Tender readiness", "Correct grading application", "Construction sector compliance"] },
+      { name: "CIDB Grades 1–9", desc: "We assist with applications for the appropriate CIDB grade, from Grade 1 to Grade 9, based on your works capability and supporting documents.", benefits: ["Grade 1 to Grade 9 guidance", "Correct grading application", "Tender readiness"] },
       { name: "CIDB Renewals (3-year renewals)", desc: "Preparation and submission of the CIDB renewal required every three years.", benefits: ["Maintain active registration", "Avoid tender interruptions", "Three-year renewal support"] },
     ]
   },
@@ -80,7 +80,7 @@ export const serviceCategories = [
     icon: Building2,
     description: "CIPC company setup and ongoing statutory maintenance for South African businesses.",
     items: [
-      { name: "Company Registration", desc: "Full private company registration support, including the core CIPC incorporation requirements.", benefits: ["Ready to trade", "Correct company setup", "Professional submission support"] },
+      { name: "Company Types & Registration", desc: "We assist with Private Company (Pty) Ltd, Public Company (Ltd), Personal Liability Company (Inc), Non-Profit Company (NPC/NPO), State-Owned Company (SOC), External Company, and Co-operative registrations through CIPC.", benefits: ["Choose the right entity", "Correct company setup", "Professional submission support"] },
       { name: "Company Amendments", desc: "Assistance with CIPC changes to company details, directors, addresses, and other registered information.", benefits: ["Accurate company records", "CIPC compliance", "Efficient amendments"] },
       { name: "Annual Returns (AR)", desc: "Preparation and submission of annual returns to keep the company in business and compliant with CIPC.", benefits: ["Avoid deregistration", "Maintain good standing", "On-time filing"] },
       { name: "Beneficial Ownership (BO)", desc: "Beneficial ownership declaration preparation and filing in line with current CIPC requirements.", benefits: ["Ownership transparency", "Regulatory compliance", "Accurate declarations"] },

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Calculator, Check, FileSpreadsheet, BriefcaseBusiness, BookOpen, MessageCircle, HardHat, Building2, Database, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Check, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import heroOne from "@assets/ditheto-accountants-hero-v2-corrected-v2_1789576958004.jpg";
 import heroTwo from "@assets/ditheto-accountants-hero-v3-corrected_1789576958005.jpg";
@@ -77,17 +77,6 @@ function HeroCarousel() {
   );
 }
 
-const services = [
-  { number: "01", title: "Tax services", description: "ITR12, IRP6, VAT201, PAYE and SARS support — submitted accurately and ahead of time.", icon: Calculator, href: "/services/tax", count: "13 services" },
-  { number: "02", title: "Payroll services", description: "Confidential payroll that runs on time, so your team is paid correctly and your returns look after themselves.", icon: FileSpreadsheet, href: "/services/payroll", count: "6 services" },
-  { number: "03", title: "Registration & consulting", description: "Get your entity registered properly and presented professionally, from CIPC to tender-ready profiles.", icon: BriefcaseBusiness, href: "/services/registration", count: "4 services" },
-  { number: "04", title: "Accounting & bookkeeping", description: "Books that are current, reconciled and useful — so you always know what the business is doing.", icon: BookOpen, href: "/services/accounting", count: "4 services" },
-  { number: "05", title: "CIDB registration", description: "Register or renew your construction business with the CIDB and stay ready for tender opportunities.", icon: HardHat, href: "/services/cidb-registration", count: "2 services" },
-  { number: "06", title: "Company registration", description: "Start and maintain your company with CIPC registrations, amendments, annual returns and beneficial ownership filings.", icon: Building2, href: "/services/company-registration", count: "4 services" },
-  { number: "07", title: "CSD registration", description: "Register or update your supplier profile on the Central Supplier Database for government opportunities.", icon: Database, href: "/services/csd-registration", count: "2 services" },
-  { number: "08", title: "COIDA registration", description: "Register with the Compensation Fund and complete the annual renewal due at the end of April.", icon: ShieldCheck, href: "/services/coida-registration", count: "2 services" },
-];
-
 const proofPoints = [
   "South African tax and compliance expertise",
   "Clear advice without accounting jargon",
@@ -142,41 +131,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-background py-20 sm:py-28">
-        <div className="site-container">
-          <Reveal className="max-w-2xl">
-            <p className="eyebrow mb-5">Everything in one place</p>
-            <h2 className="serif-display text-balance text-4xl leading-[1.02] text-secondary sm:text-5xl">Clear numbers. Calm decisions. A firm that follows through.</h2>
-            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground">Eight focused service areas, one accountable team. Open any of them to see exactly what is included before you ask for a quote.</p>
-          </Reveal>
-          <div className="mt-14 border-t editorial-rule">
-            {services.map((service, index) => {
-              const Icon = service.icon;
-              return (
-                <Reveal key={service.title} delay={index * .07}>
-                  <Link href={service.href} className="group grid gap-5 border-b editorial-rule py-8 transition-colors hover:bg-primary/[.035] sm:grid-cols-[70px_1fr_auto] sm:items-center sm:px-4" data-testid={`link-home-service-${service.number}`}>
-                    <span className="serif-display text-3xl text-secondary/20">{service.number}</span>
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <Icon className="h-4 w-4 text-primary" />
-                        <h3 className="serif-display text-2xl text-secondary sm:text-3xl">{service.title}</h3>
-                      </div>
-                      <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{service.description}</p>
-                    </div>
-                    <span className="flex items-center gap-2 text-xs font-bold text-primary sm:justify-self-end">{service.count}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></span>
-                  </Link>
-                </Reveal>
-              );
-            })}
-          </div>
-          <div className="mt-10">
-            <Link href="/services" className="inline-flex items-center gap-2 text-sm font-bold text-secondary underline decoration-primary/50 underline-offset-8 transition-colors hover:text-primary" data-testid="link-home-all-services">
-              Explore all services <ArrowUpRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <section className="bg-muted/55 py-20 sm:py-28">
         <div className="site-container grid gap-14 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
           <Reveal>
@@ -196,6 +150,34 @@ export default function Home() {
                     <p className="font-bold text-secondary">{point}</p>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{["SARS rules change. Our work stays current, careful and documented.", "You should be able to understand your numbers without a dictionary.", "From first registration to monthly books, your context stays with us."][index]}</p>
                   </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-background py-16 sm:py-20">
+        <div className="site-container">
+          <Reveal className="max-w-2xl">
+            <p className="eyebrow mb-5">Two branches. One accountable team.</p>
+            <h2 className="serif-display text-balance text-4xl leading-[1.02] text-secondary sm:text-5xl">Local support in Pretoria and Secunda.</h2>
+            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground">Choose the branch closest to you and speak to a team that understands the businesses and communities it serves.</p>
+          </Reveal>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {[
+              { name: "Pretoria", address: "No 238 Justice Mahomed Street, Brooklyn, Pretoria, 0181", phone: "012 751 3200", mobile: "067 765 7387" },
+              { name: "Secunda", address: "Shop No 25 Sanlam Plaza, Horwood Street, Secunda, 2302", phone: "017 631 1890", mobile: "071 478 1810" },
+            ].map((branch, index) => (
+              <Reveal key={branch.name} delay={index * .08} className="rounded-2xl border border-secondary/10 bg-card p-6 shadow-[0_18px_45px_-35px_hsl(var(--secondary)/.7)] sm:p-8">
+                <p className="eyebrow mb-4">{branch.name} branch</p>
+                <div className="flex items-start gap-3">
+                  <MapPin className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                  <p className="text-sm leading-6 text-muted-foreground">{branch.address}</p>
+                </div>
+                <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-secondary">
+                  <a href={`tel:${branch.phone.replaceAll(" ", "")}`} className="inline-flex items-center gap-2 transition-colors hover:text-primary"><Phone className="h-4 w-4 text-primary" />{branch.phone}</a>
+                  <a href={`tel:${branch.mobile.replaceAll(" ", "")}`} className="inline-flex items-center gap-2 transition-colors hover:text-primary"><Phone className="h-4 w-4 text-primary" />{branch.mobile}</a>
                 </div>
               </Reveal>
             ))}

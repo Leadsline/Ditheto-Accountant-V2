@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { ChevronDown, Facebook, Instagram, Linkedin, Mail, Menu, MessageCircle, Phone, X } from "lucide-react";
+import { ChevronDown, Facebook, Instagram, Mail, Menu, MessageCircle, Phone, Clock3, X } from "lucide-react";
+import { SiTiktok } from "react-icons/si";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@assets/Logo_1789472037430.png";
 
 const socialLinks = [
   { href: "https://www.facebook.com/", label: "Facebook", icon: Facebook },
   { href: "https://www.instagram.com/", label: "Instagram", icon: Instagram },
-  { href: "https://www.linkedin.com/", label: "LinkedIn", icon: Linkedin },
+  { href: "https://www.tiktok.com/", label: "TikTok", icon: SiTiktok },
   { href: "https://wa.me/27677657387", label: "WhatsApp", icon: MessageCircle },
 ];
 
 const serviceLinks = [
   { href: "/services/tax", label: "Tax Services" },
   { href: "/services/payroll", label: "Payroll Services" },
-  { href: "/services/registration", label: "Registration & Consulting" },
+  { href: "/services/registration", label: "Business Consulting" },
   { href: "/services/accounting", label: "Accounting & Bookkeeping" },
   { href: "/services/cidb-registration", label: "CIDB Registration" },
   { href: "/services/company-registration", label: "Company Registration" },
@@ -42,15 +43,23 @@ export function Navbar() {
   return (
     <div className="w-full">
       <div className="bg-secondary px-4 py-2 text-[10px] text-white sm:py-2.5 sm:text-[11px]">
-        <div className="site-container flex min-h-5 items-center gap-4">
-          <div className="flex min-w-0 items-center gap-4">
+        <div className="site-container flex flex-wrap items-center gap-x-4 gap-y-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
             <a href="tel:+27127513200" className="flex shrink-0 items-center gap-2 transition-colors hover:text-accent">
               <Phone className="h-3 w-3 text-accent" />
-              <span>Pretoria 012 751 3200</span>
+              <span>Pretoria 012 751 3200 <span className="hidden lg:inline text-white/60">· 067 765 7387</span></span>
+            </a>
+            <a href="tel:+27176311890" className="flex shrink-0 items-center gap-2 transition-colors hover:text-accent">
+              <Phone className="h-3 w-3 text-accent" />
+              <span>Secunda 017 631 1890 <span className="hidden lg:inline text-white/60">· 071 478 1810</span></span>
             </a>
             <a href="mailto:admin@dithetoaccountants.co.za" className="hidden items-center gap-2 text-white/70 transition-colors hover:text-white md:flex">
               <Mail className="h-3 w-3 text-accent" /> admin@dithetoaccountants.co.za
             </a>
+          </div>
+          <div className="flex items-center gap-2 text-white/70 sm:border-l sm:border-white/20 sm:pl-4">
+            <Clock3 className="h-3 w-3 text-accent" />
+            <span>Weekdays 08:00 – 16:30 · Weekends Closed</span>
           </div>
         </div>
       </div>

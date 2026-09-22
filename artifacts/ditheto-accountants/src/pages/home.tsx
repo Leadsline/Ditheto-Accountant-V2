@@ -83,7 +83,13 @@ const proofPoints = [
   "One accountable team from filing to follow-up",
 ];
 
-const professionalBodies = ["SARS", "CIPC", "SAIT", "SAIPA", "SAICA"];
+const professionalBodies = [
+  { name: "SARS", src: `${import.meta.env.BASE_URL}partners/sars.png`, fallback: `${import.meta.env.BASE_URL}partners/sars.svg` },
+  { name: "CIPC", src: `${import.meta.env.BASE_URL}partners/cipc.png`, fallback: `${import.meta.env.BASE_URL}partners/cipc.svg` },
+  { name: "SAIT", src: `${import.meta.env.BASE_URL}partners/sait.png`, fallback: `${import.meta.env.BASE_URL}partners/sait.svg` },
+  { name: "SAIPA", src: `${import.meta.env.BASE_URL}partners/saipa.png`, fallback: `${import.meta.env.BASE_URL}partners/saipa.svg` },
+  { name: "SAICA", src: `${import.meta.env.BASE_URL}partners/saica.png`, fallback: `${import.meta.env.BASE_URL}partners/saica.svg` },
+];
 
 export default function Home() {
   return (
@@ -196,13 +202,20 @@ export default function Home() {
             <div className="partner-marquee flex w-max items-center gap-5 px-5" role="list">
               {[...professionalBodies, ...professionalBodies].map((body, index) => (
                 <span
-                  key={`${body}-${index}`}
+                  key={`${body.name}-${index}`}
                   role="listitem"
                   aria-hidden={index >= professionalBodies.length}
-                  className="inline-flex h-14 min-w-32 items-center justify-center gap-3 rounded-lg border border-white/15 bg-white/[.055] px-7 text-sm font-bold tracking-[.12em] text-white/85 shadow-sm"
+                  className="inline-flex h-14 min-w-32 items-center justify-center rounded-lg border border-white/15 bg-white/[.055] px-7 shadow-sm"
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
-                  {body}
+                  <img
+                    src={body.src}
+                    alt={index >= professionalBodies.length ? "" : body.name}
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = body.fallback;
+                    }}
+                    className="h-9 w-auto max-w-[9rem] object-contain opacity-90"
+                  />
                 </span>
               ))}
             </div>

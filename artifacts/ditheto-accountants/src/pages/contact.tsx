@@ -41,6 +41,14 @@ const serviceOptions = [
   "Other / Multiple services",
 ] as const;
 
+const serviceLabels: Record<(typeof serviceOptions)[number], string> = {
+  "Tax Services": "Tax Services",
+  "Payroll Services": "Payroll Services",
+  "Registration & Consulting": "Business Consulting",
+  "Accounting & Bookkeeping": "Accounting & Bookkeeping",
+  "Other / Multiple services": "Other / Multiple services",
+};
+
 const contactSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required."),
   email: z.string().trim().email("Enter a valid email address."),
@@ -175,7 +183,7 @@ export default function Contact() {
                   <fieldset className="space-y-5 border-t border-secondary/10 pt-8">
                     <legend className="flex items-center gap-3 pr-4 font-heading text-lg font-bold text-secondary"><Mail className="h-5 w-5 text-primary" /> Service Request</legend>
                     <FormField control={form.control} name="serviceRequest" render={({ field }) => (
-                      <FormItem><FormLabel>Service *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Select a service" /></SelectTrigger></FormControl><SelectContent>{serviceOptions.map((service) => <SelectItem key={service} value={service}>{service}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Service *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Select a service" /></SelectTrigger></FormControl><SelectContent>{serviceOptions.map((service) => <SelectItem key={service} value={service}>{serviceLabels[service]}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="message" render={({ field }) => (
                       <FormItem><FormLabel>Message</FormLabel><FormControl><Textarea rows={6} placeholder="Add any details or questions that will help us understand your request." {...field} /></FormControl><FormMessage /></FormItem>

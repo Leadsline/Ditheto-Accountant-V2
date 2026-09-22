@@ -28,17 +28,17 @@ const serviceCatalogue = {
     "Payslips", "EMP201", "UIF Declarations", "Salary Calculations", 
     "Full Payroll Processing", "Employee Benefits Administration"
   ],
-  "Registration & Consulting": [
+  "Business Consulting": [
     "Co-operative Registration", "NPO Registration", "Company Profiles", "Business Consulting"
   ],
   "Accounting & Bookkeeping": [
     "Monthly Bookkeeping", "Management Accounts", "Bank Reconciliations", "Mentoring"
   ],
   "CIDB Registration": [
-    "CIDB Registration", "CIDB Renewals (3-year renewals)"
+    "CIDB Grades 1–9", "CIDB Renewals (3-year renewals)"
   ],
   "Company Registration": [
-    "Company Registration", "Company Amendments", "Annual Returns (AR)", "Beneficial Ownership (BO)"
+    "Company Types & Registration", "Company Amendments", "Annual Returns (AR)", "Beneficial Ownership (BO)"
   ],
   "CSD Registration": [
     "CSD Registration", "CSD Amendments"

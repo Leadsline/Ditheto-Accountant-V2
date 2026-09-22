@@ -14,3 +14,9 @@ Vercel's canonical `CLERK_PUBLISHABLE_KEY` can itself still be configured with a
 **Why:** A rebuilt bundle can be healthy and render sign-in while still showing Clerk's Development mode when the linked Vercel production environment contains development credentials.
 
 **How to apply:** Inspect the compiled public bundle for the active key environment and confirm the live alias in a real browser before declaring production sign-in ready; configure Clerk Production credentials, proxy URL, and allowed origins separately from the source fallback.
+
+For production-auth builds, select the first valid `pk_live_` value from the configured Clerk publishable-key secrets and fail early when none is available; never silently compile a `pk_test_` fallback.
+
+**Why:** The Vercel build previously inherited a development key and only failed after compiling the bundle, making the deployment error look unrelated to its environment configuration.
+
+**How to apply:** Keep the production guard enabled in the Vercel build command and allow the external Clerk publishable-key secret as a fallback when the primary publishable-key secret is stale or development-only.

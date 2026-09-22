@@ -50,11 +50,6 @@ function parseStaffUserId(value: unknown): number | null {
   return Number.isInteger(id) && id > 0 ? id : null;
 }
 
-function parseAuditLimit(value: unknown): number {
-  const limit = typeof value === "string" ? Number(value) : NaN;
-  return Number.isInteger(limit) && limit > 0 ? Math.min(limit, 100) : 100;
-}
-
 router.get("/admin/me", requireStaff, async (req: Request, res: Response): Promise<void> => {
   const staffUser = (req as AdminRequest).staffUser;
   res.json({ role: staffUser?.role ?? "staff" });
@@ -260,20 +255,6 @@ router.patch("/admin/staff-users/:staffUserId", requireFullAccess, async (req: R
     role: result.targetStaffUser.role,
     changed: result.changed,
   });
-});
-
-router.get("/admin/audit/staff-role-changes", requireFullAccess, async (req: Request, res: Response): Promise<void> => {
-  const auditEntries = await db.select({
-    id: staffRoleAuditTable.id,
-    actorStaffUserId: staffRoleAuditTable.actorStaffUserId,
-    targetStaffUserId: staffRoleAuditTable.targetStaffUserId,
-    previousRole: staffRoleAuditTable.previousRole,
-    newRole: staffRoleAuditTable.newRole,
-    changedAt: staffRoleAuditTable.changedAt,
-  }).from(staffRoleAuditTable)
-    .orderBy(desc(staffRoleAuditTable.changedAt), desc(staffRoleAuditTable.id))
-    .limit(parseAuditLimit(req.query.limit));
-  res.json(auditEntries);
 });
 
 router.get("/admin/clients", requireFullAccess, async (_req: Request, res: Response): Promise<void> => {

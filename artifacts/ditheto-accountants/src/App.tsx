@@ -17,13 +17,6 @@ const Quote = lazy(() => import('@/pages/quote'));
 const About = lazy(() => import('@/pages/about'));
 const Team = lazy(() => import('@/pages/team'));
 const Contact = lazy(() => import('@/pages/contact'));
-const AdminDashboard = lazy(() => import('@/pages/admin/dashboard'));
-const AdminClients = lazy(() => import('@/pages/admin/clients'));
-const AdminClientProfile = lazy(() => import('@/pages/admin/client-profile'));
-const AdminIntegrations = lazy(() => import('@/pages/admin/integrations'));
-const AdminReminders = lazy(() => import('@/pages/admin/reminders'));
-const AdminCampaigns = lazy(() => import('@/pages/admin/campaigns'));
-const AdminTeam = lazy(() => import('@/pages/admin/team'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
 const queryClient = new QueryClient();

@@ -34,9 +34,4 @@ jobs:
         run: pnpm run typecheck
 
       - name: Build Vercel frontend and API
-        env:
-          CLERK_PRODUCTION_AUTH_EXPECTED: "1"
-          # This is a non-functional shape-only fixture so CI validates that
-          # production builds inject a live-shaped publishable key.
-          CLERK_PUBLISHABLE_KEY: pk_live_ci_validation_only
         run: pnpm run build:vercel

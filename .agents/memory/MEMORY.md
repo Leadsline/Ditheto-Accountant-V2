@@ -1,6 +1,4 @@
 - [Vercel monorepo deployment](vercel-monorepo-deployment.md) — bundle the Express TypeScript API before Vercel packages a JavaScript adapter, and explicitly route `/api/*` to the catch-all function.
-- [Clerk environment staff bootstrap](clerk-environment-staff-bootstrap.md) — development and production Clerk users have different IDs, so initialize portal ownership per Clerk issuer when the role database is shared.
-- [Vercel Clerk proxy](vercel-clerk-proxy.md) — a Vercel deployment using a `pk_test_` key must not send Clerk traffic through the production proxy host.
 - [Post-merge setup timing](post-merge-setup-timing.md) — dependency install plus an idempotent database schema check needs a timeout buffer above 20 seconds in this workspace.
 - [GitHub private repository rules](github-private-repository-rules.md) — GitHub Free rejects branch protection and ruleset APIs for private repositories, even with repository admin access.
 - [GitHub push protection](github-push-protection.md) — GitHub scans every reachable commit, so remove credentials from history before retrying a blocked branch push.

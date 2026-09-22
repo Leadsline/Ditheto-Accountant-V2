@@ -26,3 +26,6 @@ channel = "stable-25_05"
 
 [userenv.shared]
 GH_USER = "Leadsline"
+SUPABASE_PRIVATE_BUCKET = "private-documents"
+SUPABASE_PUBLIC_BUCKET = "public-assets"
+SUPABASE_URL = "https://vnzhgajkclelpxfqbnbm.supabase.co"

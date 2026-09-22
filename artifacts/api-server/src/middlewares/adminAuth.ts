@@ -16,6 +16,10 @@ export function hasFullAccess(role: string): boolean {
   return FULL_ACCESS_ROLES.includes(role as typeof FULL_ACCESS_ROLES[number]);
 }
 
+export function hasCampaignAccess(role: string): boolean {
+  return hasFullAccess(role) || role === "marketing_staff" || role === "staff";
+}
+
 function clerkInstanceMarker(issuer: string): string {
   const instanceHash = createHash("sha256").update(issuer).digest("hex");
   return `clerk-instance:${instanceHash}`;
@@ -103,6 +107,25 @@ export function createRequireFullAccess(
   };
 }
 
+export function createRequireCampaignAccess(
+  resolveUser: StaffUserResolver = resolveStaffUser,
+): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const staffUser = await resolveUser(req);
+    if (!staffUser) {
+      res.status(401).json({ error: "Authentication required" });
+      return;
+    }
+    if (!hasCampaignAccess(staffUser.role)) {
+      res.status(403).json({ error: "Campaign access required" });
+      return;
+    }
+    attachStaffUser(req, staffUser);
+    next();
+  };
+}
+
 export const requireStaff = createRequireStaff();
 export const requireFullAccess = createRequireFullAccess();
+export const requireCampaignAccess = createRequireCampaignAccess();
 export const requireSuperAdmin = requireFullAccess;

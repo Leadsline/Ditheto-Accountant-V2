@@ -21,6 +21,9 @@ import type {
 
 import type {
   AdminClient,
+  BadRequestResponse,
+  CampaignSendInput,
+  CampaignSendResult,
   ClientDocument,
   ClientDocumentInput,
   ClientDocumentUpdate,
@@ -1352,6 +1355,88 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getSyncOdooClientMutationOptions(options));
     }
 
+export const getSendCampaignUrl = () => {
+
+
+
+
+  return `/api/admin/campaigns/send`
+}
+
+export const sendCampaign = async (campaignSendInput: CampaignSendInput, options?: Parameters<typeof customFetch>[1]): Promise<CampaignSendResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CampaignSendResult>(getSendCampaignUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(campaignSendInput)
+  }
+);}
+
+
+
+
+
+export const getSendCampaignMutationKey = () => ['sendCampaign'] as const;
+
+export const getSendCampaignMutationOptions = <TError = ErrorType<BadRequestResponse | ForbiddenResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendCampaign>>, TError,SendCampaignMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendCampaign>>, TError,SendCampaignMutationVariables, TContext> => {
+
+const mutationKey = getSendCampaignMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendCampaign>>, SendCampaignMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  sendCampaign(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendCampaignMutationResult = NonNullable<Awaited<ReturnType<typeof sendCampaign>>>
+    export type SendCampaignMutationBody = BodyType<CampaignSendInput>
+    export type SendCampaignMutationError = ErrorType<BadRequestResponse | ForbiddenResponse | NotFoundResponse>
+    export type SendCampaignMutationVariables = {data: BodyType<CampaignSendInput>}
+
+    export const useSendCampaign = <TError = ErrorType<BadRequestResponse | ForbiddenResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendCampaign>>, TError,SendCampaignMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof sendCampaign>>,
+        TError,
+        SendCampaignMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSendCampaignMutationOptions(options));
+    }
+
 export const getRequestUploadUrlUrl = () => {
 
 
@@ -1432,6 +1517,88 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getRequestUploadUrlMutationOptions(options));
+    }
+
+export const getRequestCampaignUploadUrlUrl = () => {
+
+
+
+
+  return `/api/storage/campaign-uploads/request-url`
+}
+
+export const requestCampaignUploadUrl = async (uploadUrlRequest: UploadUrlRequest, options?: Parameters<typeof customFetch>[1]): Promise<UploadUrlResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<UploadUrlResponse>(getRequestCampaignUploadUrlUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(uploadUrlRequest)
+  }
+);}
+
+
+
+
+
+export const getRequestCampaignUploadUrlMutationKey = () => ['requestCampaignUploadUrl'] as const;
+
+export const getRequestCampaignUploadUrlMutationOptions = <TError = ErrorType<ForbiddenResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCampaignUploadUrl>>, TError,RequestCampaignUploadUrlMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestCampaignUploadUrl>>, TError,RequestCampaignUploadUrlMutationVariables, TContext> => {
+
+const mutationKey = getRequestCampaignUploadUrlMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestCampaignUploadUrl>>, RequestCampaignUploadUrlMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestCampaignUploadUrl(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestCampaignUploadUrlMutationResult = NonNullable<Awaited<ReturnType<typeof requestCampaignUploadUrl>>>
+    export type RequestCampaignUploadUrlMutationBody = BodyType<UploadUrlRequest>
+    export type RequestCampaignUploadUrlMutationError = ErrorType<ForbiddenResponse>
+    export type RequestCampaignUploadUrlMutationVariables = {data: BodyType<UploadUrlRequest>}
+
+    export const useRequestCampaignUploadUrl = <TError = ErrorType<ForbiddenResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCampaignUploadUrl>>, TError,RequestCampaignUploadUrlMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestCampaignUploadUrl>>,
+        TError,
+        RequestCampaignUploadUrlMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestCampaignUploadUrlMutationOptions(options));
     }
 
 export const getGetStorageObjectUrl = (objectPath: string,) => {

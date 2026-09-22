@@ -376,6 +376,43 @@ export interface OdooSyncResult {
   externalId?: string | null;
 }
 
+export interface CampaignSendInput {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  message: string;
+  /** @minLength 1 */
+  objectPath?: string;
+}
+
+export type CampaignSendResultStatus = typeof CampaignSendResultStatus[keyof typeof CampaignSendResultStatus];
+
+
+export const CampaignSendResultStatus = {
+  handoff_ready: 'handoff_ready',
+} as const;
+
+export type CampaignSendResultChannel = typeof CampaignSendResultChannel[keyof typeof CampaignSendResultChannel];
+
+
+export const CampaignSendResultChannel = {
+  whatsapp: 'whatsapp',
+} as const;
+
+export interface CampaignSendResult {
+  success: boolean;
+  status: CampaignSendResultStatus;
+  channel: CampaignSendResultChannel;
+  deliveryUrl: string;
+  message: string;
+}
+
 export interface UploadUrlRequest {
   /** @minLength 1 */
   name: string;
@@ -394,6 +431,11 @@ export interface UploadUrlResponse {
 export interface ErrorEnvelope {
   error: string;
 }
+
+/**
+ * Invalid request
+ */
+export type BadRequestResponse = ErrorEnvelope;
 
 /**
  * Authentication required

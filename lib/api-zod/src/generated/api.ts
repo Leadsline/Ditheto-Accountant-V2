@@ -361,6 +361,28 @@ export const SyncOdooClientResponse = zod.object({
 })
 
 
+export const sendCampaignBodyTitleMax = 120;
+
+export const sendCampaignBodyMessageMax = 2000;
+
+
+
+
+export const SendCampaignBody = zod.object({
+  "title": zod.string().min(1).max(sendCampaignBodyTitleMax),
+  "message": zod.string().min(1).max(sendCampaignBodyMessageMax),
+  "objectPath": zod.string().min(1).optional()
+})
+
+export const SendCampaignResponse = zod.object({
+  "success": zod.boolean(),
+  "status": zod.enum(['handoff_ready']),
+  "channel": zod.enum(['whatsapp']),
+  "deliveryUrl": zod.string().url(),
+  "message": zod.string()
+})
+
+
 
 
 
@@ -378,7 +400,34 @@ export const RequestUploadUrlBody = zod.object({
 
 
 export const RequestUploadUrlResponse = zod.object({
-  "uploadURL": zod.string().url(),
+  "uploadURL": zod.string(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().int().min(1),
+  "contentType": zod.string().min(1)
+}).optional()
+})
+
+
+
+
+
+
+
+export const RequestCampaignUploadUrlBody = zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().int().min(1),
+  "contentType": zod.string().min(1)
+})
+
+
+
+
+
+
+export const RequestCampaignUploadUrlResponse = zod.object({
+  "uploadURL": zod.string(),
   "objectPath": zod.string(),
   "metadata": zod.object({
   "name": zod.string().min(1),

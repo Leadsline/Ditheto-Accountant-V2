@@ -13,6 +13,7 @@ tags:
   - name: Client Documents
   - name: Document Requests
   - name: Integrations
+  - name: Campaigns
   - name: Storage
   - name: Contact
 paths:
@@ -292,6 +293,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
+  /admin/campaigns/send:
+    post:
+      operationId: sendCampaign
+      tags: [Campaigns]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignSendInput"
+      responses:
+        "200":
+          description: Campaign delivery handoff prepared
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignSendResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /storage/uploads/request-url:
     post:
       operationId: requestUploadUrl
@@ -309,6 +333,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UploadUrlResponse"
+  /storage/campaign-uploads/request-url:
+    post:
+      operationId: requestCampaignUploadUrl
+      tags: [Storage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Campaign poster upload URL generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /storage/objects/{objectPath}:
     get:
       operationId: getStorageObject
@@ -348,6 +391,12 @@ components:
       schema:
         type: integer
   responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
     Unauthorized:
       description: Authentication required
       content:
@@ -550,6 +599,22 @@ components:
         success: { type: boolean }
         message: { type: string }
         externalId: { type: [string, "null"] }
+    CampaignSendInput:
+      type: object
+      required: [title, message]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        message: { type: string, minLength: 1, maxLength: 2000 }
+        objectPath: { type: string, minLength: 1 }
+    CampaignSendResult:
+      type: object
+      required: [success, status, channel, deliveryUrl, message]
+      properties:
+        success: { type: boolean }
+        status: { type: string, enum: [handoff_ready] }
+        channel: { type: string, enum: [whatsapp] }
+        deliveryUrl: { type: string, format: uri }
+        message: { type: string }
     UploadUrlRequest:
       type: object
       required: [name, size, contentType]
@@ -561,7 +626,7 @@ components:
       type: object
       required: [uploadURL, objectPath]
       properties:
-        uploadURL: { type: string, format: uri }
+        uploadURL: { type: string, format: uri-reference }
         objectPath: { type: string }
         metadata: { $ref: "#/components/schemas/UploadUrlRequest" }
     ErrorEnvelope:

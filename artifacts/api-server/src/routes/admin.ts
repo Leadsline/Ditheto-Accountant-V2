@@ -7,6 +7,8 @@ import {
   CreateDocumentRequestBody,
   CreateDocumentRequestParams,
   CreateDocumentRequestResponse,
+  SendCampaignBody,
+  SendCampaignResponse,
   DeleteClientDocumentParams,
   GetAdminClientParams,
   GetAdminClientResponse,
@@ -30,8 +32,14 @@ import {
   staffRoleAuditTable,
   staffUsersTable,
 } from "@workspace/db";
-import { requireFullAccess, requireStaff, type AdminRequest, type StaffRole } from "../middlewares/adminAuth";
-import { ObjectStorageService } from "../lib/objectStorage";
+import {
+  requireCampaignAccess,
+  requireFullAccess,
+  requireStaff,
+  type AdminRequest,
+  type StaffRole,
+} from "../middlewares/adminAuth";
+import { ObjectNotFoundError, ObjectStorageService } from "../lib/objectStorage";
 
 const router: IRouter = Router();
 const storage = new ObjectStorageService();
@@ -50,6 +58,48 @@ function parseAuditLimit(value: unknown): number {
 router.get("/admin/me", requireStaff, async (req: Request, res: Response): Promise<void> => {
   const staffUser = (req as AdminRequest).staffUser;
   res.json({ role: staffUser?.role ?? "staff" });
+});
+
+router.post("/admin/campaigns/send", requireCampaignAccess, async (req: Request, res: Response): Promise<void> => {
+  const parsed = SendCampaignBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Campaign title and message are required." });
+    return;
+  }
+  const title = parsed.data.title.trim();
+  const message = parsed.data.message.trim();
+  const objectPath = parsed.data.objectPath?.trim() ?? "";
+  if (!title || !message) {
+    res.status(400).json({ error: "Campaign title and message are required." });
+    return;
+  }
+  if (objectPath && (!objectPath.startsWith("/objects/uploads/") || objectPath.includes(".."))) {
+    res.status(400).json({ error: "Invalid campaign poster path." });
+    return;
+  }
+
+  if (objectPath) {
+    try {
+      await storage.getObjectEntityFile(objectPath);
+    } catch (error) {
+      if (error instanceof ObjectNotFoundError) {
+        res.status(404).json({ error: "The campaign poster could not be found." });
+        return;
+      }
+      req.log.error({ err: error }, "Campaign poster validation failed");
+      res.status(500).json({ error: "The campaign poster could not be validated." });
+      return;
+    }
+  }
+
+  const deliveryUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  res.json(SendCampaignResponse.parse({
+    success: true,
+    status: "handoff_ready",
+    channel: "whatsapp",
+    deliveryUrl,
+    message: "Campaign approved. WhatsApp is ready for the final send.",
+  }));
 });
 
 router.post("/admin/staff-users", requireFullAccess, async (req: Request, res: Response): Promise<void> => {

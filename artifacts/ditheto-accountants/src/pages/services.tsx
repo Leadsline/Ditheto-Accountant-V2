@@ -66,7 +66,7 @@ export const serviceCategories = [
   },
   {
     id: "cidb-registration",
-    title: "CIDB Registration",
+    title: "CIDB",
     icon: HardHat,
     description: "Registration and renewal support for construction businesses that need to remain tender-ready.",
     items: [
@@ -88,21 +88,21 @@ export const serviceCategories = [
   },
   {
     id: "csd-registration",
-    title: "CSD Registration",
+    title: "CSD",
     icon: Database,
     description: "Central Supplier Database registration and maintenance for suppliers pursuing government opportunities.",
     items: [
-      { name: "CSD Registration", desc: "Complete registration of your business on the National Treasury Central Supplier Database.", benefits: ["Government supplier readiness", "Complete supplier profile", "Tender participation support"] },
+      { name: "CSD", desc: "Complete registration of your business on the National Treasury Central Supplier Database.", benefits: ["Government supplier readiness", "Complete supplier profile", "Tender participation support"] },
       { name: "CSD Amendments", desc: "Updates and corrections to existing CSD supplier information and supporting records.", benefits: ["Current supplier details", "Reduced verification delays", "Accurate compliance records"] },
     ]
   },
   {
     id: "coida-registration",
-    title: "COIDA Registration",
+    title: "COIDA",
     icon: ShieldCheck,
     description: "Compensation Fund registration and annual renewal support for compliant employers.",
     items: [
-      { name: "COIDA Registration", desc: "Employer registration with the Compensation Fund under the Compensation for Occupational Injuries and Diseases Act.", benefits: ["Employer compliance", "Compensation Fund registration", "Good-standing readiness"] },
+      { name: "COIDA", desc: "Employer registration with the Compensation Fund under the Compensation for Occupational Injuries and Diseases Act.", benefits: ["Employer compliance", "Compensation Fund registration", "Good-standing readiness"] },
       { name: "COIDA Renewal (due every end of April)", desc: "Annual Return of Earnings and renewal support before the end-of-April due date.", benefits: ["Meet the April deadline", "Maintain good standing", "Avoid compliance delays"] },
     ]
   }

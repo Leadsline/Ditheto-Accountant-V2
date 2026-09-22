@@ -34,17 +34,17 @@ const serviceCatalogue = {
   "Accounting & Bookkeeping": [
     "Monthly Bookkeeping", "Management Accounts", "Bank Reconciliations", "Mentoring"
   ],
-  "CIDB Registration": [
+  "CIDB": [
     "CIDB Grades 1–9", "CIDB Renewals (3-year renewals)"
   ],
   "Company Registration": [
     "Company Types & Registration", "Company Amendments", "Annual Returns (AR)", "Beneficial Ownership (BO)"
   ],
-  "CSD Registration": [
-    "CSD Registration", "CSD Amendments"
+  "CSD": [
+    "CSD", "CSD Amendments"
   ],
-  "COIDA Registration": [
-    "COIDA Registration", "COIDA Renewal (due every end of April)"
+  "COIDA": [
+    "COIDA", "COIDA Renewal (due every end of April)"
   ]
 };
 

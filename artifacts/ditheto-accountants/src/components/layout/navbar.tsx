@@ -17,10 +17,10 @@ const serviceLinks = [
   { href: "/services/payroll", label: "Payroll Services" },
   { href: "/services/registration", label: "Business Consulting" },
   { href: "/services/accounting", label: "Accounting & Bookkeeping" },
-  { href: "/services/cidb-registration", label: "CIDB Registration" },
+  { href: "/services/cidb-registration", label: "CIDB" },
   { href: "/services/company-registration", label: "Company Registration" },
-  { href: "/services/csd-registration", label: "CSD Registration" },
-  { href: "/services/coida-registration", label: "COIDA Registration" },
+  { href: "/services/csd-registration", label: "CSD" },
+  { href: "/services/coida-registration", label: "COIDA" },
 ];
 
 export function Navbar() {

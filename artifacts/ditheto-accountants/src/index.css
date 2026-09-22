@@ -201,7 +201,7 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     background-image: radial-gradient(circle at 8% 4%, hsl(var(--accent) / 0.08), transparent 27rem);
-    overflow-x: hidden;
+    overflow-x: clip;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight;

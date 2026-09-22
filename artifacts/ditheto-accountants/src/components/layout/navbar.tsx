@@ -41,7 +41,7 @@ export function Navbar() {
   }, [location]);
 
   return (
-    <div className="w-full">
+    <header className="sticky top-0 z-[60] w-full bg-background/95 backdrop-blur-xl">
       <div className="bg-secondary px-4 py-2 text-[10px] text-white sm:py-2.5 sm:text-[11px]">
         <div className="site-container flex flex-wrap items-center gap-x-4 gap-y-1">
           <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
@@ -64,7 +64,7 @@ export function Navbar() {
         </div>
       </div>
 
-      <header className="sticky top-0 z-50 w-full border-b border-secondary/10 bg-background/95 shadow-[0_8px_30px_-24px_hsl(var(--secondary))] backdrop-blur-xl">
+      <div className="w-full border-b border-secondary/10 bg-background/95 shadow-[0_8px_30px_-24px_hsl(var(--secondary))]">
         <div className="site-container">
         <div className="flex h-[84px] items-center justify-between">
           <div className="flex-shrink-0 flex items-center">
@@ -180,7 +180,7 @@ export function Navbar() {
             })}
         </nav>}
         </div>
-      </header>
-    </div>
+      </div>
+    </header>
   );
 }

@@ -210,6 +210,26 @@
   :focus-visible { outline: 3px solid hsl(var(--accent) / 0.8); outline-offset: 3px; }
 }
 
+@keyframes partner-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.partner-marquee {
+  animation: partner-marquee 28s linear infinite;
+}
+
+.partner-marquee:hover,
+.partner-marquee:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-marquee {
+    animation-play-state: paused;
+  }
+}
+
 /* Staff access is provisioned by Super Admin with email/password only. */
 .cl-socialButtons,
 .cl-socialButtonsBlockButton,

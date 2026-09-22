@@ -83,6 +83,8 @@ const proofPoints = [
   "One accountable team from filing to follow-up",
 ];
 
+const professionalBodies = ["SARS", "CIPC", "SAIT", "SAIPA", "SAICA"];
+
 export default function Home() {
   return (
     <div className="w-full overflow-hidden">
@@ -186,11 +188,29 @@ export default function Home() {
       </section>
 
       <section className="bg-primary py-16 text-white sm:py-20">
-        <div className="site-container grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="site-container grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div>
             <p className="text-xs font-bold uppercase tracking-[.2em] text-accent">Let's get it sorted</p>
             <h2 className="serif-display mt-4 max-w-2xl text-4xl leading-[1] sm:text-5xl">Your next filing does not need to become a fire drill.</h2>
             <p className="mt-5 max-w-xl text-sm leading-6 text-white/75">Tell us what you need and we will come back with a clear, tailored quote.</p>
+            <div className="mt-8 overflow-hidden rounded-xl border border-white/15 bg-secondary/15 py-4" aria-label="Professional bodies and organisations we work with">
+              <p className="px-5 text-[10px] font-bold uppercase tracking-[.18em] text-white/60">Professional bodies &amp; partners</p>
+              <div className="mt-4 overflow-hidden">
+                <div className="partner-marquee flex w-max items-center gap-3 px-5" role="list">
+                  {[...professionalBodies, ...professionalBodies].map((body, index) => (
+                    <span
+                      key={`${body}-${index}`}
+                      role="listitem"
+                      aria-hidden={index >= professionalBodies.length}
+                      className="inline-flex h-11 items-center gap-2 rounded-lg border border-white/20 bg-white/[.07] px-5 text-sm font-bold tracking-wide text-white/90"
+                    >
+                      <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+                      {body}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
           <Link href="/quote" className="inline-flex h-14 items-center justify-center gap-2 rounded-sm bg-accent px-7 text-sm font-bold text-secondary transition-transform hover:-translate-y-1" data-testid="link-home-final-quote">
             Start with a quote <ArrowUpRight className="h-4 w-4" />

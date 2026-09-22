@@ -12,7 +12,9 @@ import {
 
 const REPLIT_SIDECAR_ENDPOINT = 'http://127.0.0.1:1106';
 const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseServiceKey =
+  process.env.DITHETO_SUPABASE_SERVICE_ROLE_KEY ??
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabasePrivateBucket = process.env.SUPABASE_PRIVATE_BUCKET || 'private-documents';
 const supabasePublicBucket = process.env.SUPABASE_PUBLIC_BUCKET || 'public-assets';
 

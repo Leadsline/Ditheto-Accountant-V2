@@ -22,6 +22,149 @@ type TeamMember = {
   sortOrder: number;
 };
 
+const publishedTeam: TeamMember[] = [
+  {
+    id: 1,
+    name: "Tshegofatso Phalatsi",
+    title: "CEO / Director",
+    bio: "Tshegofatso leads Ditheto Accountants with a practical belief that every business owner deserves clear numbers, calm guidance, and a partner who follows through.",
+    email: "tshego@dithetoaccountants.co.za",
+    phone: "067 765 7387",
+    initials: "TP",
+    image: null,
+    accent: "gold",
+    level: "director",
+    parentId: null,
+    sortOrder: 0,
+  },
+  {
+    id: 2,
+    name: "Mmatsiana Makgoba",
+    title: "Senior Manager: Branch Operations & Business Development",
+    bio: "Mmatsiana oversees branch operations and business development, coordinating the team to deliver responsive and dependable client service.",
+    email: "mmatsiana@dithetoaccountants.co.za",
+    phone: "012 751 3200",
+    initials: "MM",
+    image: null,
+    accent: "teal",
+    level: "lead",
+    parentId: 1,
+    sortOrder: 0,
+  },
+  {
+    id: 3,
+    name: "Tryphosa Mokaba",
+    title: "Branch Manager — Brooklyn Branch",
+    bio: "Tryphosa manages the Brooklyn branch and supports the accounting team in delivering accurate, timely work for clients.",
+    email: "tryphosa@dithetoaccountants.co.za",
+    phone: null,
+    initials: "TM",
+    image: null,
+    accent: "navy",
+    level: "lead",
+    parentId: 2,
+    sortOrder: 0,
+  },
+  {
+    id: 4,
+    name: "Motsei Malebe",
+    title: "Branch Manager — Secunda Branch",
+    bio: "Motsei manages the Secunda branch, coordinating client service and supporting the branch accounting team.",
+    email: "motsie@dithetoaccountants.co.za",
+    phone: null,
+    initials: "MM",
+    image: null,
+    accent: "teal",
+    level: "lead",
+    parentId: 2,
+    sortOrder: 1,
+  },
+  {
+    id: 5,
+    name: "Gugulethu Makhanya",
+    title: "Assistant Accountant",
+    bio: "Gugulethu supports accurate accounting records, reconciliations, and day-to-day client compliance work.",
+    email: "gugulethu@dithetoaccountants.co.za",
+    phone: null,
+    initials: "GM",
+    image: null,
+    accent: "teal",
+    level: "team",
+    parentId: 3,
+    sortOrder: 0,
+  },
+  {
+    id: 6,
+    name: "Siphiwe Khoza",
+    title: "Assistant Accountant",
+    bio: "Siphiwe keeps day-to-day accounting details in order so clients can focus on serving customers and growing their businesses.",
+    email: "siphiwe@dithetoaccountants.co.za",
+    phone: null,
+    initials: "SK",
+    image: null,
+    accent: "gold",
+    level: "team",
+    parentId: 3,
+    sortOrder: 1,
+  },
+  {
+    id: 7,
+    name: "Reneilwe Nkadimeng",
+    title: "Assistant Accountant",
+    bio: "Reneilwe supports client accounting and compliance work with careful recordkeeping and responsive follow-through.",
+    email: "reneilwe@dithetoaccountants.co.za",
+    phone: null,
+    initials: "RN",
+    image: null,
+    accent: "teal",
+    level: "team",
+    parentId: 3,
+    sortOrder: 2,
+  },
+  {
+    id: 8,
+    name: "Mbali Khoza",
+    title: "Assistant Accountant",
+    bio: "Mbali supports daily financial processing, maintains accurate records, and assists with compliant accounting administration.",
+    email: "mbali@dithetoaccountants.co.za",
+    phone: null,
+    initials: "MK",
+    image: null,
+    accent: "teal",
+    level: "team",
+    parentId: 3,
+    sortOrder: 3,
+  },
+  {
+    id: 9,
+    name: "Rukudzo Chatendeuka",
+    title: "Assistant Accountant",
+    bio: "Rukudzo assists with bookkeeping, reconciliations, and the preparation of accurate client accounting records.",
+    email: "rukudzo@dithetoaccountants.co.za",
+    phone: null,
+    initials: "RC",
+    image: null,
+    accent: "teal",
+    level: "team",
+    parentId: 3,
+    sortOrder: 4,
+  },
+  {
+    id: 10,
+    name: "Yanga Mzantsi",
+    title: "Assistant Accountant",
+    bio: "Yanga supports Secunda clients with accurate accounting administration and dependable day-to-day financial processing.",
+    email: "yanga@dithetoaccountants.co.za",
+    phone: null,
+    initials: "YM",
+    image: null,
+    accent: "teal",
+    level: "team",
+    parentId: 4,
+    sortOrder: 0,
+  },
+];
+
 const accentClasses = {
   teal: "border-primary bg-primary/10 text-primary",
   gold: "border-accent bg-accent/10 text-amber-700",
@@ -90,20 +233,23 @@ export default function Team() {
   const [selected, setSelected] = useState<TeamMember | null>(null);
   const { data, isLoading, isError } = useListTeamMembers();
   
-  const team = useMemo<TeamMember[]>(() => (data ?? []).map((member) => ({
-    id: member.id,
-    name: member.name,
-    title: member.title,
-    bio: member.bio,
-    email: member.email,
-    phone: member.phone,
-    initials: member.name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "??",
-    image: member.imageUrl,
-    accent: member.accent,
-    level: member.level,
-    parentId: member.parentId,
-    sortOrder: member.sortOrder,
-  })), [data]);
+  const team = useMemo<TeamMember[]>(() => {
+    if (!data?.length) return publishedTeam;
+    return data.map((member) => ({
+      id: member.id,
+      name: member.name,
+      title: member.title,
+      bio: member.bio,
+      email: member.email,
+      phone: member.phone,
+      initials: member.name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "??",
+      image: member.imageUrl,
+      accent: member.accent,
+      level: member.level,
+      parentId: member.parentId,
+      sortOrder: member.sortOrder,
+    }));
+  }, [data]);
 
   const director = useMemo(() => team.find((member) => member.level === "director" && !member.parentId), [team]);
   const seniorManager = useMemo(
@@ -156,8 +302,12 @@ export default function Team() {
 
           <Reveal className="mt-16" delay={.12}>
             {isLoading && <div className="rounded-3xl border border-secondary/10 bg-card p-12 text-center text-muted-foreground">Loading team structure…</div>}
-            {isError && <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center text-red-700">The team structure could not be loaded. Please try again shortly.</div>}
-            {!isLoading && !isError && (
+            {isError && (
+              <p className="mb-6 text-center text-sm text-muted-foreground">
+                Showing our latest published team profiles.
+              </p>
+            )}
+            {!isLoading && (
               <div className="overflow-hidden rounded-3xl border border-secondary/10 bg-card py-10 sm:py-16 px-4 shadow-[0_24px_70px_-50px_hsl(var(--secondary))]">
                 
                 {/* DESKTOP LAYOUT (Vertical Rails) */}

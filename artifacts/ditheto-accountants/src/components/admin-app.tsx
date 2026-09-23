@@ -20,6 +20,16 @@ function RouteLoading() {
   );
 }
 
+async function readApiBody(response: Response): Promise<{ error?: string; message?: string }> {
+  const text = await response.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text) as { error?: string; message?: string };
+  } catch {
+    return { error: text.slice(0, 240) || `Server error (${response.status}).` };
+  }
+}
+
 function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,7 +49,7 @@ function LoginScreen() {
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-      const body = (await response.json()) as { error?: string };
+      const body = await readApiBody(response);
       if (!response.ok) throw new Error(body.error ?? 'Unable to sign in.');
       window.location.assign('/admin');
     } catch (loginError) {
@@ -64,7 +74,7 @@ function LoginScreen() {
         credentials: 'include',
         body: JSON.stringify({ email }),
       });
-      const body = (await response.json()) as { error?: string; message?: string };
+      const body = await readApiBody(response);
       if (!response.ok) throw new Error(body.error ?? 'Unable to request a password reset.');
       setResetMessage(body.message ?? 'If that email is registered, a password reset link has been sent.');
     } catch (resetError) {

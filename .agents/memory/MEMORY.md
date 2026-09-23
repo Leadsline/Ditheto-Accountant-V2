@@ -8,3 +8,4 @@
 - [Auth-provider removal checks](auth-provider-removal-checks.md) — removing an auth provider requires a repo-wide reference scan plus a frozen-lockfile build check.
 - [Drizzle push schema drift](drizzle-push-drift.md) — schema push can prompt to truncate existing team roster rows; never force that destructive change.
 - [Supabase Auth project keys](supabase-auth-project-keys.md) — the active Supabase project may require its publishable key plus RLS-scoped role reads when stored service keys or connectors target another project.
+- [API error envelopes](api-error-envelopes.md) — admin client fetches must tolerate plain-text proxy failures, while the Express boundary should return JSON for unexpected errors.

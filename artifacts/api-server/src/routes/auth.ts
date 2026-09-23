@@ -1,26 +1,27 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import {
-  clearAdminSessionCookie,
-  credentialsConfigured,
-  credentialsMatch,
-  createAdminSession,
-  readAdminSession,
-  setAdminSessionCookie,
-} from "../lib/adminSession";
+  clearSupabaseAuthCookies,
+  getAdminIdentity,
+  sendPasswordReset,
+  setSupabaseAuthCookies,
+  signInWithPassword,
+} from "../lib/supabaseAuth";
 
 const router: IRouter = Router();
 
 router.get("/auth/me", (req: Request, res: Response): void => {
-  const session = readAdminSession(req);
-  if (!session) {
-    res.status(401).json({ authenticated: false });
-    return;
-  }
-  res.json({
-    authenticated: true,
-    email: session.email,
-    role: session.role,
-  });
+  void getAdminIdentity(req, res)
+    .then((identity) => {
+      if (!identity) {
+        res.status(401).json({ authenticated: false });
+        return;
+      }
+      res.json({ authenticated: true, email: identity.email, role: identity.role });
+    })
+    .catch((error) => {
+      req.log.error({ err: error }, "Supabase auth session lookup failed");
+      res.status(503).json({ error: "Supabase authentication is not configured." });
+    });
 });
 
 router.post("/auth/login", (req: Request, res: Response): void => {
@@ -30,25 +31,41 @@ router.post("/auth/login", (req: Request, res: Response): void => {
     res.status(400).json({ error: "Enter a valid email address and password." });
     return;
   }
-  if (!credentialsConfigured()) {
-    res.status(503).json({ error: "Super Admin credentials are not configured." });
-    return;
-  }
-  if (!credentialsMatch(email, password)) {
-    res.status(401).json({ error: "Incorrect email or password." });
-    return;
-  }
+  void signInWithPassword(email.trim().toLowerCase(), password)
+    .then(async (session) => {
+      setSupabaseAuthCookies(res, session);
+      const identity = await getAdminIdentity(req, res);
+      if (!identity) {
+        clearSupabaseAuthCookies(res);
+        res.status(403).json({ error: "This Supabase account is not authorized for the admin portal." });
+        return;
+      }
+      res.json({ authenticated: true, email: identity.email, role: identity.role });
+    })
+    .catch(() => {
+      res.status(401).json({ error: "Incorrect email or password." });
+    });
+});
 
-  setAdminSessionCookie(res, createAdminSession(email.trim().toLowerCase()));
-  res.json({
-    authenticated: true,
-    email: email.trim().toLowerCase(),
-    role: "super_admin",
-  });
+router.post("/auth/forgot-password", (req: Request, res: Response): void => {
+  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  if (!email.includes("@")) {
+    res.status(400).json({ error: "Enter a valid email address." });
+    return;
+  }
+  const origin = `${req.protocol}://${req.get("host")}`;
+  void sendPasswordReset(email, `${origin}/sign-in`)
+    .then(() => {
+      res.json({ message: "If that email is registered, a password reset link has been sent." });
+    })
+    .catch((error) => {
+      req.log.error({ err: error }, "Supabase password reset request failed");
+      res.status(503).json({ error: "Password reset is temporarily unavailable." });
+    });
 });
 
 router.post("/auth/logout", (_req: Request, res: Response): void => {
-  clearAdminSessionCookie(res);
+  clearSupabaseAuthCookies(res);
   res.status(204).end();
 });
 

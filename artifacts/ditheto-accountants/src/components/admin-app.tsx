@@ -24,6 +24,8 @@ function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
+  const [resetting, setResetting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -47,6 +49,31 @@ function LoginScreen() {
     }
   }
 
+  async function requestPasswordReset() {
+    if (!email.includes('@')) {
+      setError('Enter your email address first.');
+      return;
+    }
+    setResetting(true);
+    setError('');
+    setResetMessage('');
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email }),
+      });
+      const body = (await response.json()) as { error?: string; message?: string };
+      if (!response.ok) throw new Error(body.error ?? 'Unable to request a password reset.');
+      setResetMessage(body.message ?? 'If that email is registered, a password reset link has been sent.');
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : 'Unable to request a password reset.');
+    } finally {
+      setResetting(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
       <form onSubmit={submit} className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
@@ -55,7 +82,7 @@ function LoginScreen() {
         </p>
         <h1 className="mt-3 text-2xl font-bold text-secondary">Super Admin sign in</h1>
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          Sign in to configure Odoo and manage the admin portal.
+          Sign in to manage the Ditheto admin portal.
         </p>
         <label className="mt-6 block text-sm font-semibold text-secondary">
           Email
@@ -80,12 +107,21 @@ function LoginScreen() {
           />
         </label>
         {error && <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {resetMessage && <p className="mt-4 rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">{resetMessage}</p>}
         <button
           type="submit"
           disabled={submitting}
           className="mt-6 w-full rounded-md bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-secondary disabled:opacity-60"
         >
           {submitting ? 'Signing in…' : 'Sign in'}
+        </button>
+        <button
+          type="button"
+          onClick={requestPasswordReset}
+          disabled={resetting}
+          className="mt-4 w-full text-sm font-semibold text-primary transition-colors hover:text-secondary disabled:opacity-60"
+        >
+          {resetting ? 'Sending reset link…' : 'Forgot password?'}
         </button>
         <Link href="/" className="mt-4 block text-center text-sm font-semibold text-primary hover:text-secondary">
           Return to website

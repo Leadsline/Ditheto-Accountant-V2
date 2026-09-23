@@ -1,14 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
-import { readAdminSession } from "../lib/adminSession";
+import { getAdminIdentity, type AdminRole } from "../lib/supabaseAuth";
 
 export type AdminRequest = Request & {
   authUserId?: string;
   authEmail?: string;
-  authRole?: StaffRole;
+  authRole?: AdminRole;
 };
 
 export const FULL_ACCESS_ROLES = ["super_admin", "ceo", "senior_manager"] as const;
-export type StaffRole = typeof FULL_ACCESS_ROLES[number] | "marketing_staff";
 
 export function hasFullAccess(role: string): boolean {
   return FULL_ACCESS_ROLES.includes(role as typeof FULL_ACCESS_ROLES[number]);
@@ -18,17 +17,22 @@ export function hasCampaignAccess(role: string): boolean {
   return hasFullAccess(role) || role === "marketing_staff" || role === "staff";
 }
 
-function requireSession(req: Request, res: Response, next: NextFunction): void {
-  const session = readAdminSession(req);
-  if (!session) {
-    res.status(401).json({ error: "Admin sign-in required." });
-    return;
+async function requireSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const identity = await getAdminIdentity(req, res);
+    if (!identity) {
+      res.status(401).json({ error: "Admin sign-in required." });
+      return;
+    }
+    const adminRequest = req as AdminRequest;
+    adminRequest.authUserId = identity.userId;
+    adminRequest.authEmail = identity.email;
+    adminRequest.authRole = identity.role;
+    next();
+  } catch (error) {
+    req.log.error({ err: error }, "Supabase admin authentication failed");
+    res.status(503).json({ error: "Supabase authentication is not configured." });
   }
-  const adminRequest = req as AdminRequest;
-  adminRequest.authUserId = session.email;
-  adminRequest.authEmail = session.email;
-  adminRequest.authRole = session.role;
-  next();
 }
 
 export const requireStaff = requireSession;

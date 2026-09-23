@@ -36,7 +36,18 @@ function LoginScreen() {
   const [error, setError] = useState('');
   const [resetMessage, setResetMessage] = useState('');
   const [resetting, setResetting] = useState(false);
+  const [recoveryToken, setRecoveryToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    if (hash.get('type') === 'recovery' && hash.get('access_token')) {
+      setRecoveryToken(hash.get('access_token') ?? '');
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+    }
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -84,38 +95,106 @@ function LoginScreen() {
     }
   }
 
+  async function submitPasswordReset(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError('');
+    setResetMessage('');
+    if (newPassword.length < 8) {
+      setError('Your new password must be at least 8 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('The passwords do not match.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/auth/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ accessToken: recoveryToken, password: newPassword }),
+      });
+      const body = await readApiBody(response);
+      if (!response.ok) throw new Error(body.error ?? 'Unable to update your password.');
+      setRecoveryToken('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setResetMessage(body.message ?? 'Your password has been updated. You can now sign in.');
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : 'Unable to update your password.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
-      <form onSubmit={submit} className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
+      <form onSubmit={recoveryToken ? submitPasswordReset : submit} className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
           Ditheto Admin Portal
         </p>
-        <h1 className="mt-3 text-2xl font-bold text-secondary">Super Admin sign in</h1>
+        <h1 className="mt-3 text-2xl font-bold text-secondary">
+          {recoveryToken ? 'Set a new password' : 'Super Admin sign in'}
+        </h1>
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          Sign in to manage the Ditheto admin portal.
+          {recoveryToken
+            ? 'Choose a new password for your Ditheto admin account.'
+            : 'Sign in to manage the Ditheto admin portal.'}
         </p>
-        <label className="mt-6 block text-sm font-semibold text-secondary">
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="username"
-            required
-            className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
-        </label>
-        <label className="mt-4 block text-sm font-semibold text-secondary">
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-            required
-            className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
-        </label>
+        {recoveryToken ? (
+          <>
+            <label className="mt-6 block text-sm font-semibold text-secondary">
+              New password
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                autoComplete="new-password"
+                minLength={8}
+                required
+                className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </label>
+            <label className="mt-4 block text-sm font-semibold text-secondary">
+              Confirm new password
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                autoComplete="new-password"
+                minLength={8}
+                required
+                className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </label>
+          </>
+        ) : (
+          <>
+            <label className="mt-6 block text-sm font-semibold text-secondary">
+              Email
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="username"
+                required
+                className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </label>
+            <label className="mt-4 block text-sm font-semibold text-secondary">
+              Password
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+                required
+                className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 font-normal outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </label>
+          </>
+        )}
         {error && <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
         {resetMessage && <p className="mt-4 rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">{resetMessage}</p>}
         <button
@@ -123,16 +202,18 @@ function LoginScreen() {
           disabled={submitting}
           className="mt-6 w-full rounded-md bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-secondary disabled:opacity-60"
         >
-          {submitting ? 'Signing in…' : 'Sign in'}
+          {submitting ? (recoveryToken ? 'Updating password…' : 'Signing in…') : (recoveryToken ? 'Update password' : 'Sign in')}
         </button>
-        <button
-          type="button"
-          onClick={requestPasswordReset}
-          disabled={resetting}
-          className="mt-4 w-full text-sm font-semibold text-primary transition-colors hover:text-secondary disabled:opacity-60"
-        >
-          {resetting ? 'Sending reset link…' : 'Forgot password?'}
-        </button>
+        {!recoveryToken && (
+          <button
+            type="button"
+            onClick={requestPasswordReset}
+            disabled={resetting}
+            className="mt-4 w-full text-sm font-semibold text-primary transition-colors hover:text-secondary disabled:opacity-60"
+          >
+            {resetting ? 'Sending reset link…' : 'Forgot password?'}
+          </button>
+        )}
         <Link href="/" className="mt-4 block text-center text-sm font-semibold text-primary hover:text-secondary">
           Return to website
         </Link>

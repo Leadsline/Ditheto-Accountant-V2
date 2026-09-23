@@ -177,3 +177,21 @@ export async function sendPasswordReset(email: string, redirectTo: string): Prom
     body: JSON.stringify({ email, redirect_to: redirectTo }),
   });
 }
+
+export async function updatePassword(accessToken: string, password: string): Promise<void> {
+  const { url, anonKey } = getSupabaseConfig();
+  const response = await fetch(`${url}/auth/v1/user`, {
+    method: "PUT",
+    headers: authHeaders(anonKey, accessToken),
+    body: JSON.stringify({ password }),
+  });
+  const body = await readJson(response);
+  if (!response.ok) {
+    const message = typeof body.msg === "string"
+      ? body.msg
+      : typeof body.message === "string"
+        ? body.message
+        : "Supabase password update failed.";
+    throw new Error(message);
+  }
+}

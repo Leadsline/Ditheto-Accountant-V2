@@ -6,6 +6,7 @@ import {
   sendPasswordReset,
   setSupabaseAuthCookies,
   signInWithPassword,
+  updatePassword,
 } from "../lib/supabaseAuth";
 
 const router: IRouter = Router();
@@ -54,7 +55,9 @@ router.post("/auth/forgot-password", (req: Request, res: Response): void => {
     res.status(400).json({ error: "Enter a valid email address." });
     return;
   }
-  const origin = `${req.protocol}://${req.get("host")}`;
+  const forwardedProtocol = req.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const forwardedHost = req.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const origin = `${forwardedProtocol ?? req.protocol}://${forwardedHost ?? req.get("host")}`;
   void sendPasswordReset(email, `${origin}/sign-in`)
     .then(() => {
       res.json({ message: "If that email is registered, a password reset link has been sent." });
@@ -62,6 +65,23 @@ router.post("/auth/forgot-password", (req: Request, res: Response): void => {
     .catch((error) => {
       req.log.error({ err: error }, "Supabase password reset request failed");
       res.status(503).json({ error: "Password reset is temporarily unavailable." });
+    });
+});
+
+router.post("/auth/update-password", (req: Request, res: Response): void => {
+  const accessToken = typeof req.body?.accessToken === "string" ? req.body.accessToken : "";
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+  if (!accessToken || password.length < 8) {
+    res.status(400).json({ error: "Your new password must be at least 8 characters long." });
+    return;
+  }
+  void updatePassword(accessToken, password)
+    .then(() => {
+      res.json({ message: "Your password has been updated." });
+    })
+    .catch((error) => {
+      req.log.error({ err: error }, "Supabase password update failed");
+      res.status(400).json({ error: "This password reset link is invalid or has expired." });
     });
 });
 

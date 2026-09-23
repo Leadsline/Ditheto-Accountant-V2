@@ -30,6 +30,7 @@ SUPABASE_PRIVATE_BUCKET = "private-documents"
 SUPABASE_PUBLIC_BUCKET = "public-assets"
 SUPABASE_URL = "https://vnzhgajkclelpxfqbnbm.supabase.co"
 DITHETO_SUPER_ADMIN_EMAIL = "collen@afrithink.com"
+SUPABASE_ANON_KEY = "sb_publishable_QQMREDUYQ5WmkXjxr3qeWA_-rcQBaHp"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-a32a57a2-3352-4593-9a25-c56a1c375eae"

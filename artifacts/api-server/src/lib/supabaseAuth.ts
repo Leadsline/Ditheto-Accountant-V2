@@ -23,21 +23,19 @@ type SupabaseUser = {
   email?: string;
 };
 
-function getSupabaseConfig(): { url: string; serviceRoleKey: string } {
+function getSupabaseConfig(): { url: string; anonKey: string } {
   const url = process.env.SUPABASE_URL?.replace(/\/$/, "");
-  const serviceRoleKey =
-    process.env.DITHETO_SUPABASE_SERVICE_ROLE_KEY ??
-    process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
-    throw new Error("SUPABASE_URL and a Supabase service role key must be configured.");
+  const anonKey = process.env.SUPABASE_ANON_KEY;
+  if (!url || !anonKey) {
+    throw new Error("SUPABASE_URL and SUPABASE_ANON_KEY must be configured.");
   }
-  return { url, serviceRoleKey };
+  return { url, anonKey };
 }
 
-function authHeaders(serviceRoleKey: string, accessToken?: string): HeadersInit {
+function authHeaders(anonKey: string, accessToken?: string): Record<string, string> {
   return {
-    apikey: serviceRoleKey,
-    Authorization: `Bearer ${accessToken ?? serviceRoleKey}`,
+    apikey: anonKey,
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     "Content-Type": "application/json",
   };
 }
@@ -54,13 +52,10 @@ async function supabaseAuthRequest<T>(
   path: string,
   init: RequestInit,
 ): Promise<T> {
-  const { url, serviceRoleKey } = getSupabaseConfig();
+  const { url, anonKey } = getSupabaseConfig();
   const response = await fetch(`${url}/auth/v1${path}`, {
     ...init,
-    headers: {
-      ...authHeaders(serviceRoleKey),
-      ...(init.headers ?? {}),
-    },
+    headers: authHeaders(anonKey),
   });
   const body = await readJson(response);
   if (!response.ok) {
@@ -89,16 +84,16 @@ async function refreshSession(refreshToken: string): Promise<SupabaseSession> {
 }
 
 async function getUser(accessToken: string): Promise<SupabaseUser | null> {
-  const { url, serviceRoleKey } = getSupabaseConfig();
+  const { url, anonKey } = getSupabaseConfig();
   const response = await fetch(`${url}/auth/v1/user`, {
-    headers: authHeaders(serviceRoleKey, accessToken),
+    headers: authHeaders(anonKey, accessToken),
   });
   if (!response.ok) return null;
   return (await response.json()) as SupabaseUser;
 }
 
 async function getAdminRole(userId: string, accessToken: string): Promise<AdminRole | null> {
-  const { url, serviceRoleKey } = getSupabaseConfig();
+  const { url, anonKey } = getSupabaseConfig();
   const query = new URLSearchParams({
     user_id: `eq.${userId}`,
     select: "role",
@@ -106,7 +101,7 @@ async function getAdminRole(userId: string, accessToken: string): Promise<AdminR
   });
   const response = await fetch(`${url}/rest/v1/admin_users?${query.toString()}`, {
     headers: {
-      ...authHeaders(serviceRoleKey, accessToken),
+      ...authHeaders(anonKey, accessToken),
       Accept: "application/json",
     },
   });
@@ -161,10 +156,19 @@ export async function getAdminIdentity(req: Request, res?: Response): Promise<Ad
     }
   }
   if (!user?.id || !user.email || !accessToken) return null;
+  return getAdminIdentityForAccessToken(accessToken, user);
+}
 
-  const role = await getAdminRole(user.id, accessToken);
+export async function getAdminIdentityForAccessToken(
+  accessToken: string,
+  user?: SupabaseUser,
+): Promise<AdminIdentity | null> {
+  const resolvedUser = user ?? await getUser(accessToken);
+  if (!resolvedUser?.id || !resolvedUser.email) return null;
+
+  const role = await getAdminRole(resolvedUser.id, accessToken);
   if (!role) return null;
-  return { userId: user.id, email: user.email, role };
+  return { userId: resolvedUser.id, email: resolvedUser.email, role };
 }
 
 export async function sendPasswordReset(email: string, redirectTo: string): Promise<void> {

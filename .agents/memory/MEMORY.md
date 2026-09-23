@@ -7,3 +7,4 @@
 - [Supabase missing-object responses](supabase-missing-object-responses.md) — Storage can report a missing object as HTTP 400 with nested 404/NoSuchKey details.
 - [Auth-provider removal checks](auth-provider-removal-checks.md) — removing an auth provider requires a repo-wide reference scan plus a frozen-lockfile build check.
 - [Drizzle push schema drift](drizzle-push-drift.md) — schema push can prompt to truncate existing team roster rows; never force that destructive change.
+- [Supabase Auth project keys](supabase-auth-project-keys.md) — the active Supabase project may require its publishable key plus RLS-scoped role reads when stored service keys or connectors target another project.

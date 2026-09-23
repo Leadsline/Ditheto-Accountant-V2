@@ -2,6 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import {
   clearSupabaseAuthCookies,
   getAdminIdentity,
+  getAdminIdentityForAccessToken,
   sendPasswordReset,
   setSupabaseAuthCookies,
   signInWithPassword,
@@ -34,7 +35,7 @@ router.post("/auth/login", (req: Request, res: Response): void => {
   void signInWithPassword(email.trim().toLowerCase(), password)
     .then(async (session) => {
       setSupabaseAuthCookies(res, session);
-      const identity = await getAdminIdentity(req, res);
+      const identity = await getAdminIdentityForAccessToken(session.access_token);
       if (!identity) {
         clearSupabaseAuthCookies(res);
         res.status(403).json({ error: "This Supabase account is not authorized for the admin portal." });

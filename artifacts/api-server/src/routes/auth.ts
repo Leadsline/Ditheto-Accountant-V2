@@ -64,6 +64,10 @@ router.post("/auth/forgot-password", (req: Request, res: Response): void => {
     })
     .catch((error) => {
       req.log.error({ err: error }, "Supabase password reset request failed");
+      if (error instanceof Error && error.message.toLowerCase().includes("rate limit")) {
+        res.status(429).json({ error: "Too many reset emails were requested. Please wait a few minutes before trying again." });
+        return;
+      }
       res.status(503).json({ error: "Password reset is temporarily unavailable." });
     });
 });

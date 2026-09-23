@@ -215,6 +215,20 @@
   to { transform: translateX(-50%); }
 }
 
+@keyframes contact-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.contact-marquee-track {
+  animation: contact-marquee 32s linear infinite;
+}
+
+.contact-marquee-track:hover,
+.contact-marquee-track:focus-within {
+  animation-play-state: paused;
+}
+
 .partner-marquee {
   animation: partner-marquee 28s linear infinite;
 }
@@ -225,6 +239,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .contact-marquee-track {
+    animation-play-state: paused;
+  }
+
   .partner-marquee {
     animation-play-state: paused;
   }

@@ -23,6 +23,31 @@ const serviceLinks = [
   { href: "/services/coida-registration", label: "COIDA" },
 ];
 
+function ContactMarqueeGroup({ duplicate = false }: { duplicate?: boolean }) {
+  return (
+    <div
+      className="contact-marquee-group flex shrink-0 items-center gap-6 px-5 sm:gap-8 sm:px-8 lg:px-10"
+      aria-hidden={duplicate}
+    >
+      <a href="tel:+27127513200" className="flex shrink-0 items-center gap-2 whitespace-nowrap transition-colors hover:text-accent">
+        <Phone className="h-3 w-3 shrink-0 text-accent" />
+        <span>Pretoria 012 751 3200 <span className="text-white/60">· 067 765 7387</span></span>
+      </a>
+      <a href="tel:+27176311890" className="flex shrink-0 items-center gap-2 whitespace-nowrap transition-colors hover:text-accent">
+        <Phone className="h-3 w-3 shrink-0 text-accent" />
+        <span>Secunda 017 631 1890 <span className="text-white/60">· 071 478 1810</span></span>
+      </a>
+      <a href="mailto:admin@dithetoaccountants.co.za" className="flex shrink-0 items-center gap-2 whitespace-nowrap text-white/70 transition-colors hover:text-white">
+        <Mail className="h-3 w-3 shrink-0 text-accent" /> admin@dithetoaccountants.co.za
+      </a>
+      <div className="flex shrink-0 items-center gap-2 whitespace-nowrap text-white/70">
+        <Clock3 className="h-3 w-3 shrink-0 text-accent" />
+        <span>Weekdays 08:00 – 16:30 · Weekends Closed</span>
+      </div>
+    </div>
+  );
+}
+
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
@@ -43,23 +68,10 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-[60] w-full bg-background/95 backdrop-blur-xl">
       <div className="bg-secondary px-4 py-2 text-[10px] text-white sm:py-2.5 sm:text-[11px]">
-        <div className="site-container flex flex-wrap items-center gap-x-4 gap-y-1">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
-            <a href="tel:+27127513200" className="flex shrink-0 items-center gap-2 transition-colors hover:text-accent">
-              <Phone className="h-3 w-3 text-accent" />
-              <span>Pretoria 012 751 3200 <span className="hidden lg:inline text-white/60">· 067 765 7387</span></span>
-            </a>
-            <a href="tel:+27176311890" className="flex shrink-0 items-center gap-2 transition-colors hover:text-accent">
-              <Phone className="h-3 w-3 text-accent" />
-              <span>Secunda 017 631 1890 <span className="hidden lg:inline text-white/60">· 071 478 1810</span></span>
-            </a>
-            <a href="mailto:admin@dithetoaccountants.co.za" className="hidden items-center gap-2 text-white/70 transition-colors hover:text-white md:flex">
-              <Mail className="h-3 w-3 text-accent" /> admin@dithetoaccountants.co.za
-            </a>
-          </div>
-          <div className="flex items-center gap-2 text-white/70 sm:border-l sm:border-white/20 sm:pl-4">
-            <Clock3 className="h-3 w-3 text-accent" />
-            <span>Weekdays 08:00 – 16:30 · Weekends Closed</span>
+        <div className="overflow-hidden" aria-label="Contact information">
+          <div className="contact-marquee-track flex w-max items-center" role="group">
+            <ContactMarqueeGroup />
+            <ContactMarqueeGroup duplicate />
           </div>
         </div>
       </div>

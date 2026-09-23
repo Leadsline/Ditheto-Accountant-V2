@@ -68,18 +68,20 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 
 function App() {
   const [location] = useLocation();
-  const isRecoveryRoute =
+  const hasRecoveryCallback =
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery' &&
     Boolean(new URLSearchParams(window.location.hash.slice(1)).get('access_token'));
   const isAdminRoute =
+    location === '/admin/reset-password' ||
+    location.startsWith('/admin/reset-password/') ||
     location === '/sign-in' ||
     location.startsWith('/sign-in/') ||
     location === '/sign-up' ||
     location.startsWith('/sign-up/') ||
     location === '/admin' ||
     location.startsWith('/admin/') ||
-    isRecoveryRoute;
+    hasRecoveryCallback;
 
   return (
     <QueryClientProvider client={queryClient}>

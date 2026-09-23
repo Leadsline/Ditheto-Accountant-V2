@@ -58,8 +58,10 @@ router.post("/auth/forgot-password", (req: Request, res: Response): void => {
   const forwardedProtocol = req.get("x-forwarded-proto")?.split(",")[0]?.trim();
   const forwardedHost = req.get("x-forwarded-host")?.split(",")[0]?.trim();
   const origin = `${forwardedProtocol ?? req.protocol}://${forwardedHost ?? req.get("host")}`;
-  const configuredRedirectUrl = process.env.SUPABASE_PASSWORD_RESET_REDIRECT_URL?.replace(/\/+$/, "");
-  const redirectTo = configuredRedirectUrl || `${origin}/sign-in`;
+  const defaultRedirectUrl = process.env.NODE_ENV === "production"
+    ? "https://ditheto-accountant-pi.vercel.app/admin/reset-password"
+    : "http://localhost:3000/admin/reset-password";
+  const redirectTo = process.env.SUPABASE_PASSWORD_RESET_REDIRECT_URL?.trim() || defaultRedirectUrl;
   void sendPasswordReset(email, redirectTo)
     .then(() => {
       res.json({ message: "If that email is registered, a password reset link has been sent." });

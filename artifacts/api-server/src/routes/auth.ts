@@ -58,7 +58,9 @@ router.post("/auth/forgot-password", (req: Request, res: Response): void => {
   const forwardedProtocol = req.get("x-forwarded-proto")?.split(",")[0]?.trim();
   const forwardedHost = req.get("x-forwarded-host")?.split(",")[0]?.trim();
   const origin = `${forwardedProtocol ?? req.protocol}://${forwardedHost ?? req.get("host")}`;
-  void sendPasswordReset(email, `${origin}/sign-in`)
+  const configuredRedirectUrl = process.env.SUPABASE_PASSWORD_RESET_REDIRECT_URL?.replace(/\/+$/, "");
+  const redirectTo = configuredRedirectUrl || `${origin}/sign-in`;
+  void sendPasswordReset(email, redirectTo)
     .then(() => {
       res.json({ message: "If that email is registered, a password reset link has been sent." });
     })

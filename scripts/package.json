@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "create-super-admin": "tsx ./src/create-super-admin.ts",
     "hello": "tsx ./src/hello.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

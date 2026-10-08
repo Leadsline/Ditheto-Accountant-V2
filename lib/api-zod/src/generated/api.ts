@@ -45,6 +45,8 @@ export const createContactSubmissionBodyCompanyRegistrationNumberMax = 80;
 
 export const createContactSubmissionBodyVatNumberMax = 80;
 
+export const createContactSubmissionBodyServiceRequestMax = 160;
+
 export const createContactSubmissionBodyMessageMax = 3000;
 
 
@@ -57,7 +59,7 @@ export const CreateContactSubmissionBody = zod.object({
   "companyName": zod.string().max(createContactSubmissionBodyCompanyNameMax).nullish(),
   "companyRegistrationNumber": zod.string().max(createContactSubmissionBodyCompanyRegistrationNumberMax).nullish(),
   "vatNumber": zod.string().max(createContactSubmissionBodyVatNumberMax).nullish(),
-  "serviceRequest": zod.enum(['Tax Services', 'Payroll Services', 'Registration & Consulting', 'Accounting & Bookkeeping', 'Other / Multiple services']),
+  "serviceRequest": zod.string().min(1).max(createContactSubmissionBodyServiceRequestMax).describe('The individual service selected from the current service catalogue.'),
   "message": zod.string().max(createContactSubmissionBodyMessageMax).nullish()
 })
 
@@ -70,7 +72,7 @@ export const CreateContactSubmissionResponse = zod.object({
   "companyName": zod.string().nullable(),
   "companyRegistrationNumber": zod.string().nullable(),
   "vatNumber": zod.string().nullable(),
-  "serviceRequest": zod.enum(['Tax Services', 'Payroll Services', 'Registration & Consulting', 'Accounting & Bookkeeping', 'Other / Multiple services']),
+  "serviceRequest": zod.string().describe('The service name selected when the enquiry was submitted, including historical service labels.'),
   "message": zod.string().nullable(),
   "createdAt": zod.coerce.date()
 })

@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.2.0
  */
 import type { ContactSubmissionClientType } from './contactSubmissionClientType';
-import type { ContactSubmissionServiceRequest } from './contactSubmissionServiceRequest';
 
 export interface ContactSubmission {
   id: number;
@@ -20,7 +19,8 @@ export interface ContactSubmission {
   companyRegistrationNumber: string | null;
   /** @nullable */
   vatNumber: string | null;
-  serviceRequest: ContactSubmissionServiceRequest;
+  /** The service name selected when the enquiry was submitted, including historical service labels. */
+  serviceRequest: string;
   /** @nullable */
   message: string | null;
   createdAt: Date;

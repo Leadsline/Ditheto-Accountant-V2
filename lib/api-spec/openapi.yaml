@@ -453,7 +453,7 @@ components:
         vatNumber: { type: [string, "null"] }
         serviceRequest:
           type: string
-          enum: [Tax Services, Payroll Services, Registration & Consulting, Accounting & Bookkeeping, Other / Multiple services]
+          description: The service name selected when the enquiry was submitted, including historical service labels.
         message: { type: [string, "null"] }
         createdAt: { type: string, format: date-time }
     ContactSubmissionInput:
@@ -469,7 +469,9 @@ components:
         vatNumber: { type: [string, "null"], maxLength: 80 }
         serviceRequest:
           type: string
-          enum: [Tax Services, Payroll Services, Registration & Consulting, Accounting & Bookkeeping, Other / Multiple services]
+          description: The individual service selected from the current service catalogue.
+          minLength: 1
+          maxLength: 160
         message: { type: [string, "null"], maxLength: 3000 }
     TeamMemberInput:
       type: object

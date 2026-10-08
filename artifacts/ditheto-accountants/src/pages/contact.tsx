@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { serviceCategories } from "@/pages/services";
 
 const branches = [
   {
@@ -33,21 +34,9 @@ const branches = [
   },
 ] as const;
 
-const serviceOptions = [
-  "Tax Services",
-  "Payroll Services",
-  "Registration & Consulting",
-  "Accounting & Bookkeeping",
-  "Other / Multiple services",
-] as const;
-
-const serviceLabels: Record<(typeof serviceOptions)[number], string> = {
-  "Tax Services": "Tax Services",
-  "Payroll Services": "Payroll Services",
-  "Registration & Consulting": "Business Consulting",
-  "Accounting & Bookkeeping": "Accounting & Bookkeeping",
-  "Other / Multiple services": "Other / Multiple services",
-};
+const serviceOptions = serviceCategories.flatMap((category) =>
+  category.items.map((service) => service.name)
+);
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required."),
@@ -57,7 +46,8 @@ const contactSchema = z.object({
   companyName: z.string().trim().optional(),
   companyRegistrationNumber: z.string().trim().optional(),
   vatNumber: z.string().trim().optional(),
-  serviceRequest: z.enum(serviceOptions, { required_error: "Select a service." }),
+  serviceRequest: z.string({ required_error: "Select a service." })
+    .refine((service) => serviceOptions.includes(service), "Select a service from the list."),
   message: z.string().trim().max(3000, "Message must be 3,000 characters or fewer.").optional(),
 }).superRefine((value, context) => {
   if (value.clientType === "business" && !value.companyName) {
@@ -183,7 +173,29 @@ export default function Contact() {
                   <fieldset className="space-y-5 border-t border-secondary/10 pt-8">
                     <legend className="flex items-center gap-3 pr-4 font-heading text-lg font-bold text-secondary"><Mail className="h-5 w-5 text-primary" /> Service Request</legend>
                     <FormField control={form.control} name="serviceRequest" render={({ field }) => (
-                      <FormItem><FormLabel>Service *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Select a service" /></SelectTrigger></FormControl><SelectContent>{serviceOptions.map((service) => <SelectItem key={service} value={service}>{serviceLabels[service]}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
+                      <FormItem>
+                        <FormLabel>Service *</FormLabel>
+                        <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-contact-service">
+                              <SelectValue placeholder="Select a service" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="max-h-80">
+                            {serviceCategories.map((category) => (
+                              <SelectGroup key={category.id}>
+                                <SelectLabel className="text-primary">{category.title}</SelectLabel>
+                                {category.items.map((service, index) => (
+                                  <SelectItem key={service.name} value={service.name} data-testid={`contact-service-${category.id}-${index}`}>
+                                    {service.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
                     )} />
                     <FormField control={form.control} name="message" render={({ field }) => (
                       <FormItem><FormLabel>Message</FormLabel><FormControl><Textarea rows={6} placeholder="Add any details or questions that will help us understand your request." {...field} /></FormControl><FormMessage /></FormItem>

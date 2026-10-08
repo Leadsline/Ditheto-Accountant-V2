@@ -21,8 +21,6 @@ export * from './contactSubmission';
 export * from './contactSubmissionClientType';
 export * from './contactSubmissionInput';
 export * from './contactSubmissionInputClientType';
-export * from './contactSubmissionInputServiceRequest';
-export * from './contactSubmissionServiceRequest';
 export * from './documentCategory';
 export * from './documentRequest';
 export * from './documentRequestChannel';

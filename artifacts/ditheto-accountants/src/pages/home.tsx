@@ -116,7 +116,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 lg:self-center">
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .8, delay: .15, ease: [0.22, 1, .36, 1] }} className="min-w-0 -ml-2 w-[calc(100%+1rem)] lg:ml-0 lg:w-[calc(100%+2rem)] lg:self-center">
               <HeroCarousel />
             </motion.div>
           </div>

@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.2.0
  */
 import type { ContactSubmissionInputClientType } from './contactSubmissionInputClientType';
-import type { ContactSubmissionInputServiceRequest } from './contactSubmissionInputServiceRequest';
 
 export interface ContactSubmissionInput {
   /**
@@ -37,7 +36,12 @@ export interface ContactSubmissionInput {
      * @nullable
      */
   vatNumber?: string | null;
-  serviceRequest: ContactSubmissionInputServiceRequest;
+  /**
+     * The individual service selected from the current service catalogue.
+     * @minLength 1
+     * @maxLength 160
+     */
+  serviceRequest: string;
   /**
      * @maxLength 3000
      * @nullable

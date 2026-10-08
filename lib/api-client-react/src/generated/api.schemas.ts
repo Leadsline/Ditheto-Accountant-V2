@@ -54,17 +54,6 @@ export const ContactSubmissionClientType = {
   business: 'business',
 } as const;
 
-export type ContactSubmissionServiceRequest = typeof ContactSubmissionServiceRequest[keyof typeof ContactSubmissionServiceRequest];
-
-
-export const ContactSubmissionServiceRequest = {
-  Tax_Services: 'Tax Services',
-  Payroll_Services: 'Payroll Services',
-  'Registration_&_Consulting': 'Registration & Consulting',
-  'Accounting_&_Bookkeeping': 'Accounting & Bookkeeping',
-  'Other_/_Multiple_services': 'Other / Multiple services',
-} as const;
-
 export interface ContactSubmission {
   id: number;
   fullName: string;
@@ -77,7 +66,8 @@ export interface ContactSubmission {
   companyRegistrationNumber: string | null;
   /** @nullable */
   vatNumber: string | null;
-  serviceRequest: ContactSubmissionServiceRequest;
+  /** The service name selected when the enquiry was submitted, including historical service labels. */
+  serviceRequest: string;
   /** @nullable */
   message: string | null;
   createdAt: string;
@@ -89,17 +79,6 @@ export type ContactSubmissionInputClientType = typeof ContactSubmissionInputClie
 export const ContactSubmissionInputClientType = {
   individual: 'individual',
   business: 'business',
-} as const;
-
-export type ContactSubmissionInputServiceRequest = typeof ContactSubmissionInputServiceRequest[keyof typeof ContactSubmissionInputServiceRequest];
-
-
-export const ContactSubmissionInputServiceRequest = {
-  Tax_Services: 'Tax Services',
-  Payroll_Services: 'Payroll Services',
-  'Registration_&_Consulting': 'Registration & Consulting',
-  'Accounting_&_Bookkeeping': 'Accounting & Bookkeeping',
-  'Other_/_Multiple_services': 'Other / Multiple services',
 } as const;
 
 export interface ContactSubmissionInput {
@@ -131,7 +110,12 @@ export interface ContactSubmissionInput {
      * @nullable
      */
   vatNumber?: string | null;
-  serviceRequest: ContactSubmissionInputServiceRequest;
+  /**
+     * The individual service selected from the current service catalogue.
+     * @minLength 1
+     * @maxLength 160
+     */
+  serviceRequest: string;
   /**
      * @maxLength 3000
      * @nullable

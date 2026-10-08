@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
+
+:root {
+  --background: 42 34% 96%;
+  --foreground: 210 48% 17%;
+  --card: 42 40% 98%;
+  --card-foreground: 210 48% 17%;
+  --popover: 42 40% 98%;
+  --popover-foreground: 210 48% 17%;
+  --primary: 174 63% 35%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 55% 16%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 39 28% 91%;
+  --muted-foreground: 210 17% 42%;
+  --accent: 42 91% 57%;
+  --accent-foreground: 210 55% 16%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 39 24% 84%;
+  --input: 39 24% 79%;
+  --ring: 174 63% 35%;
+  --sidebar: 210 55% 12%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 210 42% 22%;
+  --sidebar-primary: 174 63% 35%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 42% 22%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 180 100% 30%;
+  --app-font-sans: "DM Sans", sans-serif;
+  --app-font-heading: "Plus Jakarta Sans", sans-serif;
+  --app-font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans: "DM Sans", sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --radius: 0.65rem;
+}
+
+.dark {
+  --background: 210 55% 10%;
+  --foreground: 0 0% 100%;
+  --card: 210 48% 14%;
+  --card-foreground: 0 0% 100%;
+  --popover: 210 60% 15%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 174 63% 42%;
+  --primary-foreground: 210 55% 10%;
+  --secondary: 210 48% 20%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 210 42% 20%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 45 93% 50%;
+  --accent-foreground: 210 73% 14%;
+  --border: 210 60% 25%;
+  --input: 210 60% 25%;
+  --ring: 174 63% 42%;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .site-container {
+    @apply mx-auto w-full max-w-[1240px] px-5 sm:px-8 lg:px-10;
+  }
+
+  .serif-display {
+    font-family: var(--app-font-serif);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+  }
+
+  .noise::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    mix-blend-mode: soft-light;
+  }
+}

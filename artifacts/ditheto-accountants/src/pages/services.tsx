@@ -72,6 +72,7 @@ export const serviceCategories = [
     items: [
       { name: "CIDB Grades 1–9", desc: "We assist with applications for the appropriate CIDB grade, from Grade 1 to Grade 9, based on your works capability and supporting documents.", benefits: ["Grade 1 to Grade 9 guidance", "Correct grading application", "Tender readiness"] },
       { name: "CIDB Renewals (3-year renewals)", desc: "Preparation and submission of the CIDB renewal required every three years.", benefits: ["Maintain active registration", "Avoid tender interruptions", "Three-year renewal support"] },
+      { name: "CIDB Grade Upgrades", desc: "Support to apply for an upgrade to a higher CIDB contractor grading designation, based on your project history and financial capability.", benefits: ["Assess upgrade eligibility", "Prepare project and financial evidence", "Pursue access to larger tenders"] },
     ]
   },
   {
@@ -82,6 +83,7 @@ export const serviceCategories = [
     items: [
       { name: "Company Types & Registration", desc: "We assist with Private Company (Pty) Ltd, Public Company (Ltd), Personal Liability Company (Inc), Non-Profit Company (NPC/NPO), State-Owned Company (SOC), External Company, and Co-operative registrations through CIPC.", benefits: ["Choose the right entity", "Correct company setup", "Professional submission support"] },
       { name: "Company Amendments", desc: "Assistance with CIPC changes to company details, directors, addresses, and other registered information.", benefits: ["Accurate company records", "CIPC compliance", "Efficient amendments"] },
+      { name: "Company Reinstatement", desc: "Assistance with restoring a deregistered company to active CIPC status, including the required applications and supporting documents.", benefits: ["Restore company status", "Guidance on outstanding compliance requirements", "Prepared CIPC submission"] },
       { name: "Annual Returns (AR)", desc: "Preparation and submission of annual returns to keep the company in business and compliant with CIPC.", benefits: ["Avoid deregistration", "Maintain good standing", "On-time filing"] },
       { name: "Beneficial Ownership (BO)", desc: "Beneficial ownership declaration preparation and filing in line with current CIPC requirements.", benefits: ["Ownership transparency", "Regulatory compliance", "Accurate declarations"] },
     ]

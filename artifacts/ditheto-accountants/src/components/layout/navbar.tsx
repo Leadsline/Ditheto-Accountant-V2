@@ -78,10 +78,12 @@ export function Navbar() {
 
       <div className="w-full border-b border-secondary/10 bg-background/95 shadow-[0_8px_30px_-24px_hsl(var(--secondary))]">
         <div className="site-container">
-        <div className="flex h-[84px] items-center justify-between">
+        <div className="flex h-[92px] items-center justify-between sm:h-[100px]">
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="flex items-center gap-2">
-               <img src={logo} alt="Ditheto Accountants" className="h-14 w-auto mix-blend-multiply sm:h-16" />
+            <Link href="/" className="flex items-center">
+               <span className="inline-flex rounded-md bg-[hsl(174_42%_88%)] px-2.5 py-1.5 sm:px-3 sm:py-2">
+                 <img src={logo} alt="Ditheto Accountants" className="h-[2.85rem] w-auto mix-blend-multiply sm:h-[4.5rem]" />
+               </span>
             </Link>
           </div>
             <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
@@ -138,7 +140,7 @@ export function Navbar() {
              </div>
           </nav>
           
-            <div className="flex items-center gap-1 md:hidden">
+             <div className="hidden items-center gap-1 min-[380px]:flex md:hidden">
               {socialLinks.map(({ href, label, icon: Icon }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="flex h-8 w-8 items-center justify-center rounded-full text-secondary/65 transition-colors hover:bg-primary/10 hover:text-primary">
                   <Icon className="h-3.5 w-3.5" />

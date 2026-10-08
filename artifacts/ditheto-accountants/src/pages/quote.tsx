@@ -35,10 +35,10 @@ const serviceCatalogue = {
     "Monthly Bookkeeping", "Management Accounts", "Bank Reconciliations", "Mentoring"
   ],
   "CIDB": [
-    "CIDB Grades 1–9", "CIDB Renewals (3-year renewals)"
+    "CIDB Grades 1–9", "CIDB Renewals (3-year renewals)", "CIDB Grade Upgrades"
   ],
   "Company Registration": [
-    "Company Types & Registration", "Company Amendments", "Annual Returns (AR)", "Beneficial Ownership (BO)"
+    "Company Types & Registration", "Company Amendments", "Company Reinstatement", "Annual Returns (AR)", "Beneficial Ownership (BO)"
   ],
   "CSD": [
     "CSD", "CSD Amendments"

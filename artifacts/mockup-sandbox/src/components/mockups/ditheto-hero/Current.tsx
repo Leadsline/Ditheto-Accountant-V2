@@ -9,7 +9,7 @@ const heroImages = [
   "/__mockup/images/ditheto-hero-three.jpg",
 ];
 
-function HeroCarousel() {
+function HeroCarousel({ updated = false }: { updated?: boolean }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -31,7 +31,7 @@ function HeroCarousel() {
 
   return (
     <div
-      className="group relative aspect-[79/53] w-full overflow-hidden rounded-[1.75rem] bg-secondary shadow-[0_35px_110px_-48px_rgba(46,188,179,.55),0_30px_80px_-46px_rgba(0,0,0,.9)]"
+      className={`group relative aspect-[79/53] w-full overflow-hidden bg-secondary ${updated ? "rounded-[1.25rem] shadow-[0_35px_110px_-48px_rgba(46,188,179,.4),0_30px_80px_-46px_rgba(0,0,0,.9)]" : "rounded-[1.75rem] shadow-[0_35px_110px_-48px_rgba(46,188,179,.55),0_30px_80px_-46px_rgba(0,0,0,.9)]"}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -72,22 +72,24 @@ function HeroCarousel() {
   );
 }
 
-export function Current() {
+export function Current({ updated = false }: { updated?: boolean }) {
   return (
     <main className="noise relative min-h-screen overflow-hidden bg-secondary text-white">
       <div className="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full border border-primary/20 bg-primary/10 blur-3xl" />
       <div className="site-container relative z-10">
-        <div className="grid min-h-[700px] items-start gap-10 py-16 lg:items-stretch lg:grid-cols-[.78fr_1.22fr] lg:grid-rows-[auto_auto] lg:py-24">
-          <p className="mb-0 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent lg:col-start-1 lg:row-start-1">
-            <span className="h-px w-9 bg-accent" /> Built for the filing season
-          </p>
+        <div className={updated ? "grid items-start gap-9 py-12 sm:gap-12 sm:py-16 lg:min-h-[590px] lg:grid-cols-[.88fr_1.12fr] lg:items-center lg:gap-10 lg:py-16" : "grid min-h-[700px] items-start gap-10 py-16 lg:items-stretch lg:grid-cols-[.78fr_1.22fr] lg:grid-rows-[auto_auto] lg:py-24"}>
+          {!updated && (
+            <p className="mb-0 flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-accent lg:col-start-1 lg:row-start-1">
+              <span className="h-px w-9 bg-accent" /> Built for the filing season
+            </p>
+          )}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-3xl lg:col-start-1 lg:row-start-2"
+            className={updated ? "max-w-3xl lg:self-center" : "max-w-3xl lg:col-start-1 lg:row-start-2"}
           >
-            <h1 className="serif-display text-balance text-5xl leading-[.98] sm:text-6xl lg:text-[5.6rem]">
+            <h1 className={updated ? "serif-display text-balance text-5xl leading-[.98] sm:text-6xl lg:text-[4.8rem] xl:text-[5.2rem]" : "serif-display text-balance text-5xl leading-[.98] sm:text-6xl lg:text-[5.6rem]"}>
               Accounting and tax you <em className="text-accent">never</em> have to chase.
             </h1>
             <p className="mt-8 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">
@@ -106,9 +108,9 @@ export function Current() {
             initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="min-w-0 lg:col-start-2 lg:row-start-2 lg:self-center"
+            className={updated ? "min-w-0 lg:self-center" : "min-w-0 lg:col-start-2 lg:row-start-2 lg:self-center"}
           >
-            <HeroCarousel />
+            <HeroCarousel updated={updated} />
           </motion.div>
         </div>
       </div>

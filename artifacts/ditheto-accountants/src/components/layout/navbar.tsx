@@ -82,11 +82,11 @@ export function Navbar() {
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center">
                <span className="inline-flex rounded-md bg-[hsl(174_42%_88%)] px-2.5 py-1.5 sm:px-3 sm:py-2">
-                 <img src={logo} alt="Ditheto Accountants" className="h-[2.85rem] w-auto mix-blend-multiply sm:h-[4.5rem]" />
+                  <img src={logo} alt="Ditheto Accountants" className="h-14 w-auto mix-blend-multiply sm:h-20" />
                </span>
             </Link>
           </div>
-            <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
+            <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
             {links.map((link) => {
               const active = link.href === "/" ? location === "/" : location.startsWith(link.href);
               if (link.href === "/services") {
@@ -140,9 +140,9 @@ export function Navbar() {
              </div>
           </nav>
           
-             <div className="hidden items-center gap-1 min-[380px]:flex md:hidden">
+             <div className="flex items-center gap-1 lg:hidden">
               {socialLinks.map(({ href, label, icon: Icon }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="flex h-8 w-8 items-center justify-center rounded-full text-secondary/65 transition-colors hover:bg-primary/10 hover:text-primary">
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="hidden h-8 w-8 items-center justify-center rounded-full text-secondary/65 transition-colors hover:bg-primary/10 hover:text-primary min-[420px]:flex">
                   <Icon className="h-3.5 w-3.5" />
                 </a>
               ))}
@@ -151,7 +151,7 @@ export function Navbar() {
             </button>
           </div>
         </div>
-          {menuOpen && <nav className="border-t border-secondary/10 py-3 md:hidden" aria-label="Mobile navigation">
+          {menuOpen && <nav className="border-t border-secondary/10 py-3 lg:hidden" aria-label="Mobile navigation">
             {links.map((link) => {
               const active = link.href === "/" ? location === "/" : location.startsWith(link.href);
               if (link.href === "/services") {

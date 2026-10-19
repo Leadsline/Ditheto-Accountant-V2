@@ -1,6 +1,6 @@
 # Partner logo assets
 
-The five PNG files in this folder are the official logo assets used by the homepage marquee. Replace an individual file only when an approved updated logo is available.
+The five PNG files in this folder are the approved logo assets used by the homepage marquee. UIF, CSD, COIDA, and CIDB currently use matching text wordmarks; replace them with official logo files only when approved assets are available.
 
 Keep these filenames so the homepage needs no code changes:
 

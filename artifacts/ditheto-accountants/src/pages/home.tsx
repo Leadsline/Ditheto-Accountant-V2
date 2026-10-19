@@ -84,10 +84,14 @@ const proofPoints = [
 ];
 
 const professionalBodies = [
-  { name: "SARS", src: `${import.meta.env.BASE_URL}partners/sars.png` },
+  { name: "UIF", wordmark: "UIF" },
   { name: "CIPC", src: `${import.meta.env.BASE_URL}partners/cipc.png` },
-  { name: "SAIT", src: `${import.meta.env.BASE_URL}partners/sait.png` },
+  { name: "CSD", wordmark: "CSD" },
   { name: "SAIPA", src: `${import.meta.env.BASE_URL}partners/saipa.png` },
+  { name: "COIDA", wordmark: "COIDA" },
+  { name: "CIDB", wordmark: "cidb" },
+  { name: "SARS", src: `${import.meta.env.BASE_URL}partners/sars.png` },
+  { name: "SAIT", src: `${import.meta.env.BASE_URL}partners/sait.png` },
   { name: "SAICA", src: `${import.meta.env.BASE_URL}partners/saica.png` },
 ];
 
@@ -204,11 +208,17 @@ export default function Home() {
                   aria-hidden={index >= professionalBodies.length}
                   className="inline-flex h-20 min-w-[13rem] items-center justify-center rounded-lg border border-white/20 bg-white px-6 py-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,.7)]"
                 >
-                  <img
-                    src={body.src}
-                    alt={index >= professionalBodies.length ? "" : body.name}
-                    className="h-12 w-auto max-w-[12rem] object-contain"
-                  />
+                  {body.src ? (
+                    <img
+                      src={body.src}
+                      alt={index >= professionalBodies.length ? "" : body.name}
+                      className="h-12 w-auto max-w-[12rem] object-contain"
+                    />
+                  ) : (
+                    <span className={`font-heading text-2xl font-bold tracking-[.12em] text-secondary ${body.name === "CIDB" ? "lowercase" : ""}`}>
+                      {body.wordmark}
+                    </span>
+                  )}
                 </span>
               ))}
             </div>
